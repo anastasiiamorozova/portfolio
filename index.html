@@ -8,21 +8,40 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css"
     />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma-social@2/css/all.min.css"
+    />
+    <script
+      defer
+      src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"
+    ></script>
 
     <style>
-        .content figure {
-            margin-left: 0;
-            margin-right: 0;
-        }
-        a {
-            color: #456864
-        }
+      .content figure {
+        margin-left: 0;
+        margin-right: 0;
+      }
+      a {
+        color: #2e333d;
+      }
 
-        .hero a {
-                color: black !important;
-                background: wheat;
-                padding: 2px 5px;
-        }
+      .hero.is-primary {
+        background-color: #e7e2da;
+      }
+
+      body {
+        font-family: "Roboto";
+        font-size: 22px;
+        background-color: #e7e2da;
+      }
+      .card-content {
+        background-color: #e7e2da;
+      }
     </style>
 
     <title>Anastasiia Morozova's Portfolio</title>
@@ -30,154 +49,272 @@
 
   <body>
     <section class="hero is-primary">
-        <div class="container">
-
+      <div class="container">
         <div class="hero-body">
-            <h1 class="title is-1">Hi, I'm A.</h1>
-            <p class="subtitle is-4">
-              Hello, I'm Anastasiia. I'm who I am <a href="mailto:nst.morozova13@gmail.com">nst.morozova13@gmail.com</a>
-              or <a href="https://www.linkedin.com/in/nst-morozova/">nst-morozova on LinkedIn</a
-              >.
-            </p>
+          <h1 class="title is-1">Anastasiia Morozova</h1>
+          <p class="subtitle is-4">Data and investigative journalist</p>
+
+          <p>
+            <a>nst.morozova13@gmail.com</a>
+          </p>
+
+          <!-- Icon Buttons -->
+          <a
+            class="button is-medium is-facebook"
+            href="https://www.facebook.com/anastasiia.morozova.3150/"
+          >
+            <span class="icon">
+              <i class="fab fa-facebook fa-lg"></i>
+            </span>
+          </a>
+
+          <a class="button is-medium is-github" href="https://github.com/anastasiiamorozova">
+            <span class="icon">
+              <i class="fab fa-github fa-lg"></i>
+            </span>
+          </a>
+
+          <a class="button is-medium is-linkedin" href="https://www.linkedin.com/in/nst-morozova/">
+            <span class="icon">
+              <i class="fab fa-linkedin fa-lg"></i>
+            </span>
+          </a>
         </div>
-        </div>
-      </section>
+      </div>
+    </section>
     <div class="container">
-        
+      <section class="section">
+        <div class="columns is-multiline content">
+          <!first box with card-->
+          <div class="column is-one-third">
+            <div class="card">
+              <div class="card-image">
+                <figure class="image is-5by3">
+                  <img src="redcross2.jpeg" alt="Placeholder image" />
+                </figure>
+              </div>
+              <div class="card-content">
+                <div class="media">
+                  <div class="media-content">
+                    <p class="title is-4">
+                      KREMLIN LEAKS: how Putin turned the Red Cross into a tool
+                      of propaganda and war
+                    </p>
+                  </div>
+                </div>
 
-          <section class="section">
-    
-    <div class="columns is-multiline content">
+                <div class="content">
+                  <div class="tags">
+                    <span class="tag is-link">INVESTIGATION</span>
+                    <span class="tag is-dark">OSINT</span>
+                  </div>
+                  <p class="subtitle is-6">
+                    Russian Red Cross, which is supposed to remain neutral and
+                    independent, is a part of Russia’s propaganda machine. The
+                    Kremlin plots to expand the influence of the RRC throughout
+                    the world, hiding behind the International Red Cross.
+                  </p>
+                  <button class="button">
+                    <a
+                      href="https://vsquare.org/kremlin-leaks-putin-red-cross-propaganda-war/"
+                    >
+                      Read in English</a
+                    >
+                  </button>
+                  <button class="button">
+                    <a
+                      href="https://frontstory.pl/kremlin-leaks-putin-rosja-czerwony-krzyz-wojna-propaganda-ukraina/"
+                      >Read in Polish</a
+                    >
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <!first box with card--> 
-        <div class="column is-one-quarter">
+          <!second box-->
+
+          <div class="column is-one-third">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
                   <img
-                    src="https://bulma.io/assets/images/placeholders/1280x960.png"
+                    src="andromeda-jacht-nord-stream-1024x572.jpg"
                     alt="Placeholder image"
                   />
                 </figure>
               </div>
               <div class="card-content">
                 <div class="media">
-    
+                  <div class="media-content">
+                    <p class="title is-4">ANDROMEDA: Ukrainian puzzle</p>
+                  </div>
+                </div>
+                <div class="tags">
+                  <span class="tag is-link">INVESTIGATION</span>
+                  <span class="tag is-dark">OSINT</span>
+                  <span class="tag is-dark">ON-GROUND</span>
+                  <span class="tag is-dark">SAT IMAGE ANALYSIS</span>
+                  <div class="content">
+                    <p class="subtitle is-6">
+                      By analyzing satellite images and AIS signals, we
+                      reconstructed the possible route of the yacht Andromeda,
+                      suspected in the Nord Stream pipeline explosions. Through
+                      in-depth OSINT and on-ground investigation, we uncovered a
+                      network of connections leading to a Kyiv businessman whose
+                      company rented the yacht.
+                    </p>
+                    <button class="button">
+                      <a
+                        href="https://frontstory.pl/andromeda-rurociag-nord-stream-wybuch-ukraina-trasa-rosja-niemcy/"
+                        >Read in Polish</a
+                      >
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!third box-->
+
+          <div class="column is-one-third">
+            <div class="card">
+              <div class="card-image">
+                <figure class="image is-5by3">
+                  <img src="LANDSCAPE_1280.jpeg" alt="Placeholder image" />
+                </figure>
+              </div>
+              <div class="card-content">
+                <div class="media">
+                  <div class="media-content">
+                    <p class="title is-4">The map of toxic Poland</p>
+                  </div>
+                </div>
+                <div class="tags">
+                  <span class="tag is-danger">DATA</span>
+                  <span class="tag is-link">INVESTIGATION</span>
+                  <span class="tag is-dark">ON-GROUND</span>
+                  <span class="tag is-dark">SCROLLYTELLING</span>
+                  <span class="tag is-dark">AI</span>
+
+                  <div class="content">
+                    <p class="subtitle is-6">
+                      Waste mafias profit from abandoned waste, while in May
+                      2024 alone, there were three major fires at illegal dumps.
+                      We automated 3,000 FOIA requests, used LLM to extract
+                      locations from replies in PDF, and verified them
+                      on-ground, discovering nearly 200 hazardous waster dumps
+                      across country.
+                    </p>
+                    <button class="button">
+                      <a
+                        href="https://frontstory.pl/andromeda-rurociag-nord-stream-wybuch-ukraina-trasa-rosja-niemcy/"
+                        >Read in Polish</a
+                      >
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!fourth box-->
+
+          <div class="column is-one-third">
+            <div class="card">
+              <div class="card-image">
+                <figure class="image is-5by3">
+                  <img
+                    src="sigint story main art, credit Mart Nigola _ Delfi Estonia.jpg"
+                    alt="Placeholder image"
+                  />
+                </figure>
+              </div>
+              <div class="card-content">
+                <div class="media">
                   <div class="media-content">
                     <p class="title is-4">
-                            <a
-                              href="https://frontstory.pl/dubaj-emiraty-piotr-obarzanek-list-gonczy-dubai-unlocked/?fbclid=IwZXh0bgNhZW0CMTAAAR0pq0supHzYUhJMl9zL-kimoVydHhHT-pOm2yVeGy-Sul8oP7aFjvCXa4Y_aem_AdXot537ncOYdmjJDftglNr7WQZDR0AdIKfBDTu_1MvCS0oaYxPIqSsmm5MGWA6FwlGvq_FTUbqlZ2xSQPQwkZx1"
-                              >A story one</a
-                            >
+                      Russian diplomatic facilities serve as SIGINT nests in
+                      Europe
                     </p>
                   </div>
                 </div>
-    
+
                 <div class="content">
-                  <p>A little blurb about this story</p>
                   <div class="tags">
-                    <span class="tag is-success">Python/pandas</span>
-                    <span class="tag is-warning">D3</span>
-                    <span class="tag is-link">Scrollama</span>
+                    <span class="tag is-link">INVESTIGATION</span>
+                    <span class="tag is-danger">DATA</span>
+                    <span class="tag is-dark">OSINT</span>
+                  </div>
+                  <p class="subtitle is-6">
+                    Specialized equipment for signals intelligence (SIGINT) has
+                    been mounted on the roof of the Russian diplomats’ building
+                    in Warsaw.From Warsaw to Budapest, Stockholm, or Brussels –
+                    we found similar equipment on the rooftops of Russian
+                    facilities across Europe.
+                  </p>
+                  <button class="button">
+                    <a
+                      href="https://vsquare.org/russian-diplomatic-facilities-serve-as-sigint-nests-in-europe/"
+                    >
+                      Read in English</a
+                    >
+                  </button>
+                  <button class="button">
+                    <a
+                      href="https://frontstory.pl/tu-slucha-moskwa-ujawniamy-gniazdo-rosyjskich-sluzb/"
+                      >Read in Polish</a
+                    >
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!fifth box-->
+
+          <div class="column is-one-third">
+            <div class="card">
+              <div class="card-image">
+                <figure class="image is-5by3">
+                  <img src="LANDSCAPE_1280.jpeg" alt="Placeholder image" />
+                </figure>
+              </div>
+              <div class="card-content">
+                <div class="media">
+                  <div class="media-content">
+                    <p class="title is-4">FIREHOSE OF FALSEHOOD</p>
+                  </div>
+                </div>
+                <div class="tags">
+                  <span class="tag is-danger">DATA</span>
+                  <span class="tag is-link">INVESTIGATION</span>
+                  <span class="tag is-dark">ON-GROUND</span>
+                  <span class="tag is-dark">SCROLLYTELLING</span>
+                  <span class="tag is-dark">AI</span>
+
+                  <div class="content">
+                    <p class="subtitle is-6">
+                      Waste mafias profit from abandoned waste, while in May
+                      2024 alone, there were three major fires at illegal dumps.
+                      We automated 3,000 FOIA requests, used LLM to extract
+                      locations from replies in PDF, and verified them
+                      on-ground, discovering nearly 200 hazardous waster dumps
+                      across country.
+                    </p>
+                    <button class="button">
+                      <a
+                        href="https://frontstory.pl/andromeda-rurociag-nord-stream-wybuch-ukraina-trasa-rosja-niemcy/"
+                        >Read in Polish</a
+                      >
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-
-      <!second box--> 
-
-      <div class="column is-one-quarter">
-        <div class="card">
-          <div class="card-image">
-            <figure class="image is-5by3">
-              <img
-                src="https://bulma.io/assets/images/placeholders/1280x960.png"
-                alt="Placeholder image"
-              />
-            </figure>
-          </div>
-          <div class="card-content">
-            <div class="media">
-
-              <div class="media-content">
-                <p class="title is-4">
-                  <a
-                    href="https://frontstory.pl/lasy-panstwowe-pieniadze-fundusz-darowizny-kosciol-solidarna-polska/"
-                    >A second second </a
-                  >
-                </p>
-              </div>
-            </div>
-
-            <div class="content">
-              <p>A little blurb about this story</p>
-              <div class="tags">
-                <span class="tag is-success">Python/pandas</span>
-                <span class="tag is-warning">D3</span>
-                <span class="tag is-link">Scrollama</span>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-
-      <!third box--> 
-
-      <div class="column is-one-third">
-        <h3 class="title is-4 ">
-          <a
-            href="https://frontstory.pl/lasy-panstwowe-pieniadze-fundusz-darowizny-kosciol-solidarna-polska/"
-            >A third story of mine</a
-          >
-        </h3>
-        <p>A little blurb about this story. ldfghl;asjg  fdklgjsl f l;sjg ;skd;slgj  ;sj sf</p>
-        <div class="tags">
-          <span class="tag is-success">Python/pandas</span>
-          <span class="tag is-warning">D3</span>
-          <span class="tag is-link">Scrollama</span>
-        </div>
-      </div>
-
-
-      <!fourth box--> 
-
-      <div class="column is-one-third">
-        <h3 class="title is-4">
-          <a
-            href="https://frontstory.pl/lasy-panstwowe-pieniadze-fundusz-darowizny-kosciol-solidarna-polska/"
-            >A second story of mine</a
-          >
-        </h3>
-        <p>A little blurb about this story</p>
-      </div>
-      <div class="column is-one-third">
-        <h3 class="title is-4">
-          <a
-            href="https://frontstory.pl/lasy-panstwowe-pieniadze-fundusz-darowizny-kosciol-solidarna-polska/"
-            >A second story of mine</a
-          >
-        </h3>
-        <p>A little blurb about this story</p>
-        <div class="tags">
-          <span class="tag is-success is-light">Python/pandas</span>
-          <span class="tag is-warning">D3</span>
-          <span class="tag is-link">Scrollama</span>
-        </div>
-      </div>
-      <div class="column is-one-third">
-        <h3 class="title is-4">
-          <a
-            href="https://frontstory.pl/lasy-panstwowe-pieniadze-fundusz-darowizny-kosciol-solidarna-polska/"
-            >A second story of mine</a
-          >
-        </h3>
-        <p>A little blurb about this story</p>
-      </div>
+      </section>
     </div>
-</section>
-</div>
-
   </body>
 </html>

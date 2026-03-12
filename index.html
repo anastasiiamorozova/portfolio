@@ -40,6 +40,9 @@
       .card-content {
         background-color: #e7e2da;
       }
+      .columns.is-multiline {
+        padding: 0 6%;
+      }
     </style>
 
     <title>Portfolio</title>
@@ -52,6 +55,7 @@
           <h1 class="title is-1">Anastasiia Morozova</h1>
           <p class="subtitle is-4">Data and investigative journalist</p>
           <p class="subtitle is-4">
+            Challenge-driven and a natural team player with a strong interest in combining OSINT and data analysis to uncover stories. I get the most satisfaction from taking a unique idea all the way from pitch through brainstorming, reporting, writing, designing, and editing. Co-authored award-winning investigative pieces.<br></br>
             Here are a few examples of my data work. I use <b>Python</b> to explore and extract data, design visualizations in <b>Illustrator</b>, and create maps with <b>Mapbox</b> and <b>QGIS</b>. For interactive projects, I work with <b>JavaScript</b> and <b>Svelte</b>.
           </p>
 
@@ -92,7 +96,7 @@
       <section class="section">
         <div class="columns is-multiline content">
           <!-- GRU Parcel Bombs -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -103,8 +107,7 @@
                 <div class="media">
                   <div class="media-content">
                     <p class="title is-4">
-                      Crossing NATO Lines: Tracing Russia's GRU Explosive Parcel
-                      Bombs
+                      <a href="https://vsquare.org/crossing-nato-lines-tracing-the-arson-sabotage-russia-gru-explosive-parcel-bombs/" target="_blank">Crossing NATO Lines: Tracing Russia's GRU Explosive Parcel Bombs</a>
                     </p>
                   </div>
                 </div>
@@ -115,26 +118,45 @@
                     <span class="tag is-dark">SCROLLYTELLING</span>
                   </div>
                   <p class="subtitle is-6">
-                    An in-depth visual investigation tracing how GRU explosive
-                    parcel bombs traveled across NATO countries. Using OSINT and
-                    open-source data, we reconstructed the route of sabotage
-                    parcels linked to Russian military intelligence operations
-                    targeting Europe.
+                    An interactive scrollytelling piece built with custom JavaScript injected into a CMS that didn't support it. I added a moving-camera effect to guide readers through a dense network of names and connections across several countries. The Lithuanian prosecutor's office went public two days early, so I finished it in twenty minutes instead of two days. Named Innovation of the Year in media by Wirtualne Media in 2026.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/crossing-nato-lines-tracing-the-arson-sabotage-russia-gru-explosive-parcel-bombs/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
+                  <button class="button"><a href="https://anastasiiamorozova.github.io/website/posts/sabotage/" target="_blank">Behind the story</a></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lewica / Pismo -->
+          <div class="column is-half">
+            <div class="card">
+              <div class="card-image">
+                <figure class="image is-5by3">
+                  <img src="radar6.jpg" alt="Polish political parties visualization" />
+                </figure>
+              </div>
+              <div class="card-content">
+                <div class="media">
+                  <div class="media-content">
+                    <p class="title is-4">Three decades of Polish politics, visualized</p>
+                  </div>
+                </div>
+                <div class="content">
+                  <div class="tags">
+                    <span class="tag is-danger">DATA</span>
+                    <span class="tag is-danger">ILLUSTRATOR</span>
+                    <span class="tag is-dark">PRINT</span>
+                  </div>
+                  <p class="subtitle is-6">
+                    A Sankey diagram tracing thirty years of Polish political party history, built from Wikipedia election data scraped into Flourish and exported as SVG, then refined in Illustrator and InDesign for print. The same story also needed a radar diagram of political preferences. My first print commission, and the day I learned InDesign.
+                  </p>
+                  <button class="button"><a href="https://anastasiiamorozova.github.io/website/posts/pismo/" target="_blank">Behind the story</a></button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Telegram_narko -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -148,8 +170,7 @@
                 <div class="media">
                   <div class="media-content">
                     <p class="title is-4">
-                      Faster than Pizza Delivery: Poland's Online Drug Market Is
-                      Out of Control
+                      <a href="https://vsquare.org/faster-than-pizza-delivery-polands-online-drug-market-telegram-parcel-lockers-inpost-blik-police/" target="_blank">Faster than Pizza Delivery: Poland's Online Drug Market Is Out of Control</a>
                     </p>
                   </div>
                 </div>
@@ -160,35 +181,16 @@
                     <span class="tag is-danger">MACHINE LEARNING</span>
                   </div>
                   <p class="subtitle is-6">
-                    For this article, I scraped 500,000 messages from popular
-                    Telegram channels. Using machine learning, I identified
-                    those containing drug advertisements. The analysis revealed
-                    that the most common delivery method was Poland's largest
-                    private postal company. I also identified the most popular
-                    drugs and demonstrated the scale of drug trafficking on
-                    Telegram in Poland.
+                    I scraped 500,000 messages from 1,500 Telegram channels using Telethon and a snowballing method, then built a Doc2Vec classifier trained on 300 manually labeled drug ads to identify advertisements at scale. String matching against a custom drug slang library helped quantify substance frequency, while InPost and BLIK mentions mapped how the market actually works. Presented at Dataharvest 2025 and now being replicated for Germany.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/faster-than-pizza-delivery-polands-online-drug-market-telegram-parcel-lockers-inpost-blik-police/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
-                  <button class="button">
-                    <a
-                      href="https://frontstory.pl/narkotyki-telegram-internet-inpost/"
-                      target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
+                  <button class="button"><a href="https://anastasiiamorozova.github.io/website/posts/drugs/" target="_blank">Behind the story</a></button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Bazy NATO -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -199,7 +201,7 @@
                 <div class="media">
                   <div class="media-content">
                     <p class="title is-4">
-                      Mapping Russia's War Machine on NATO's Doorstep
+                      <a href="https://vsquare.org/russia-military-bases-threat-europe-nato/" target="_blank">Mapping Russia's War Machine on NATO's Doorstep</a>
                     </p>
                   </div>
                 </div>
@@ -210,33 +212,15 @@
                     <span class="tag is-danger">ILLUSTRATOR</span>
                   </div>
                   <p class="subtitle is-6">
-                    Based on high-resolution satellite images, a regional
-                    investigation maps developments in Russia's military bases
-                    bordering Poland and the Baltic countries. While Russian GRU
-                    special forces in Kaliningrad are trained for sabotage
-                    attacks, a new nuclear threat is building up in Belarus.
+                    We used high-resolution satellite imagery to map Russian military base activity along NATO's eastern border. GRU special forces in Kaliningrad are being trained for sabotage operations, and new nuclear weapons infrastructure is taking shape in Belarus.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/russia-military-bases-threat-europe-nato/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
-                  <button class="button">
-                    <a
-                      href="https://frontstory.pl/krolewiec-gniazdo-sabotazu/"
-                      target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Sumy -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -247,7 +231,7 @@
                 <div class="media">
                   <div class="media-content">
                     <p class="title is-4">
-                      How safe you are in Sumy during an air raid alert?
+                      <a href="https://www.instagram.com/p/C9zrP7vu4WU/" target="_blank">How safe you are in Sumy during an air raid alert?</a>
                     </p>
                   </div>
                 </div>
@@ -257,27 +241,15 @@
                     <span class="tag is-danger">ILLUSTRATOR</span>
                   </div>
                   <p class="subtitle is-6">
-                    Using QGIS, Illustrator, and data from local authorities on
-                    bomb shelter locations, I created a series of images
-                    illustrating how well residents in the largest cities of the
-                    Sumy region are protected during air raid alerts. This
-                    project was created with love for Sumy, my home region in
-                    Ukraine, and is dedicated to Kordon.Media.
+                    I used QGIS and official shelter location data from local authorities to map how well protected residents of Sumy region's largest cities actually are during air raid alerts. Visualized in Illustrator and published on Instagram. Made for my home region in Ukraine, dedicated to Kordon.Media.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://www.instagram.com/p/C9zrP7vu4WU/"
-                      target="_blank"
-                      >See on Instagram</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Orlen -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -288,8 +260,7 @@
                 <div class="media">
                   <div class="media-content">
                     <p class="title is-4">
-                      Unpacking CEE's biggest oil company's promises to 'go
-                      green'
+                      <a href="https://vsquare.org/orlen-oil-green-transformation-poland-gas-usa/" target="_blank">Unpacking CEE's biggest oil company's promises to 'go green'</a>
                     </p>
                   </div>
                 </div>
@@ -300,34 +271,15 @@
                     <span class="tag is-danger">DATA</span>
                   </div>
                   <p class="subtitle is-6">
-                    The Polish fuel giant, Orlen, claims to be fighting for the
-                    environment and presents itself as being at the forefront of
-                    an "energy transformation." In reality, the company is
-                    fighting to preserve profits, and is hoping to use Poland's
-                    slow green transformation to hold onto the last oil refinery
-                    in Europe.
+                    Orlen presents itself as a green energy leader. We dug into company filings and public data and found a company fighting to preserve oil refining profits, using Poland's slow green transition as cover. Published as a scrollytelling piece.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/orlen-oil-green-transformation-poland-gas-usa/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
-                  <button class="button">
-                    <a
-                      href="https://frontstory.pl/zielony-orlen-klimat-zmiana-paliwo-energetyka/"
-                      target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Midgard -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -338,8 +290,7 @@
                 <div class="media">
                   <div class="media-content">
                     <p class="title is-4">
-                      Online neo-Nazi Store and Customers From Central Europe
-                      Exposed
+                      <a href="https://vsquare.org/nazi-shop-sweden-poland-czech-slovak-politics/" target="_blank">Online neo-Nazi Store and Customers From Central Europe Exposed</a>
                     </p>
                   </div>
                 </div>
@@ -350,26 +301,15 @@
                     <span class="tag is-danger">DATA</span>
                   </div>
                   <p class="subtitle is-6">
-                    Information on approximately 20,000 purchases on Midgård was
-                    put online. The leak, which was spread by the left-wing
-                    extremist organization AFA, contains Midgård's customer
-                    register and provides insight into just how widespread
-                    Midgård's sales are.
+                    A database of 20,000 purchases from the neo-Nazi webshop Midgård was leaked by the antifascist organization AFA. We analyzed the customer register to map how widespread its Central European sales network is, identifying buyers across Poland, Czechia, and Slovakia.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/nazi-shop-sweden-poland-czech-slovak-politics/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Red Cross -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -380,8 +320,7 @@
                 <div class="media">
                   <div class="media-content">
                     <p class="title is-4">
-                      KREMLIN LEAKS: how Putin turned the Red Cross into a tool
-                      of propaganda and war
+                      <a href="https://vsquare.org/kremlin-leaks-putin-red-cross-propaganda-war/" target="_blank">KREMLIN LEAKS: how Putin turned the Red Cross into a tool of propaganda and war</a>
                     </p>
                   </div>
                 </div>
@@ -391,32 +330,15 @@
                     <span class="tag is-dark">OSINT</span>
                   </div>
                   <p class="subtitle is-6">
-                    Russian Red Cross, which is supposed to remain neutral and
-                    independent, is a part of Russia's propaganda machine. The
-                    Kremlin plots to expand the influence of the RRC throughout
-                    the world, hiding behind the International Red Cross.
+                    Leaked documents show how the Russian Red Cross, legally required to stay neutral, became a vehicle for Kremlin propaganda. We traced how Moscow uses it to extend influence abroad under the cover of the International Red Cross brand.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/kremlin-leaks-putin-red-cross-propaganda-war/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
-                  <button class="button">
-                    <a
-                      href="https://frontstory.pl/kremlin-leaks-putin-rosja-czerwony-krzyz-wojna-propaganda-ukraina/"
-                      target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Andromeda -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -429,7 +351,7 @@
               <div class="card-content">
                 <div class="media">
                   <div class="media-content">
-                    <p class="title is-4">ANDROMEDA: Ukrainian puzzle</p>
+                    <p class="title is-4"><a href="https://frontstory.pl/andromeda-rurociag-nord-stream-wybuch-ukraina-trasa-rosja-niemcy/" target="_blank">ANDROMEDA: Ukrainian puzzle</a></p>
                   </div>
                 </div>
                 <div class="content">
@@ -440,27 +362,15 @@
                     <span class="tag is-dark">SAT IMAGE ANALYSIS</span>
                   </div>
                   <p class="subtitle is-6">
-                    By analyzing satellite images and AIS signals, we
-                    reconstructed the possible route of the yacht Andromeda,
-                    suspected in the Nord Stream pipeline explosions. Through
-                    in-depth OSINT and on-ground investigation, we uncovered a
-                    network of connections leading to a Kyiv businessman whose
-                    company rented the yacht.
+                    We tracked the yacht Andromeda, suspected in the Nord Stream pipeline explosions, by cross-referencing satellite imagery and AIS vessel tracking data. On-ground OSINT reporting led us to a Kyiv businessman whose company had rented the boat.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://frontstory.pl/andromeda-rurociag-nord-stream-wybuch-ukraina-trasa-rosja-niemcy/"
-                      target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Toxic Poland -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -470,7 +380,7 @@
               <div class="card-content">
                 <div class="media">
                   <div class="media-content">
-                    <p class="title is-4">The map of toxic Poland</p>
+                    <p class="title is-4"><a href="https://smieci.frontstory.pl/" target="_blank">The map of toxic Poland</a></p>
                   </div>
                 </div>
                 <div class="content">
@@ -482,25 +392,15 @@
                     <span class="tag is-dark">AI</span>
                   </div>
                   <p class="subtitle is-6">
-                    Waste mafias profit from abandoned waste, while in May 2024
-                    alone, there were three major fires at illegal dumps. We
-                    automated 3,000 FOIA requests, used LLM to extract locations
-                    from replies in PDF, and verified them on-ground,
-                    discovering nearly 200 hazardous waster dumps across
-                    country.
+                    We automated 3,000 FOIA requests to map illegal waste dumps across Poland, then used an LLM to extract location data from PDF responses. Ground-truthed on site, the dataset revealed nearly 200 hazardous dump sites nationwide — three of them caught fire in May 2024 alone.
                   </p>
-                  <button class="button">
-                    <a href="https://smieci.frontstory.pl/" target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- SIGINT -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -514,8 +414,7 @@
                 <div class="media">
                   <div class="media-content">
                     <p class="title is-4">
-                      Russian diplomatic facilities serve as SIGINT nests in
-                      Europe
+                      <a href="https://vsquare.org/russian-diplomatic-facilities-serve-as-sigint-nests-in-europe/" target="_blank">Russian diplomatic facilities serve as SIGINT nests in Europe</a>
                     </p>
                   </div>
                 </div>
@@ -526,33 +425,15 @@
                     <span class="tag is-dark">OSINT</span>
                   </div>
                   <p class="subtitle is-6">
-                    Specialized equipment for signals intelligence (SIGINT) has
-                    been mounted on the roof of the Russian diplomats' building
-                    in Warsaw. From Warsaw to Budapest, Stockholm, or Brussels –
-                    we found similar equipment on the rooftops of Russian
-                    facilities across Europe.
+                    We identified signals intelligence (SIGINT) equipment mounted on rooftops of Russian diplomatic facilities across Europe. Verified through satellite imagery and open-source research, the same setup appeared from Warsaw to Budapest, Stockholm, and Brussels.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/russian-diplomatic-facilities-serve-as-sigint-nests-in-europe/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
-                  <button class="button">
-                    <a
-                      href="https://frontstory.pl/tu-slucha-moskwa-ujawniamy-gniazdo-rosyjskich-sluzb/"
-                      target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Kremlin Leaks: Reelection -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -566,8 +447,7 @@
                 <div class="media">
                   <div class="media-content">
                     <p class="title is-4">
-                      KREMLIN LEAKS: secret files reveal how Putin pre-rigged
-                      his reelection
+                      <a href="https://vsquare.org/kremlin-leaks-putin-elections-russia-propaganda-ukraine/" target="_blank">KREMLIN LEAKS: secret files reveal how Putin pre-rigged his reelection</a>
                     </p>
                   </div>
                 </div>
@@ -577,32 +457,15 @@
                     <span class="tag is-dark">OSINT</span>
                   </div>
                   <p class="subtitle is-6">
-                    Newly leaked documents from the Putin's regime reveal how
-                    the Kremlin is working to ensure his reelection, building a
-                    pan-Russian propaganda network and internet censorship
-                    machinery for the purposes of information warfare.
+                    Leaked Kremlin documents reveal the infrastructure behind Putin's reelection: a pan-Russian propaganda network, internet censorship machinery, and coordinated information warfare operations. We analyzed the files as part of a cross-border team.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/kremlin-leaks-putin-elections-russia-propaganda-ukraine/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
-                  <button class="button">
-                    <a
-                      href="https://frontstory.pl/kremlin-leaks-putin-rosja-wybory-ukraina-propaganda-tajne-dokumenty/"
-                      target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Firehose of Falsehood -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -612,7 +475,7 @@
               <div class="card-content">
                 <div class="media">
                   <div class="media-content">
-                    <p class="title is-4">FIREHOSE OF FALSEHOOD</p>
+                    <p class="title is-4"><a href="https://vsquare.org/firehose-of-falsehood-russia-disinformation-propaganda-europe/" target="_blank">FIREHOSE OF FALSEHOOD</a></p>
                   </div>
                 </div>
                 <div class="content">
@@ -622,28 +485,15 @@
                     <span class="tag is-dark">NETWORK ANALYSIS</span>
                   </div>
                   <p class="subtitle is-6">
-                    There is a vast ecosystem of pro-Russian and alt-right
-                    disinformation websites operating in Central and Eastern
-                    Europe. We analysed how these websites mutually correlate
-                    and how they spread Russian propaganda and conspiracy
-                    theories. Our findings provide an insight into the scale and
-                    scope of the pro-Russian and anti-Western disinformation
-                    networks operating in Europe.
+                    We mapped a network of pro-Russian and alt-right disinformation sites operating across Central and Eastern Europe. Using network analysis, we showed how these sites cross-reference each other to amplify Russian narratives and spread conspiracy theories in local languages.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/firehose-of-falsehood-russia-disinformation-propaganda-europe/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Banknote mulch -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -653,7 +503,7 @@
               <div class="card-content">
                 <div class="media">
                   <div class="media-content">
-                    <p class="title is-4">Banknote mulch</p>
+                    <p class="title is-4"><a href="https://frontstory.pl/lasy-panstwowe-pieniadze-fundusz-darowizny-kosciol-solidarna-polska/" target="_blank">Banknote mulch</a></p>
                   </div>
                 </div>
                 <div class="content">
@@ -662,34 +512,15 @@
                     <span class="tag is-link">INVESTIGATION</span>
                   </div>
                   <p class="subtitle is-6">
-                    During eight years of PiS rule in Poland, forest districts
-                    transferred tens of millions for 'socially useful purposes.'
-                    Many of these funds went to churches and organizations that
-                    promoted 'national values' or supported the logging of the
-                    Białowieża Forest. Money also went to entities from which
-                    foresters profited.
+                    During eight years of PiS rule, Polish forest districts funneled tens of millions in public funds to churches, nationalist organizations, and entities connected to the foresters themselves. We tracked the money using public spending data and a custom text classifier to categorize thousands of transfers.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://frontstory.pl/lasy-panstwowe-pieniadze-fundusz-darowizny-kosciol-solidarna-polska/"
-                      target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
-                  <button class="button">
-                    <a
-                      href="https://github.com/anastasiiamorozova/Public-expenses-classification"
-                      target="_blank"
-                      >See the code</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- See Minsk and die -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -702,7 +533,7 @@
               <div class="card-content">
                 <div class="media">
                   <div class="media-content">
-                    <p class="title is-4">See Minks and die</p>
+                    <p class="title is-4"><a href="https://vsquare.org/see-minsk-and-die-how-belarusian-firms-smuggle-refugees/" target="_blank">See Minsk and die</a></p>
                   </div>
                 </div>
                 <div class="content">
@@ -711,34 +542,15 @@
                     <span class="tag is-dark">OSINT</span>
                   </div>
                   <p class="subtitle is-6">
-                    Companies connected with the Alexander Lukashenko regime are
-                    profiting from smuggling migrants from the Middle East. We
-                    have uncovered illicit financial flows and identified the
-                    individuals behind this human trafficking scheme. We have
-                    secured direct evidence of connections between the regime
-                    and the smugglers.
+                    We traced financial flows linking companies in the Lukashenko regime's orbit to migrant smuggling networks bringing people from the Middle East into Europe. OSINT and on-ground reporting uncovered direct ties between the regime and the traffickers.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/see-minsk-and-die-how-belarusian-firms-smuggle-refugees/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
-                  <button class="button">
-                    <a
-                      href="https://frontstory.pl/zobaczyc-minsk-i-umrzec-jak-bialoruskie-firmy-handluja-migrantami/"
-                      target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Russian Asset Tracker -->
-          <div class="column is-one-third">
+          <div class="column is-half">
             <div class="card">
               <div class="card-image">
                 <figure class="image is-5by3">
@@ -748,7 +560,7 @@
               <div class="card-content">
                 <div class="media">
                   <div class="media-content">
-                    <p class="title is-4">RUSSIAN ASSET TRACKER</p>
+                    <p class="title is-4"><a href="https://vsquare.org/russian-assets-in-v4-countries/" target="_blank">RUSSIAN ASSET TRACKER</a></p>
                   </div>
                 </div>
                 <div class="content">
@@ -757,27 +569,8 @@
                     <span class="tag is-dark">OSINT</span>
                   </div>
                   <p class="subtitle is-6">
-                    As part of a joint investigation by the OCCRP, in which 25
-                    editors, including FRONTSTORY.PL, took part, we screened the
-                    assets of Russian oligarchs scattered around the world. We
-                    look at the Russians who are on the so-called
-                    Anti-Corruption Foundation's list of 35. This is an
-                    organisation founded by Alexei Navalny.
+                    A joint OCCRP investigation with 25 newsrooms tracking the assets of Russian oligarchs on Navalny's Anti-Corruption Foundation list of 35. We covered Poland and Central Europe, cross-referencing property records, corporate filings, and public databases.
                   </p>
-                  <button class="button">
-                    <a
-                      href="https://vsquare.org/russian-assets-in-v4-countries/"
-                      target="_blank"
-                      >Read in English</a
-                    >
-                  </button>
-                  <button class="button">
-                    <a
-                      href="https://frontstory.pl/deripasko-rosja-majatek-oligarcha-strabag-occrp-russian-assets-tracker/"
-                      target="_blank"
-                      >Read in Polish</a
-                    >
-                  </button>
                 </div>
               </div>
             </div>

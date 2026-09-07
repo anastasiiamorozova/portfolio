@@ -1,0 +1,2589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destination: The Baltic — Poland’s 20 Best Beaches</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fira+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="assets/tlo.png" as="image" fetchpriority="high">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+    <script defer fetchpriority="high" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script defer fetchpriority="high" src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script defer fetchpriority="high" id="mapLibScript" src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
+    <style>
+        :root {
+            --accent-yellow: #ffd200;
+            --ink: #111111;
+            --muted: #5f6468;
+            --line: rgba(17, 17, 17, 0.14);
+            --paper: #f7f7f4;
+            --panel: rgba(255, 255, 255, 0.88);
+            --shadow: 0 18px 42px rgba(0, 0, 0, 0.16);
+            --green: #27ae60;
+            --lime: #8cc152;
+            --gold: #f5b731;
+            --orange: #e67e22;
+            --red: #e74c3c;
+            font-family: "Fira Sans", system-ui, sans-serif;
+            color: var(--ink);
+            background: var(--paper);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        html::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            margin: 0;
+            background: var(--paper);
+            font-family: "Fira Sans", system-ui, sans-serif;
+            overflow-x: clip;
+        }
+
+        body.is-map-unavailable .map-fallback {
+            display: grid;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            width: 0;
+            height: 4px;
+            background: var(--accent-yellow);
+            pointer-events: none;
+        }
+
+        .story {
+            width: 100%;
+            overflow: clip;
+        }
+
+        .scrolly {
+            position: relative;
+            min-height: 780vh;
+            background: #dde5e8;
+        }
+
+        .map-stage {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            height: 100svh;
+            min-height: 620px;
+            overflow: hidden;
+            background: #e7ecef;
+            isolation: isolate;
+        }
+
+        #map {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: #dfe8ee;
+            touch-action: pan-y;
+        }
+
+        .map-fallback {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: none;
+            place-items: center;
+            padding: 32px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(247, 247, 244, 0.92)),
+                url("assets/image.png?v=20260624") center / cover no-repeat;
+            text-align: center;
+        }
+
+        .map-fallback p {
+            max-width: 520px;
+            margin: 0;
+            padding: 18px 20px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.88);
+            color: #333333;
+            line-height: 1.5;
+        }
+
+        .map-tint {
+            display: none;
+        }
+
+        .map-credit {
+            position: absolute;
+            right: max(18px, 3.2vw);
+            bottom: 18px;
+            z-index: 5;
+            max-width: min(420px, calc(100vw - 36px));
+            color: rgba(17, 17, 17, 0.58);
+            font-size: 11px;
+            line-height: 1.35;
+            text-align: right;
+        }
+
+        .map-credit a {
+            color: inherit;
+        }
+
+        .leaflet-control-container {
+            display: none;
+        }
+
+        .leaflet-marker-icon {
+            background: transparent;
+            border: 0;
+        }
+
+        .story-point {
+            transition: fill-opacity 260ms ease, stroke-opacity 260ms ease;
+        }
+
+        .beach-hover-tip {
+            position: absolute;
+            z-index: 800;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-family: "Fira Sans", system-ui, sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: #111;
+            white-space: nowrap;
+            pointer-events: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+        }
+
+        .beach-marker {
+            display: grid !important;
+            place-items: center;
+            background: transparent;
+            border: 0;
+            pointer-events: none;
+        }
+
+        .marker-dot {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            border: 2px solid rgba(255, 255, 255, 0.94);
+            border-radius: 50%;
+            background: var(--marker-color);
+            color: #ffffff;
+            box-shadow: 0 5px 16px rgba(0, 0, 0, 0.30);
+            font-family: "Fira Sans", system-ui, sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1;
+            opacity: 0;
+            transform: scale(0.28);
+            transition: opacity 260ms ease, transform 260ms ease, box-shadow 260ms ease, background 260ms ease;
+        }
+
+        .marker-label {
+            display: block;
+        }
+
+        .beach-marker.is-visible .marker-dot {
+            opacity: 1;
+            transform: scale(0.96);
+        }
+
+        .beach-marker.is-preview .marker-dot {
+            border-color: #111111;
+            background: #ffd200 !important;
+        }
+
+        .beach-marker.is-preview .marker-label,
+        .beach-marker:not(.is-visible) .marker-label {
+            display: none;
+        }
+
+        .beach-marker.is-explore {
+            pointer-events: auto;
+        }
+
+        .beach-marker.is-muted .marker-dot {
+            opacity: 0.58;
+            transform: scale(0.86);
+        }
+
+        .beach-marker.is-active .marker-dot {
+            opacity: 1;
+            transform: scale(1.66);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.36);
+        }
+
+        .place-detail {
+            position: fixed;
+            left: max(22px, 6vw);
+            top: 50%;
+            z-index: 6;
+            width: min(360px, calc(100vw - 36px));
+            max-height: min(72vh, 560px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(17, 17, 17, 0.16);
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+            opacity: 0;
+            transform: translateY(calc(-50% + 14px));
+            pointer-events: none;
+            transition: opacity 220ms ease, transform 220ms ease;
+        }
+
+        .place-detail.is-visible {
+            opacity: 1;
+            transform: translateY(-50%);
+            pointer-events: auto;
+        }
+
+        .place-detail.is-popup {
+            top: 0;
+            left: 0;
+            right: auto;
+            bottom: auto;
+            width: min(460px, calc(100vw - 44px));
+            max-height: min(66vh, 520px);
+            border: 1px solid rgba(17, 17, 17, 0.14);
+            border-radius: 10px;
+            overflow: visible;
+            transform: translateY(-6px);
+            box-shadow: 0 14px 38px rgba(0, 0, 0, 0.24);
+        }
+
+        .place-detail.is-popup.is-visible {
+            transform: translateY(0);
+        }
+
+        .place-detail.is-popup .place-detail-inner {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .place-detail.is-popup::before {
+            content: "";
+            position: absolute;
+            top: -9px;
+            left: var(--arrow-x, 50%);
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 9px solid #ffffff;
+            filter: drop-shadow(0 -3px 2px rgba(0, 0, 0, 0.06));
+        }
+
+        .place-detail.is-popup.is-side::before {
+            top: var(--arrow-y, 50%);
+            left: -9px;
+            transform: translateY(-50%);
+            border-top: 9px solid transparent;
+            border-bottom: 9px solid transparent;
+            border-right: 9px solid #ffffff;
+            border-left: 0;
+            filter: drop-shadow(-3px 0 2px rgba(0, 0, 0, 0.06));
+        }
+
+        .place-detail.is-side .place-detail-img {
+            height: 132px;
+        }
+
+        .place-detail.is-side .place-detail-title {
+            font-size: 21px;
+        }
+
+        .place-detail.is-side .place-detail-desc {
+            font-size: 13.5px;
+            line-height: 1.42;
+        }
+
+        .place-detail-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2;
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.92);
+            color: #111111;
+            cursor: pointer;
+            font-size: 24px;
+            line-height: 1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+        }
+
+        .place-detail-inner {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            flex: 1 1 auto;
+            overflow: hidden;
+        }
+
+        .place-detail-img {
+            display: block;
+            flex: 0 0 auto;
+            width: 100%;
+            height: 188px;
+            object-fit: cover;
+            background: #d9e2e8;
+        }
+
+        .place-detail-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding: 15px 16px 17px;
+            scrollbar-width: thin;
+            scrollbar-color: #ffd200 #f8f8f8;
+        }
+
+        .place-detail-body::-webkit-scrollbar {
+            width: 9px;
+            height: 9px;
+            display: block;
+        }
+
+        .place-detail-body::-webkit-scrollbar-track {
+            background-color: #f8f8f8;
+            border-radius: 5px;
+        }
+
+        .place-detail-body::-webkit-scrollbar-thumb {
+            background-color: #ffd200;
+            border-radius: 5px;
+        }
+
+        .place-detail-title {
+            margin: 0;
+            color: #000000;
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.02;
+            letter-spacing: 0;
+        }
+
+        .place-detail-desc {
+            margin: 10px 0 0;
+            color: #000000;
+            font-size: 15px;
+            line-height: 1.45;
+        }
+
+        .steps {
+            position: relative;
+            z-index: 6;
+            margin-top: -100vh;
+            pointer-events: none;
+        }
+
+        .step {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 10vh max(22px, 6vw);
+        }
+
+        .step-allpoints {
+            margin-top: 55vh;
+        }
+
+        .steps .step-pin {
+            min-height: 230vh;
+            display: block;
+            align-items: stretch;
+            padding: 0;
+        }
+
+        .step-pin-inner {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            height: 100svh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 28px max(22px, 6vw) 0;
+            pointer-events: none;
+        }
+
+        .step-pin .step-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .step-card-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 2;
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border: 0;
+            background: transparent;
+            color: #000000;
+            cursor: pointer;
+            font-size: 26px;
+            line-height: 1;
+            pointer-events: auto;
+        }
+
+        .step-pin .step-card.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .free-help-btn {
+            position: absolute;
+            right: max(18px, 4vw);
+            top: max(24px, 5vh);
+            z-index: 8;
+            width: 48px;
+            height: 48px;
+            display: none;
+            place-items: center;
+            border: 0;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #000000;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1;
+            pointer-events: auto;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+        }
+
+        .free-help-btn.is-visible {
+            display: grid;
+        }
+
+        .step-pin .step-desc,
+        .step-pin .hint-mouse,
+        .step-pin .hint-touch {
+            align-items: center;
+            text-align: center;
+        }
+
+        .step-pin .hint-line {
+            justify-content: center;
+        }
+
+        .step:nth-child(odd):not(.step-hero) {
+            justify-content: flex-end;
+        }
+
+        .step[data-mode="podium"] {
+            justify-content: flex-end;
+        }
+
+        .step[data-mode="podium"][data-rank="1"] {
+            margin-top: 36vh;
+        }
+
+        .step.step-calc {
+            justify-content: center !important;
+        }
+
+        .step-hero {
+            min-height: 112vh;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .hero-blur-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            background: url('assets/tlo.png') center / cover no-repeat;
+            opacity: 1;
+            pointer-events: none;
+            transition: opacity 600ms ease;
+        }
+
+        .hero-deco {
+            position: absolute;
+            display: block;
+            height: auto;
+            pointer-events: none;
+            transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+
+        #heroBlur.is-hero-active .hero-deco {
+            pointer-events: auto;
+        }
+
+        .hero-deco-ball {
+            top: clamp(58px, 9vh, 128px);
+            left: clamp(6px, 2.5vw, 48px);
+            width: clamp(120px, 17vw, 210px);
+        }
+
+        .hero-deco-ice {
+            right: clamp(6px, 2.5vw, 48px);
+            bottom: clamp(8px, 2.5vh, 48px);
+            width: clamp(140px, 20vw, 250px);
+        }
+
+        .hero-deco-ball:hover {
+            transform: rotate(-12deg) scale(1.08);
+        }
+
+        .hero-deco-ice:hover {
+            transform: rotate(12deg) scale(1.08);
+        }
+
+        @media (max-width: 760px) {
+            .beach-marker.is-preview .marker-dot {
+                width: 23px;
+                height: 23px;
+            }
+
+            .hero-deco-ice {
+                display: none;
+            }
+
+            .hero-deco-ball {
+                top: auto;
+                left: auto;
+                right: 16%;
+                bottom: clamp(16px, 6vh, 70px);
+                width: clamp(120px, 34vw, 180px);
+            }
+        }
+
+        .hero-copy {
+            width: min(560px, calc(100vw - 44px));
+            color: #111111;
+            pointer-events: auto;
+            text-align: center;
+        }
+
+        .hero-tytul {
+            display: block;
+            width: min(560px, 100%);
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            margin: 0;
+            font-family: "Bebas Neue", "Fira Sans", sans-serif;
+            font-size: clamp(42px, 6.5vw, 82px);
+            font-weight: 400;
+            line-height: 0.88;
+            letter-spacing: 0;
+        }
+
+        .hero-year {
+            display: inline-block;
+            margin-left: 0.08em;
+            padding: 0 0.08em;
+            background: var(--accent-yellow);
+            color: #111111;
+        }
+
+        .hero-lead {
+            margin: 34px auto 0;
+            color: #ffffff;
+            font-family: "Fira Sans", system-ui, sans-serif;
+            font-size: clamp(15px, 1.6vw, 18px);
+            font-weight: 400;
+            line-height: 1.38;
+        }
+
+        .hero-scroll {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-top: 40px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: #ffffff;
+            font-family: "Fira Sans", system-ui, sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0;
+            cursor: pointer;
+        }
+
+        .hero-scroll-arrow {
+            width: 20px;
+            height: 20px;
+            border-right: 3px solid #ffffff;
+            border-bottom: 3px solid #ffffff;
+            transform: rotate(45deg);
+            animation: heroScrollBounce 1.6s ease-in-out infinite;
+        }
+
+        @keyframes heroScrollBounce {
+            0%, 100% { transform: rotate(45deg) translate(0, 0); }
+            50% { transform: rotate(45deg) translate(4px, 4px); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-scroll-arrow { animation: none; }
+        }
+
+        .step-card {
+            width: min(460px, calc(100vw - 44px));
+            padding: 30px;
+            border: none;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: none;
+            pointer-events: auto;
+            transition: transform 220ms ease, background 220ms ease;
+        }
+
+        .step.is-active .step-card {
+            transform: translateY(-4px);
+            background: #ffffff;
+        }
+
+        .step.step-pin .step-card {
+            background: rgba(255, 255, 255, 0.48);
+            backdrop-filter: blur(8px) saturate(1.2);
+            -webkit-backdrop-filter: blur(8px) saturate(1.2);
+        }
+
+        .step-card-wide {
+            width: min(600px, calc(100vw - 44px));
+        }
+
+        .step-card-calc {
+            width: min(600px, calc(100vw - 44px));
+            padding: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .step.is-active .step-card-calc {
+            background: transparent;
+        }
+
+        .step-calc-placeholder {
+            display: block;
+            width: 100%;
+            height: 600px;
+            border-radius: 8px;
+            background: #d9d9d9;
+        }
+
+        .step-kicker {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+            color: #000000;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .podium-place-label {
+            font-size: 15px;
+            font-weight: 800;
+            color: #000000;
+            letter-spacing: -0.01em;
+        }
+
+        .step-cta {
+            pointer-events: auto;
+            text-align: center;
+            color: #111111;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.6);
+            transition: opacity 300ms ease;
+        }
+
+        .step-cta.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .step[data-mode="free"] {
+            justify-content: center !important;
+        }
+
+        .rank-pill {
+            min-width: 27px;
+            height: 27px;
+            display: inline-grid;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--rank-color, var(--accent-yellow));
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .step-title {
+            margin: 0;
+            color: #000000;
+            font-size: clamp(19px, 2.7vw, 31px);
+            font-weight: 800;
+            line-height: 0.98;
+            letter-spacing: 0;
+            text-wrap: balance;
+        }
+
+        .step-region {
+            margin: 9px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .step-desc {
+            margin: 14px 0 0;
+            color: #000000;
+            font-size: 14px;
+            line-height: 1.48;
+        }
+
+        .step-cta-link {
+            margin: 16px 0 0;
+            color: #000000;
+            font-size: clamp(15px, 1.8vw, 18px);
+            font-weight: 800;
+        }
+
+        .hint-mouse {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .hint-touch {
+            display: none;
+        }
+
+        .hint-line {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .hint-line svg {
+            flex: none;
+            width: auto;
+            height: 20px;
+            fill: currentColor;
+            color: #111111;
+        }
+
+        .hint-line svg.icon-zoom {
+            height: 16px;
+        }
+
+        .hint-line kbd {
+            display: inline-block;
+            min-width: 1.1em;
+            padding: 2px 7px;
+            border: 1px solid #cdd3d6;
+            border-bottom-width: 2px;
+            border-radius: 6px;
+            background: #f4f6f7;
+            box-shadow: 0 1px 0 rgba(17, 17, 17, 0.05);
+            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: #2f3437;
+            vertical-align: middle;
+        }
+
+        .hint-line kbd.key-cmd {
+            display: none;
+        }
+
+        body.is-mac .hint-line kbd.key-ctrl {
+            display: none;
+        }
+
+        body.is-mac .hint-line kbd.key-cmd {
+            display: inline-block;
+        }
+
+        @media (max-width: 760px) {
+            .hint-mouse {
+                display: none;
+            }
+
+            .hint-touch {
+                display: flex;
+                flex-direction: column;
+                gap: 9px;
+            }
+
+            .step-pin .hint-line {
+                width: min(280px, 100%);
+                margin-inline: auto;
+                align-items: center;
+                justify-content: flex-start;
+                text-align: left;
+            }
+
+            .step-pin .hint-line > span {
+                text-wrap: balance;
+            }
+        }
+
+        @media (max-width: 380px) {
+            #freeCta .step-title {
+                align-self: stretch;
+                text-align: left;
+            }
+        }
+
+        .overview-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .overview-item {
+            padding: 12px 0 0;
+            border-top: 3px solid var(--item-color);
+        }
+
+        .overview-number {
+            display: block;
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .overview-label {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .summary.post-scrolly {
+            position: relative;
+            z-index: 7;
+            margin-top: -100vh;
+            margin-top: -100svh;
+            padding: 0;
+            background: #ffffff;
+            overflow: clip;
+            isolation: isolate;
+        }
+
+        @media (min-width: 901px) {
+            .summary.post-scrolly {
+                margin-top: 0;
+            }
+        }
+
+        .post-sticky {
+            position: sticky;
+            top: 0;
+            z-index: 0;
+            height: 100vh;
+            height: 100svh;
+            min-height: 620px;
+            margin-bottom: -100vh;
+            overflow: hidden;
+            background: #ffffff;
+            pointer-events: none;
+        }
+
+        .post-photo {
+            position: absolute;
+            inset: 0;
+            background-image: var(--post-image);
+            background-position: var(--post-focus, center);
+            background-size: cover;
+            opacity: 0;
+            transform: scale(1.045);
+            transition: opacity 760ms ease, transform 1800ms ease;
+        }
+
+        .post-photo.is-visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .post-photo::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .post-gradient {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 520ms ease;
+            pointer-events: none;
+        }
+
+        .post-gradient-left {
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.74), rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.00) 72%);
+        }
+
+        .post-gradient-right {
+            background: linear-gradient(270deg, rgba(0, 0, 0, 0.74), rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.00) 72%);
+        }
+
+        .summary.post-scrolly.is-shade-left .post-gradient-left,
+        .summary.post-scrolly.is-shade-right .post-gradient-right {
+            opacity: 1;
+        }
+
+        .post-scene {
+            position: relative;
+            z-index: 1;
+            min-height: 118vh;
+            padding: 0 max(22px, 6vw);
+            color: #ffffff;
+        }
+
+        .post-scene-light {
+            min-height: 100vh;
+            background: #ffffff;
+            color: #111111;
+        }
+
+        .post-scene-intro {
+            min-height: 0;
+        }
+
+        .post-scene-intro .post-scene-inner {
+            min-height: 0;
+            align-items: flex-start;
+            padding: 8vh 0 5vh;
+        }
+
+        .post-scene-ranking .post-scene-inner {
+            align-items: flex-start;
+            padding: 10vh 0;
+        }
+
+        .post-scene-ranking .post-copy {
+            width: min(880px, calc(100vw - 44px));
+        }
+
+        .ranking-logo {
+            display: block;
+            width: min(280px, 70%);
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .post-scene-inner {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 14vh 0;
+        }
+
+        .post-scene-right .post-scene-inner {
+            justify-content: flex-end;
+        }
+
+        .post-copy {
+            width: min(520px, calc(100vw - 44px));
+            opacity: 0.18;
+            transform: translateY(18px);
+            transition: opacity 420ms ease, transform 420ms ease;
+        }
+
+        .post-scene.is-active .post-copy {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .post-scene-light .post-copy {
+            width: min(760px, calc(100vw - 44px));
+            margin: 0 auto;
+            text-align: left;
+            opacity: 1;
+            transform: none;
+        }
+
+        .post-title {
+            margin: 0;
+            font-size: clamp(22px, 2.45vw, 34px);
+            font-weight: 800;
+            line-height: 1.04;
+            letter-spacing: 0;
+            text-wrap: balance;
+        }
+
+        .post-desc {
+            margin: 18px 0 0;
+            font-size: clamp(16px, 1.55vw, 20px);
+            line-height: 1.45;
+        }
+
+        .post-scene-light .post-desc {
+            max-width: 700px;
+            color: #2f3437;
+        }
+
+        .post-quote {
+            margin: 22px 0 0;
+            padding: 0 0 0 18px;
+            border-left: 4px solid var(--accent-yellow);
+            font-size: clamp(19px, 2.1vw, 26px);
+            font-weight: 800;
+            line-height: 1.18;
+        }
+
+        .post-scene-light .post-quote {
+            max-width: 680px;
+            color: #111111;
+        }
+
+        .post-list {
+            display: grid;
+            gap: 9px;
+            margin: 22px 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .post-list li {
+            padding-left: 18px;
+            border-left: 4px solid var(--accent-yellow);
+            font-size: clamp(16px, 1.55vw, 19px);
+            font-weight: 700;
+            line-height: 1.32;
+        }
+
+        @media (max-width: 760px) {
+            .post-sticky {
+                min-height: 560px;
+            }
+
+            .post-scene {
+                min-height: 112vh;
+                padding: 0 18px;
+            }
+
+            .post-scene-light {
+                min-height: 100vh;
+            }
+
+            .post-scene-intro {
+                min-height: 0;
+            }
+
+            .post-scene-intro .post-scene-inner {
+                min-height: 0;
+                align-items: flex-start;
+                padding: 7vh 0 5vh;
+            }
+
+            .post-scene-inner,
+            .post-scene-right .post-scene-inner {
+                justify-content: flex-start;
+                align-items: flex-end;
+                padding: 12vh 0 10vh;
+            }
+
+            .post-scene-light .post-scene-inner {
+                align-items: center;
+            }
+
+            .post-copy,
+            .post-scene-light .post-copy {
+                width: 100%;
+            }
+
+            .post-title {
+                font-size: clamp(22px, 7vw, 30px);
+            }
+
+            .post-desc {
+                font-size: 16px;
+                line-height: 1.42;
+            }
+
+            .post-quote {
+                font-size: 19px;
+            }
+
+            .post-gradient-left,
+            .post-gradient-right {
+                background: linear-gradient(180deg, rgba(0, 0, 0, 0.00), rgba(0, 0, 0, 0.34) 28%, rgba(0, 0, 0, 0.74) 100%);
+            }
+        }
+
+        .ranking-table {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0 28px;
+            margin-top: 32px;
+            border-top: 1px solid #222222;
+        }
+
+        .ranking-row {
+            display: grid;
+            grid-template-columns: 40px 1fr;
+            gap: 6px;
+            align-items: center;
+            min-height: 58px;
+            border-bottom: 1px solid rgba(17, 17, 17, 0.12);
+        }
+
+        .ranking-rank {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--row-color);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .ranking-name {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .ranking-region {
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.2;
+        }
+
+        .ranking-score {
+            color: #222222;
+            font-size: 15px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 900px) {
+
+            .step:not(.step-pin),
+            .step:nth-child(odd):not(.step-hero):not(.step-pin),
+            .step[data-mode="podium"] {
+                align-items: end;
+                justify-content: center;
+                min-height: 134vh;
+                padding: 12vh 18px 12vh;
+            }
+
+            .step.step-hero,
+            .step.step-allpoints {
+                align-items: flex-start;
+            }
+
+            .step.step-hero {
+                min-height: 112vh;
+            }
+
+            .step-pin-inner {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .steps .step-pin {
+                margin-top: 80vh;
+            }
+
+            .summary.post-scrolly {
+                margin-top: -100vh;
+                margin-top: -100svh;
+                padding: 0;
+            }
+
+            .steps .step[data-mode="podium"] {
+                min-height: 0;
+                margin-top: 56vh;
+            }
+
+            .steps .step[data-mode="podium"][data-rank="1"] {
+                margin-top: 44vh;
+            }
+
+            .hero-title {
+                font-size: clamp(38px, 8vw, 72px);
+            }
+
+            .step-card,
+            .step-card-wide,
+            .step-card-calc {
+                width: 100%;
+            }
+
+            .map-credit {
+                display: none;
+            }
+
+            .place-detail {
+                left: 18px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .map-stage {
+                min-height: 560px;
+            }
+
+            .hero-copy {
+                width: 100%;
+            }
+
+            .hero-tytul {
+                width: 90%;
+            }
+
+            .step-card {
+                padding: 26px;
+            }
+
+            .step-card-calc {
+                padding: 0;
+            }
+
+            .overview-list,
+            .ranking-table {
+                grid-template-columns: 1fr;
+            }
+
+            .place-detail-img {
+                height: 168px;
+            }
+
+            .place-detail-body {
+                padding: 14px 16px 16px;
+            }
+
+            .place-detail-title {
+                font-size: 22px;
+            }
+
+            .place-detail-desc {
+                font-size: 13px;
+                line-height: 1.38;
+            }
+        }
+
+        .stopka {
+            padding: 20px 16px 64px;
+            background: #ffffff;
+        }
+        .stopka .authors-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            margin-top: 20px;
+            color: #000000;
+        }
+        .stopka .stopka-profiles {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        .stopka .profile {
+            text-align: center;
+            max-width: 160px;
+            flex: 1;
+        }
+        .stopka .profile a {
+            color: inherit;
+            text-decoration: none;
+            display: block;
+        }
+        .stopka .profile img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 5px;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            border: 5px solid #ffffff;
+        }
+        .stopka .profile img:hover { transform: scale(1.05); }
+        .stopka .profile img:active { transform: scale(1.1); }
+        .stopka .profile .name {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            font-weight: 500;
+            color: #000000;
+            line-height: 1.3;
+        }
+        .stopka .profile .name span {
+            display: block;
+        }
+        .stopka .credits {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #000000;
+            line-height: 1.5;
+        }
+        @media (min-width: 761px) {
+            .stopka .credits {
+                max-width: 620px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+        @media (max-width: 440px) {
+            .stopka .stopka-profiles {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+                justify-content: center;
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto 30px;
+            }
+            .stopka .profile { max-width: 140px; }
+            .stopka .profile:last-child {
+                grid-column: 1 / -1;
+                justify-self: center;
+            }
+        }
+
+    
+  .portfolio-link{
+    position:fixed; top:14px; left:14px; z-index:10050;
+    display:inline-flex; align-items:center; gap:7px;
+    padding:8px 13px; border:1px solid rgba(46,51,61,.2); border-radius:999px;
+    background:rgba(231,226,218,.94); color:#2e333d;
+    font:600 12px/1.1 "Fira Sans",Roboto,system-ui,sans-serif;
+    letter-spacing:.01em; text-decoration:none;
+    box-shadow:0 2px 12px rgba(0,0,0,.12); backdrop-filter:blur(8px);
+  }
+  .portfolio-link span{font-size:16px; line-height:.7}
+  .portfolio-link b{font-weight:400; opacity:.7}
+  .portfolio-link:hover{background:#fff; color:#111}
+  .portfolio-link:focus-visible{outline:3px solid #2e333d; outline-offset:3px}
+  @media(max-width:520px){.portfolio-link{top:10px;left:10px;padding:8px 11px}.portfolio-link b{display:none}}
+  @media print{.portfolio-link{display:none}}
+
+  .hero-title{display:grid;justify-items:center;text-transform:uppercase;font-family:"Bebas Neue",sans-serif;line-height:.78;letter-spacing:.015em;color:#111;text-align:center}
+  .hero-title span{font-size:clamp(54px,8vw,100px)}
+  .hero-title strong{font-size:clamp(84px,14vw,176px);font-weight:400;color:#58afd3}
+  .hero-title small{margin-top:20px;font:700 clamp(13px,1.5vw,19px)/1.2 "Fira Sans",sans-serif;letter-spacing:.14em}
+  .ranking-heading{margin:0 0 28px;font-family:"Bebas Neue",sans-serif;font-size:clamp(46px,7vw,82px);line-height:.9;letter-spacing:.02em;color:#58afd3;text-align:center;text-transform:uppercase}
+  .profile-monogram{display:grid;place-items:center;width:104px;height:104px;margin:0 auto 8px;border:5px solid #fff;border-radius:50%;background:#e7e2da;color:#2e333d;font:700 26px/1 "Fira Sans",sans-serif}
+</style>
+</head>
+<body>
+  <a class="portfolio-link" href="https://anastasiiamorozova.github.io/portfolio/" aria-label="Back to Anastasiia Morozova’s portfolio"><span aria-hidden="true">←</span> Anastasiia Morozova <b>/ Portfolio</b></a>
+    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+    <main class="story">
+        <section class="scrolly" aria-label="Poland’s best beaches — 2026 ranking">
+            <div class="map-stage">
+                <div id="map" aria-hidden="true"></div>
+                <div class="map-fallback">
+                    <p>The map could not load in this preview. With network access, the full map layer will appear.</p>
+                </div>
+                <div class="map-tint" aria-hidden="true"></div>
+                <div class="hero-blur-overlay" id="heroBlur" aria-hidden="true"></div>
+                <div class="map-credit">
+                    <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a> |
+                    &copy; <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a>
+                    &copy; OpenStreetMap contributors
+                </div>
+            </div>
+
+            <div class="steps" id="steps"></div>
+            <article class="place-detail" id="placeDetail" aria-live="polite"></article>
+        </section>
+
+        <section class="summary post-scrolly" id="postScrolly" aria-label="Portrait of a Polish tourist on the Baltic Sea">
+            <div class="post-sticky" aria-hidden="true">
+                <div class="post-photo" data-post-photo="control" style="--post-image: url('assets/photos/18.jpg'); --post-focus: center;"></div>
+                <div class="post-photo" data-post-photo="choice" style="--post-image: url('assets/photos/1.jpg'); --post-focus: center;"></div>
+                <div class="post-photo" data-post-photo="two-faces" style="--post-image: url('assets/photos/47.jpg'); --post-focus: center;"></div>
+                <div class="post-photo" data-post-photo="poles" style="--post-image: url('assets/photos/13.jpg'); --post-focus: center;"></div>
+                <div class="post-photo" data-post-photo="mielno" style="--post-image: url('assets/photos/27.jpg'); --post-focus: center;"></div>
+                <div class="post-photo" data-post-photo="quiet" style="--post-image: url('assets/photos/43.jpg'); --post-focus: center;"></div>
+                <div class="post-gradient post-gradient-left"></div>
+                <div class="post-gradient post-gradient-right"></div>
+            </div>
+
+            <section class="post-scene post-scene-light post-scene-intro is-active" data-post-scene="intro">
+                <div class="post-scene-inner">
+                    <div class="post-copy">
+                        <h2 class="post-title">The beach as a mirror of the Polish tourist</h2>
+                        <p class="post-desc">How important is clean water? Must the beach be wide? How much does the choice of restaurants matter? Answers from the project’s calculator did more than identify good places to stay: together they form a portrait of the Baltic holidaymaker, revealing the needs and summer dreams behind each choice.</p>
+                        <p class="post-desc">That visitor is not easy to stereotype—not simply a passive package tourist or a loner escaping the world. The picture is more deliberate and cautious. Communication specialist and tourism-trends researcher Dr Dominik Lewiński describes someone who goes to the sea “not in search of adventure, but for a holiday that works.”</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="post-scene" data-post-scene="control" data-post-photo="control">
+                <div class="post-scene-inner">
+                    <div class="post-copy">
+                        <h2 class="post-title">The priority: a holiday under control</h2>
+                        <p class="post-desc">Picture a Polish visitor at the Baltic. In the morning, they leave their room or hotel and reach the beach in minutes. There is no search and no wandering. The ideal beach is wide, the water looks clean and a lifeguard is nearby. Changing rooms and clean toilets are available, and a beach bar is close enough for a cold drink. None of this feels like luxury; it is the expected standard.</p>
+                        <p class="post-desc">The rest of the day follows the same logic. There is no need to spend hours choosing dinner: it is enough to know that something suitable will be available. In the evening, there may be a promenade, some greenery and perhaps a café with a view. The visitor does not require a big city, but does not want to feel cut off either. The goal is rest on their own terms, with the practical details under control.</p>
+                        <p class="post-desc">Lewiński connects this preference for standards and routine with limited leave, rising costs and often complicated family logistics. Travellers do not want to gamble with a holiday they worked hard to afford. “We have grown more comfortable and accustomed to having things ready and reliable,” he says. “The holiday has to work.”</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="post-scene post-scene-right" data-post-scene="choice" data-post-photo="choice">
+                <div class="post-scene-inner">
+                    <div class="post-copy">
+                        <h2 class="post-title">The key to a successful holiday: choice</h2>
+                        <p class="post-desc">When rain reaches the Baltic and the wind turns cold, good infrastructure provides alternatives: food, entertainment and recreation. Marcin, 44, from Warsaw has returned to Świnoujście with his wife and three children for a decade. He values how easily the family can switch plans—cycling to Germany on connected promenade routes, visiting nearby Lake Wicko, finding a quieter beach around Karsibór, or choosing an aquapark, the turquoise lake and archipelago at Lubin, Peenemünde’s former rocket site or the aircraft museum at Heringsdorf.</p>
+                        <p class="post-desc">He does not mind booking more than a kilometre from the sea. His preferred area, the Platan estate, is about a 15-minute walk from the beach and also makes it easy to reach the centre, the port or the ferry between Usedom and Wolin.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="post-scene" data-post-scene="two-faces" data-post-photo="two-faces">
+                <div class="post-scene-inner">
+                    <div class="post-copy">
+                        <h2 class="post-title">One tourist, two faces</h2>
+                        <p class="post-desc">The data and first-hand accounts suggest that the Polish Baltic tourist has two faces that only appear contradictory.</p>
+                        <p class="post-desc">“There is a tension between the need for comfort and accessible services, and the desire for seclusion and renewal,” Lewiński says. Those needs can coexist: “The same person may sometimes want to rest in comfort and at other times more contemplatively.”</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="post-scene post-scene-right" data-post-scene="poles" data-post-photo="poles">
+                <div class="post-scene-inner">
+                    <div class="post-copy">
+                        <h2 class="post-title">Two poles of the ideal beach</h2>
+                        <p class="post-desc">That is why Kołobrzeg and Pogorzelica—radically different places—can finish second and third in the same ranking.</p>
+                        <p class="post-desc">Kołobrzeg answers the desire to have everything close at hand: accommodation, food, bathing areas and easy logistics. It is the safe choice for visitors who want certainty that nothing will be missing.</p>
+                        <p class="post-desc">Pogorzelica answers a different version of the same need: equally good, but quieter. Forest, clean water and silence create a sense of considered escape. “The absence of crowds, silence and peace are among the advantages mentioned most often,” Lewiński notes.</p>
+                        <p class="post-desc">They are opposite ends of one shared requirement: quality with confidence.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="post-scene" data-post-scene="mielno" data-post-photo="mielno">
+                <div class="post-scene-inner">
+                    <div class="post-copy">
+                        <h2 class="post-title">Why the winning beach won</h2>
+                        <p class="post-desc">A third element explains Mielno’s victory. The typical Baltic visitor seeks a middle path—not an overcrowded resort, but not complete isolation either. Mielno does not force one virtue to come at the expense of another. It never dominated a single category, yet combined sufficient infrastructure, accommodation close to the beach and prices that are easier to live with than those of a major resort.</p>
+                        <p class="post-desc">Kołobrzeg offers confidence through completeness.<br>Pogorzelica offers it through peace and quality.<br>Mielno offers it through a well-judged compromise.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="post-scene post-scene-right" data-post-scene="change" data-post-photo="quiet">
+                <div class="post-scene-inner">
+                    <div class="post-copy">
+                        <h2 class="post-title">How our style of rest has changed</h2>
+                        <p class="post-desc">This is more than a story about three towns. Lewiński points back to the origins of mass tourism as rest for workers. In France, paid leave existed for selected groups in the nineteenth century, but 1936 brought the first universal entitlement: two weeks of paid holiday and a 40-hour working week. “It was a model of holiday as rest and recovery,” he says. Only later did tourism turn towards intense sightseeing and experience collecting—sometimes producing fatigue rather than renewal.</p>
+                        <p class="post-desc">There are signs of a return to that original function, driven by the pace of life and a growing mental load. Holidays become less an exercise in constant exploration and more a tool for recovery. “Increasingly, we want to rest—not come home exhausted from our holiday,” Lewiński says.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="post-scene post-scene-right" data-post-scene="quiet" data-post-photo="quiet">
+                <div class="post-scene-inner">
+                    <div class="post-copy">
+                        <h2 class="post-title">A holiday for switching off, not keeping score</h2>
+                        <p class="post-desc">Travellers increasingly choose places and forms of rest that help them slow down, even at the cost of famous attractions or spectacular experiences. Something once treated as a failure—boredom—can become valuable. “Boredom used to be a curse; today it is a luxury,” Lewiński observes. Having nowhere to be and nothing chasing you can be the reward itself. Destinations that let visitors do less may therefore gain an advantage. Half joking, but only half, he concludes that resorts should offer “high-quality boredom.” It may become their most desirable product.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="post-scene post-scene-light post-scene-ranking" data-post-scene="ranking">
+                <div class="post-scene-inner">
+                    <div class="post-copy">
+                        <h2 class="ranking-heading">The Baltic’s 20 best beaches</h2>
+                        <div class="ranking-table" id="rankingTable"></div>
+                    </div>
+                </div>
+            </section>
+
+        </section>
+
+    </main>
+
+    <script src="plaze-coords.js?v=20260624"></script>
+    <script>
+
+
+        const BEACHES = [
+            { rank: 1, city: "Mielno", region: "West Pomeranian Voivodeship", lat: 54.26180687141744, lng: 16.06065385515295, score: 0.89, calculatorRank: 3, desc: "Mielno did not win every category. It topped the ranking because it offers a little of everything—the balance many travellers want from a Baltic holiday. The calculator’s third most frequent recommendation sits neatly between Kołobrzeg’s resort infrastructure and Pogorzelica’s natural setting. Mielno is the middle ground: a medium-sized town, accessible prices, Blue Flag bathing areas and the shortest walk to the beach among the top three.", img: "assets/photos/27.jpg" },
+            { rank: 2, city: "Kołobrzeg", region: "West Pomeranian Voivodeship", lat: 54.185081552403545, lng: 15.57739351389595, score: 0.87, calculatorRank: 1, desc: "The quality leader: nine bathing areas, more than 100 restaurants, a pier, marina, lighthouse and one of the wider beaches in the ranking. Kołobrzeg was the calculator’s most frequent recommendation because it has virtually everything expected of a seaside resort. That comes at a price—expensive restaurants and hotels, chronic parking shortages and the bustle of a 40,000-person town. It suits visitors who put quality first and are not counting every złoty.", img: "assets/photos/18.jpg" },
+            { rank: 3, city: "Pogorzelica", region: "West Pomeranian Voivodeship", lat: 54.10156195367683, lng: 15.114036270230317, score: 0.78, calculatorRank: 2, desc: "Pogorzelica completes the podium with a combination of silence, forest and calm that is increasingly rare on the Polish coast. Its place as the calculator’s second most frequent recommendation shows how many holidaymakers want to escape city noise. Comfort is not sacrificed: Blue Flag bathing areas and clean water support a high-quality stay. The trade-off is a smaller accommodation base, fewer restaurants and a less convenient journey.", img: "assets/photos/13.jpg" },
+            { rank: 4, city: "Rewal", region: "West Pomeranian Voivodeship", lat: 54.08196055388609, lng: 15.01402752182748, score: 0.77, calculatorRank: 7, desc: "Rewal offers the best value for money in the top ten. A cliff-lined coast, fishing boats pulled onto the sand and panoramic terraces create a distinctive atmosphere. Four Blue Flag bathing areas, reasonably priced accommodation and affordable food deliver a great deal for the money. Nearby Trzęsacz and Niechorze add even more options for days out and sightseeing.", img: "assets/photos/11.jpg" },
+            { rank: 5, city: "Jarosławiec", region: "West Pomeranian Voivodeship", lat: 54.53895039694112, lng: 16.539649762570267, score: 0.76, calculatorRank: 6, desc: "One of Poland’s widest beaches is a powerful draw, but not the only one. Even at the height of summer, its vast strip of sand creates a sense of space. Jarosławiec is also a quiet, family-oriented resort with holiday cottages and prices that remain reasonable. The 150-metre-wide beach has a downside, however: the long walk to the water can be difficult with a pushchair, for older visitors or for anyone who dislikes trudging across sand.", img: "assets/photos/37.jpg" },
+            { rank: 6, city: "Sopot", region: "Pomeranian Voivodeship", lat: 54.44408294051299, lng: 18.56827737818933, score: 0.71, calculatorRank: 14, desc: "Sopot received the highest marks from our reporters. Its pier, cultural events, water sports and one of the Baltic’s longest seasons make boredom unlikely. The calculator recommended it less often, chiefly because its higher prices may deter some visitors. Those who do come get a polished resort experience and a range of attractions unmatched elsewhere on the Polish coast.", img: "assets/photos/68.jpg" },
+            { rank: 7, city: "Pobierowo", region: "West Pomeranian Voivodeship", lat: 54.061611005369556, lng: 14.932414769443872, score: 0.65, calculatorRank: 8, desc: "A dependable holiday town that long sat in the shadow of better-known resorts. With a wide beach, six bathing areas, Blue Flag status and clean water, Pobierowo has few serious weaknesses. Its strength is balance: parking is relatively easy, prices are moderate and the town becomes much quieter outside peak season. That blend of convenience, quality and consistency made it a frequent calculator recommendation.", img: "assets/photos/8.jpg" },
+            { rank: 8, city: "Władysławowo", region: "Pomeranian Voivodeship", lat: 54.79622857212615, lng: 18.40430014629219, score: 0.63, calculatorRank: 13, desc: "The gateway to the Hel Peninsula is one of the easiest places in which to organise a seaside stay. A railway station, marina, numerous campsites, parking and public toilets make it especially convenient. Our reporters’ visit confirmed the calculator’s verdict: Władysławowo balances accessibility, attractions and a genuine coastal atmosphere. Congested access roads and packed trains in high season are the main drawbacks.", img: "assets/photos/55.jpg" },
+            { rank: 9, city: "Świnoujście", region: "West Pomeranian Voivodeship", lat: 53.92286924074953, lng: 14.253401398418886, score: 0.63, calculatorRank: 9, desc: "A broad beach with an urban character is Świnoujście’s central strength. The ferry crossing and the sight of ships entering and leaving the port add to its appeal. Facilities include Blue Flag bathing areas, a marina, an extensive cycle network and accessible infrastructure. Higher prices and scarce parking cost it points, but the spacious beach and unusually wide range of activities compensate.", img: "assets/photos/1.jpg" },
+            { rank: 10, city: "Kopalino / Lubiatowo", region: "Pomeranian Voivodeship", lat: 54.80344841841891, lng: 17.859247957315056, score: 0.62, calculatorRank: 15, desc: "The only place in the ranking to receive a perfect 10/10 from our reporters for their overall impression. Its almost empty beaches are hidden among forests, up to two kilometres from the nearest buildings. The absence of lifeguarded bathing areas, promenades and extensive facilities is a deliberate feature, not a flaw. Kopalino and Lubiatowo are for visitors who choose silence and nature over the standard conveniences of a resort.", img: "assets/photos/47.jpg" },
+            { rank: 11, city: "Czołpino", region: "Pomeranian Voivodeship", lat: 54.72299633409803, lng: 17.231397123999496, score: 0.61, calculatorRank: 11, desc: "A jewel of Słowiński National Park, Czołpino combines a natural landscape with exceptional peace. An empty beach, shifting dunes and a walk of almost a kilometre through the forest make reaching the sea part of the experience. Despite the wild setting, there are clean, free toilets and some of the clearest water on the Polish coast. For many visitors, the lack of conventional resort infrastructure is its greatest advantage.", img: "assets/photos/43.jpg" },
+            { rank: 12, city: "Sarbinowo", region: "West Pomeranian Voivodeship", lat: 54.24745951660476, lng: 15.963726796340033, score: 0.58, calculatorRank: 4, desc: "Sarbinowo appeared frequently in the calculator results, although the lively promenade directly beside the beach lowered its score in our reporters’ assessment. For many visitors, that animated summer atmosphere is precisely the attraction. Four clean bathing areas, a wide range of services and a short distance between the beach and town make it a strong option for a convenient, traditional seaside holiday.", img: "assets/photos/24.jpg" },
+            { rank: 13, city: "Grzybowo", region: "West Pomeranian Voivodeship", lat: 54.17027620282531, lng: 15.485622549995348, score: 0.57, calculatorRank: 10, desc: "A quieter neighbour of Kołobrzeg, Grzybowo combines a small-scale atmosphere with one of the region’s best-equipped beaches. Its Blue Flag bathing area has showers, changing rooms and accessible facilities, while the water is rated in the cleanest class. Free parking and low-rise development are further advantages. Kołobrzeg’s attractions remain only about 15 minutes away by bicycle—an appealing compromise between a major resort and a peaceful base.", img: "assets/photos/17.jpg" },
+            { rank: 14, city: "Jastarnia", region: "Pomeranian Voivodeship", lat: 54.69156189847561, lng: 18.67898517033732, score: 0.54, calculatorRank: 20, desc: "Jastarnia was the only place in the ranking to receive 10/10 from our reporters for beach cleanliness. Its position on the Hel Peninsula provides the Baltic Sea on one side and the sheltered waters of Puck Bay for water sports on the other. A railway station, marina and Blue Flag bathing area round out one of the most versatile destinations on the Polish coast.", img: "assets/photos/58.jpg" },
+            { rank: 15, city: "Podczele", region: "West Pomeranian Voivodeship", lat: 54.19901277331845, lng: 15.692284943799354, score: 0.46, calculatorRank: 12, desc: "A quiet district of Kołobrzeg where a 500-metre walk through the forest separates the beach from the large resort’s bustle. The result is more space, a calmer atmosphere and close contact with nature. Excellent water quality and the wooded setting make it especially relaxing. There are no food outlets directly on the beach, but many visitors gladly trade that convenience for silence and fewer crowds.", img: "assets/photos/19.jpg" },
+            { rank: 16, city: "Poddąbie", region: "Pomeranian Voivodeship", lat: 54.621456614236, lng: 16.951238280183215, score: 0.46, calculatorRank: 5, desc: "A wild beach, forest and pervasive quiet make Poddąbie a dream for some nature-minded visitors. Others may find it too austere and short on standard seaside amenities. Excellent water quality and relatively inexpensive accommodation keep it high in the ranking. It is best suited to deliberate minimalists who value simplicity, calm and nature more than extensive infrastructure.", img: "assets/photos/40.jpg" },
+            { rank: 17, city: "Międzywodzie", region: "West Pomeranian Voivodeship", lat: 54.00583927546725, lng: 14.69681857640304, score: 0.40, calculatorRank: 16, desc: "A calm holiday town designed for a convenient, predictable break. Its Blue Flag bathing area, clean water and easy access make Międzywodzie a safe choice for families and comfort-minded travellers. The beaches are wide and generally uncrowded, with permanent toilets near the entrances and readily available parking. It has few spectacular attractions—but also few important faults.", img: "assets/photos/4.jpg" },
+            { rank: 18, city: "Dźwirzyno", region: "West Pomeranian Voivodeship", lat: 54.156654540280556, lng: 15.409680132493948, score: 0.31, calculatorRank: 19, desc: "Dźwirzyno draws visitors with a wide, well-kept beach, excellent water quality and a convenient cycle path to Kołobrzeg. It suits anyone seeking peace while keeping a larger resort within easy reach. The food selection directly by the beach is limited, so a plate of fried fish may require a longer walk. Free parking, cleanliness and access to Kołobrzeg’s attractions nevertheless earned it a top-20 place.", img: "assets/photos/16.jpg" },
+            { rank: 19, city: "Stegna", region: "Pomeranian Voivodeship", lat: 54.3319670214274, lng: 19.113881872881336, score: 0.29, calculatorRank: 17, desc: "Stegna performs well for infrastructure and access to attractions, but ranked last in our reporters’ subjective assessment. Their visit found familiar resort clutter: crowded stalls, amusement machines and overflowing bins that reduced the town’s charm. Some visitors enjoy that energy, but we found it better suited to a short visit than a long, quiet seaside holiday.", img: "assets/photos/76.jpg" },
+            { rank: 20, city: "Hel", region: "Pomeranian Voivodeship", lat: 54.60878397388439, lng: 18.80150851039972, score: 0.26, calculatorRank: 18, desc: "Hel’s broad beach, seal sanctuary and harbour atmosphere make it one of the Baltic’s best-known destinations. Our reporters also found natural debris washed ashore and paid toilets, which lowered its subjective score. There are plenty of family attractions, but many visitors may prefer Hel as a day trip rather than a long stay. Its remarkable location at the end of the peninsula secures the final place in the top 20, though summer traffic can make the journey difficult.", img: "assets/photos/60.jpg" }
+        ];
+
+        const stepsEl = document.getElementById("steps");
+        const progressEl = document.getElementById("scrollProgress");
+        const placeDetailEl = document.getElementById("placeDetail");
+        const heroBlurEl = document.getElementById("heroBlur");
+        const postScrollyEl = document.getElementById("postScrolly");
+        const postScenes = [...document.querySelectorAll(".post-scene")];
+        const postPhotos = [...document.querySelectorAll(".post-photo")];
+        const mobileQuery = window.matchMedia("(max-width: 760px)");
+
+        const isMac = /Mac|iPhone|iPad|iPod/i.test(
+            (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent
+        );
+        if (isMac) document.body.classList.add("is-mac");
+
+        const COORDS = window.PLAZE_COORDS || {};
+
+        BEACHES.forEach((beach) => {
+            const c = COORDS[beach.city];
+            if (c) { beach.lat = c[0]; beach.lng = c[1]; }
+        });
+
+        const topBeachNames = new Set(BEACHES.map((beach) => beach.city));
+        const sortedAscending = [...BEACHES].sort((a, b) => a.rank - b.rank);
+        const podiumOrder = [...BEACHES].filter((beach) => beach.rank <= 3).sort((a, b) => a.rank - b.rank);
+        const beachByRank = new Map(BEACHES.map((beach) => [beach.rank, beach]));
+        const markers = new Map();
+        const allPointMarkers = [];
+        let allPointData = [];
+        let allPointTimers = [];
+        let activePlaceBeach = null;
+        let glLayer = null;
+        let rankRevealTimers = [];
+        let map = null;
+        let activeStep = null;
+        let activeRank = null;
+        let currentMode = "intro";
+        let scrollTicking = false;
+        let hoverTip = null;
+        let revealAllCount = -1;
+        let revealTopCount = -1;
+        let top20Dimmed = false;
+
+        function hideHoverTip() {
+            if (hoverTip) hoverTip.hidden = true;
+        }
+
+        function escHtml(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        function averageScore(beach) {
+            return beach.score;
+        }
+
+        function rankColor(rank) {
+            if (rank <= 3) return "#27ae60";
+            if (rank <= 7) return "#8cc152";
+            if (rank <= 10) return "#f5b731";
+            if (rank <= 15) return "#e67e22";
+            return "#e74c3c";
+        }
+
+        function rankGradientColor(rank, total) {
+            const stops = [
+                [0.00, [0x27, 0xae, 0x60]],
+                [0.25, [0x8c, 0xc1, 0x52]],
+                [0.50, [0xf5, 0xb7, 0x31]],
+                [0.75, [0xe6, 0x7e, 0x22]],
+                [1.00, [0xe7, 0x4c, 0x3c]]
+            ];
+            const t = total > 1 ? (rank - 1) / (total - 1) : 0;
+            let a = stops[0], b = stops[stops.length - 1];
+            for (let i = 0; i < stops.length - 1; i++) {
+                if (t >= stops[i][0] && t <= stops[i + 1][0]) { a = stops[i]; b = stops[i + 1]; break; }
+            }
+            const span = b[0] - a[0];
+            const f = span > 0 ? (t - a[0]) / span : 0;
+            const ch = (i) => Math.round(a[1][i] + (b[1][i] - a[1][i]) * f);
+            return `rgb(${ch(0)}, ${ch(1)}, ${ch(2)})`;
+        }
+
+        function renderRankingTable() {
+            const el = document.getElementById("rankingTable");
+            if (!el) return;
+            el.innerHTML = sortedAscending.map((beach) => `
+                <div class="ranking-row">
+                    <span class="ranking-rank" style="--row-color:${rankGradientColor(beach.rank, sortedAscending.length)}">${beach.rank}</span>
+                    <span class="ranking-name">${escHtml(beach.city)}</span>
+                </div>
+            `).join("");
+        }
+
+        function barColor(score) {
+            if (score >= 0.80) return "#27ae60";
+            if (score >= 0.70) return "#8cc152";
+            if (score >= 0.58) return "#f5b731";
+            if (score >= 0.42) return "#e67e22";
+            return "#e74c3c";
+        }
+
+        const PODIUM_COPY = {
+            1: [
+                "Mielno won not by dominating a single category, but by performing well almost everywhere. Its image has moved beyond loud nightlife: today it is one of the Baltic’s most versatile resorts. The widened beach offers more space in high season, and the clean shore supports a comfortable day by the water.",
+                "Restaurants, cafés and attractions are plentiful, while prices—from fish bars to ice cream and waffles—can be pleasantly surprising. Lake Jamno adds another setting for recreation. A promenade, Baltic-facing restaurant terraces and the town’s famous walrus monument show Mielno’s different sides. It works for visitors who want activity and for those seeking calm. That versatility secured first place."
+            ],
+            2: [
+                "Kołobrzeg’s second place is easy to understand. One of the largest and best-equipped Baltic resorts, it combines wide sandy beaches with an extensive accommodation base, hundreds of restaurants and a broad range of attractions. It has remained a fixture on Poland’s holiday map for years.",
+                "The pier, harbour and lighthouse define the city, with coastal views from above and excursion boats departing below. The seafront promenade stays busy throughout the season. Kołobrzeg’s scale is also its drawback: cod costs more than in many neighbouring towns, and finding free parking at the height of summer can be difficult."
+            ],
+            3: [
+                "Pogorzelica does not compete for attention with neon signs, loud promenades or endless attractions. It offers space, calm and proximity to nature instead. Sheltered by coastal forest, the small town has broad beaches where finding an uncrowded patch of sand remains possible even in high season.",
+                "Its intimate character is the attraction. There is little market clutter and few of the stalls that dominate larger resorts. Restaurants and fish bars cluster near the main beach entrance while the rest of the town stays quiet. Free parking is relatively easy to find, and a narrow-gauge railway provides a charming way to explore more of the coast."
+            ]
+        };
+
+        function renderSteps() {
+            const intro = `
+                <section class="step step-hero is-active" data-mode="intro">
+                    <div class="hero-copy">
+                        <div class="hero-title"><span>Destination</span><strong>The Baltic</strong><small>Poland’s 20 best beaches</small></div>
+                        <p class="hero-lead">Where on the Baltic coast can you truly enjoy a holiday? Does lively Świnoujście beat fashionable Sopot, or can intimate Poddąbie outscore them both? More than 50,000 calculator responses, thousands of data points and hundreds of kilometres of field reporting produced the first ranking of its kind in Poland.</p>
+                        <button type="button" class="hero-scroll" id="heroScroll" aria-label="Scroll Down">
+                            <span class="hero-scroll-label"><b>Scroll down</b></span>
+                            <span class="hero-scroll-arrow"></span>
+                        </button>
+                    </div>
+                </section>`;
+
+            const allPoints = `
+                <section class="step step-allpoints" data-mode="all81">
+                    <article class="step-card step-card-wide">
+                        <h2 class="step-title">From Świnoujście to Piaski: 81 coastal towns compared</h2>
+                        <p class="step-desc">The project began in May with a calculator that helped more than 50,000 people find their ideal Baltic destination. It compared 81 coastal towns—from Świnoujście to Piaski—using weather, beach cleanliness and width, infrastructure and average prices, then matched the results to each visitor’s priorities.</p>
+                        <p class="step-desc">Didn’t get a chance to see which beach best matched your preferences in the project calculator? <b>You can still try it below ↓</b></p>
+                    </article>
+                </section>`;
+
+            const calculatorStep = `
+                <section class="step step-calc" data-mode="all81">
+                    <article class="step-card step-card-calc">
+                        <div class="step-calc-placeholder" aria-hidden="true"></div>
+                    </article>
+                </section>`;
+
+            const rankingIntroStep = `
+                <section class="step step-top20-intro" data-mode="top20">
+                    <article class="step-card step-card-wide">
+                        <h2 class="step-title">A uniquely comprehensive coastal ranking</h2>
+                        <p class="step-desc">The calculator’s most frequent recommendations produced a shortlist of 20 coastal destinations, which our reporters then visited and assessed in person. Calculator performance supplied half of the final score and field observations the other half, combining measured data with first-hand experience.</p>
+                    </article>
+                </section>`;
+
+            const top20Step = `
+                <section class="step" data-mode="top20">
+                    <article class="step-card step-card-wide">
+                        <h2 class="step-title">Twenty Baltic standouts</h2>
+                        <p class="step-desc">The top 20 range from major resorts such as Kołobrzeg and Sopot to small coastal villages including Lubiatowo and Pogorzelica. We considered both wild, open beaches and places with complete infrastructure for families, active travellers and comfort-minded visitors.</p>
+                        <p class="step-desc">Three familiar resorts led the calculator, but field visits revealed one unusually versatile destination. It suits travellers who enjoy a lively resort while still offering room to escape the crowds. That balance became the key to victory.</p>
+                        <p class="step-cta-link">Explore the ranking ↓</p>
+                    </article>
+                </section>`;
+
+            const podiumSteps = podiumOrder.map((beach) => {
+                const paragraphs = (PODIUM_COPY[beach.rank] || [beach.desc])
+                    .map((p) => `<p class="step-desc">${escHtml(p)}</p>`).join("");
+                return `
+                <section class="step" data-mode="podium" data-rank="${beach.rank}">
+                    <article class="step-card">
+                        <div class="step-kicker">
+                            <span class="rank-pill" style="--rank-color:${rankColor(beach.rank)}">${beach.rank}</span>
+                            <span class="podium-place-label">place</span>
+                        </div>
+                        <h2 class="step-title">${escHtml(beach.city)}</h2>
+                        ${paragraphs}
+                    </article>
+                </section>`;
+            }).join("");
+
+            const outro = `
+                <section class="step step-pin" data-mode="free">
+                    <div class="step-pin-inner">
+                        <article class="step-card step-card-wide" id="freeCta">
+                            <button class="step-card-close" type="button" aria-label="Close">&times;</button>
+                            <h2 class="step-title">Explore the full ranking</h2>
+                            <p class="step-desc">
+                                <span class="hint-mouse">
+                                    <span class="hint-line">
+                                        <svg viewBox="0 0 451.44 767.84" fill="currentColor" aria-hidden="true"><path d="M332.83,740.66c-87.61,47.45-195.05,31.52-265.58-38.04C24.79,660.74,0,603.63,0,543.15V224.5c.01-60.43,24.85-117.47,67.24-159.3C144.7-11.22,264.77-21.67,354.07,40.25c50.23,34.83,84.4,88.12,94.35,148.52,1.97,11.93,3.02,22.12,3.02,34.39l-.2,335.33c-5.92,68.77-40.79,130.13-97.24,169.12l-21.17,13.05ZM91.22,660.87c71.56,80.96,196.91,80.86,268.52.68,29.49-33.02,45.72-75.45,45.72-120.77V227.03c0-45.31-16.24-87.75-45.71-120.76-71.85-80.46-197.59-80.1-268.85,1.03-19.71,22.44-34.07,49.4-40.42,79.51-1.65,7.8-4.07,15.83-4.07,24.26v345.66c0,8.44,2.42,16.45,4.08,24.28,6.35,29.98,20.6,57.07,40.73,79.84Z"/><path d="M264.8,300.43c.01,17.08-14.63,29.66-32.93,30.46-17.5.76-35.72-11.55-35.71-28.55l.08-138.97c0-16.47,17.93-27.93,34.28-27.71,18.39.24,34.17,12.57,34.18,29.3l.1,135.48Z"/></svg>
+                                        <span>Hold <kbd class="key-ctrl">Ctrl</kbd><kbd class="key-cmd">⌘&nbsp;Cmd</kbd> and scroll to zoom.</span>
+                                    </span>
+                                    <span class="hint-line">
+                                        <svg viewBox="0 0 278.17 383.85" fill="currentColor" aria-hidden="true"><path d="M197.95,383.68l-69.81.17c-26.59.07-51.1-14.29-65.2-36.58L5.61,256.65c-11.21-17.73-4.79-40.56,11.91-51.77,16.5-11.08,40.22-8.1,52.06,8.62l12.77,18.04.09-141.52c.01-18.63,14.7-32.68,32.33-32.97,18.21-.3,33.39,14.05,33.42,32.84l.07,34.92c17.45-5.67,35.4,3.31,41.68,20.69,18.6-7.03,37.61,2.77,43.78,21.13,11.04-3.36,21.41-2.55,30.81,4.1,7.07,5,13.67,14.56,13.65,25.26l-.14,105.97c-.06,43.62-36.03,80.22-80.09,81.72ZM212.4,202.38l-.19-27.48c-.04-6.1-6.25-9.66-11.33-9.05-5.69.68-9.31,5.11-9.31,11.19l.02,25.25-22.46.14-.13-46.37c-.02-6.28-4.79-10.36-10.3-10.4s-10.44,4.01-10.45,10.31l-.05,46.37-22.49.02v-112.36c0-6.51-5.29-10.71-10.93-10.35-5.97.38-9.91,4.69-9.91,11.47l-.04,214.35-53.87-79.19c-4.86-7.14-15.53-6.61-21.35-2.39-6.14,4.46-9.5,13.68-4.97,20.8l59.45,93.41c9.28,14.58,27.06,23.19,43.99,23.17l68.3-.05c31.19-.02,58.92-26.63,58.97-58.24l.19-107.01c.01-6.91-8.35-10.24-13.23-8.51-5.97,2.12-8.46,7.76-7.11,14.84l-22.8.06Z"/><polygon points="126.02 31.06 103.43 31.05 103.44 0 126.1 0 126.02 31.06"/><polygon points="71.71 51.31 50.74 28.57 67.38 13.26 88.42 36.33 71.71 51.31"/><polygon points="197.36 84.59 166.23 87.36 164.16 65.01 195.09 62.09 197.36 84.59"/><polygon points="157.02 51.41 140.4 36.25 161.27 13.24 177.98 28.3 157.02 51.41"/><polygon points="62.45 87.27 31.51 84.59 33.41 62.04 64.42 64.96 62.45 87.27"/></svg>
+                                        <span>Select a point to see details.</span>
+                                    </span>
+                                </span>
+                                <span class="hint-touch">
+                                    <span class="hint-line">
+                                        <svg class="icon-zoom" viewBox="0 0 275.02 274.77" fill="currentColor" aria-hidden="true"><path d="M274.82,262.53c-.02,7.65-7.39,12.22-13.97,12.22h-61.71c-7.26,0-12.76-5.24-12.92-12.31-.15-6.41,5.06-12.54,12.12-12.59l32.49-.23-69.2-69.3c-5.55-5.56-6.69-13.27-1.17-18.93,5.18-5.31,13.31-5.01,18.84.48l70.6,70.11.15-32.29c.03-7.32,5.97-12.66,12.67-12.45,7.17.22,12.3,5.87,12.28,13.24l-.2,62.07Z"/><path d="M97.74,116.33L25.13,43.89l-.22,32.45c-.05,6.69-5.74,11.79-11.95,12.02-5.97.22-12.81-4.37-12.82-11.22L0,13.89C-.01,7.64,4.32,1.01,11.35,1.01l64.37-.07c7.13,0,11.84,6.64,11.72,12.61-.14,7.22-5.91,12.39-13.13,12.4l-31.38.04,71.98,72.08c4.75,4.76,4.47,12.48.25,17.14-3.97,4.39-12.09,6.45-17.43,1.12Z"/><path d="M249.78,42.64l-73.42,73.32c-4.77,4.76-12.78,3.25-16.85-1.01-4.5-4.71-4.85-12.43.07-17.35L232.24,24.9l-33.01-.2c-6.74-.04-11.38-6.03-11.68-12.03C187.26,7,191.74,0,198.36,0l66.29.05c5.54,0,10.26,6.36,10.27,11.46l.09,62.53c.01,7.28-5.12,13.09-12.25,13.23-6.75.14-12.65-5.13-12.7-12.46l-.27-32.18Z"/><path d="M13.74,274.76c-7.12,0-13.5-4.63-13.5-11.94v-63.9c0-6.97,6.62-11.87,12.71-11.68,6.63.2,11.94,5.44,11.98,12.44l.18,32.32,70.74-70.72c5-5,11.84-5.75,17.27-1.4,4.43,3.54,7.22,11.99,2.23,17l-72.43,72.74,33.54.31c7.1.07,11.61,7.18,11.12,13.26-.57,7-6.2,11.58-13.32,11.58H13.74Z"/></svg>
+                                        <span>Use two fingers to zoom.</span>
+                                    </span>
+                                    <span class="hint-line">
+                                        <svg viewBox="0 0 278.17 383.85" fill="currentColor" aria-hidden="true"><path d="M197.95,383.68l-69.81.17c-26.59.07-51.1-14.29-65.2-36.58L5.61,256.65c-11.21-17.73-4.79-40.56,11.91-51.77,16.5-11.08,40.22-8.1,52.06,8.62l12.77,18.04.09-141.52c.01-18.63,14.7-32.68,32.33-32.97,18.21-.3,33.39,14.05,33.42,32.84l.07,34.92c17.45-5.67,35.4,3.31,41.68,20.69,18.6-7.03,37.61,2.77,43.78,21.13,11.04-3.36,21.41-2.55,30.81,4.1,7.07,5,13.67,14.56,13.65,25.26l-.14,105.97c-.06,43.62-36.03,80.22-80.09,81.72ZM212.4,202.38l-.19-27.48c-.04-6.1-6.25-9.66-11.33-9.05-5.69.68-9.31,5.11-9.31,11.19l.02,25.25-22.46.14-.13-46.37c-.02-6.28-4.79-10.36-10.3-10.4s-10.44,4.01-10.45,10.31l-.05,46.37-22.49.02v-112.36c0-6.51-5.29-10.71-10.93-10.35-5.97.38-9.91,4.69-9.91,11.47l-.04,214.35-53.87-79.19c-4.86-7.14-15.53-6.61-21.35-2.39-6.14,4.46-9.5,13.68-4.97,20.8l59.45,93.41c9.28,14.58,27.06,23.19,43.99,23.17l68.3-.05c31.19-.02,58.92-26.63,58.97-58.24l.19-107.01c.01-6.91-8.35-10.24-13.23-8.51-5.97,2.12-8.46,7.76-7.11,14.84l-22.8.06Z"/><polygon points="126.02 31.06 103.43 31.05 103.44 0 126.1 0 126.02 31.06"/><polygon points="71.71 51.31 50.74 28.57 67.38 13.26 88.42 36.33 71.71 51.31"/><polygon points="197.36 84.59 166.23 87.36 164.16 65.01 195.09 62.09 197.36 84.59"/><polygon points="157.02 51.41 140.4 36.25 161.27 13.24 177.98 28.3 157.02 51.41"/><polygon points="62.45 87.27 31.51 84.59 33.41 62.04 64.42 64.96 62.45 87.27"/></svg>
+                                        <span>Tap a point to see details.</span>
+                                    </span>
+                                </span>
+                            </p>
+                        </article>
+                        <button type="button" class="free-help-btn" id="freeHelpBtn" aria-label="Show instructions">?</button>
+                    </div>
+                </section>`;
+
+            stepsEl.innerHTML = intro + allPoints + calculatorStep + rankingIntroStep + top20Step + podiumSteps + outro;
+        }
+
+        function hideFreeCta() {
+            const freeCta = document.getElementById("freeCta");
+            if (freeCta) freeCta.classList.add("is-hidden");
+            const helpBtn = document.getElementById("freeHelpBtn");
+            if (helpBtn) helpBtn.classList.add("is-visible");
+        }
+
+        function showFreeCta() {
+            const freeCta = document.getElementById("freeCta");
+            if (freeCta) freeCta.classList.remove("is-hidden");
+            const helpBtn = document.getElementById("freeHelpBtn");
+            if (helpBtn) helpBtn.classList.remove("is-visible");
+        }
+
+        function selectBeach(rank) {
+            if (currentMode !== "free") return;
+            const beach = beachByRank.get(rank);
+            if (!beach) return;
+            activeRank = rank;
+            hideFreeCta();
+            setTopMarkerState({ mode: "free", activeRank: rank });
+            showPlaceDetail(beach);
+            focusBeach(beach);
+        }
+
+        function initMap() {
+            if (!window.L) {
+                document.body.classList.add("is-map-unavailable");
+                return;
+            }
+
+            map = L.map("map", {
+                center: [54.20, 17.18],
+                zoom: mobileQuery.matches ? 7 : 7.25,
+                minZoom: mobileQuery.matches ? 6.0 : 6.4,
+                maxZoom: 12,
+                zoomSnap: 0.1,
+                zoomControl: false,
+                attributionControl: false,
+                scrollWheelZoom: false,
+                dragging: false,
+                touchZoom: false,
+                doubleClickZoom: false,
+                boxZoom: false,
+                keyboard: false,
+                maxBoundsViscosity: 1.0
+            });
+
+            map.setMaxBounds(L.latLngBounds([44.0, 11.5], [60.0, 22.5]));
+
+            if (L.maplibreGL) {
+                glLayer = L.maplibreGL({ style: "map.json" });
+                glLayer.addTo(map);
+            }
+
+            const coordEntries = Object.entries(COORDS).sort((a, b) => a[1][1] - b[1][1]);
+            allPointData = coordEntries.map(([name, c]) => ({ name, ll: L.latLng(c[0], c[1]) }));
+            coordEntries.forEach(([name, c]) => {
+                    const point = L.circleMarker([c[0], c[1]], {
+                        radius: mobileQuery.matches ? 4 : 5.5,
+                        stroke: true,
+                        color: "#111111",
+                        weight: 0.7,
+                        opacity: 0,
+                        fillColor: "#ffd200",
+                        fillOpacity: 0,
+                        interactive: false,
+                        className: "story-point"
+                    }).addTo(map);
+                    allPointMarkers.push(point);
+                });
+
+            hoverTip = document.createElement("div");
+            hoverTip.className = "beach-hover-tip";
+            hoverTip.hidden = true;
+            hoverTip.setAttribute("aria-hidden", "true");
+            document.getElementById("map").appendChild(hoverTip);
+
+            map.on("mousemove", function (e) {
+
+                if (currentMode === "free") return;
+                if (currentMode !== "all81" && currentMode !== "top20") {
+                    hoverTip.hidden = true;
+                    return;
+                }
+                const pos = map.latLngToContainerPoint(e.latlng);
+                let closest = null;
+                let bestDist = 20;
+                allPointData.forEach(({ name, ll }) => {
+                    const mp = map.latLngToContainerPoint(ll);
+                    const d = Math.hypot(pos.x - mp.x, pos.y - mp.y);
+                    if (d < bestDist) { bestDist = d; closest = name; }
+                });
+                if (closest) {
+                    hoverTip.textContent = closest;
+                    hoverTip.hidden = false;
+                    hoverTip.style.left = pos.x + "px";
+                    hoverTip.style.top = (pos.y - 26) + "px";
+                } else {
+                    hoverTip.hidden = true;
+                }
+            });
+            map.on("mouseout", () => { hoverTip.hidden = true; });
+
+            map.on("zoomstart movestart", () => {
+                if (currentMode === "free" && !programmaticMove) hideFreeCta();
+            });
+
+            map.on("move zoom", positionPlaceDetail);
+
+            map.on("movestart", () => { if (glLayer) glLayer._zooming = false; });
+
+            map.on("moveend zoomend", () => {
+                if (!glLayer) return;
+                glLayer._zooming = false;
+                if (typeof glLayer._update === "function") glLayer._update();
+            });
+
+            sortedAscending.forEach((beach) => {
+                const color = rankColor(beach.rank);
+                const icon = L.divIcon({
+                    className: "beach-marker",
+                    html: `<span class="marker-dot" style="--marker-color:${color}"><span class="marker-label">${beach.rank}</span></span>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+
+                const marker = L.marker([beach.lat, beach.lng], {
+                    icon,
+                    keyboard: false,
+                    zIndexOffset: (21 - beach.rank) * 100
+                }).addTo(map);
+
+                marker.on("click", () => {
+                    selectBeach(beach.rank);
+                });
+
+                marker.on("mouseover", () => {
+                    if (mobileQuery.matches) return;
+                    if (currentMode !== "free") return;
+                    const pos = map.latLngToContainerPoint(marker.getLatLng());
+                    hoverTip.textContent = beach.city;
+                    hoverTip.hidden = false;
+                    hoverTip.style.left = pos.x + "px";
+                    hoverTip.style.top = (pos.y - 26) + "px";
+                });
+                marker.on("mouseout", () => {
+                    if (currentMode === "free") hoverTip.hidden = true;
+                });
+
+                markers.set(beach.rank, marker);
+            });
+
+            map.whenReady(() => {
+                setOverviewView(false);
+                window.setTimeout(() => map.invalidateSize(), 250);
+            });
+        }
+
+        function markProgrammaticMove() {
+            if (!map) return;
+            programmaticMove = true;
+            map.once("moveend", () => { programmaticMove = false; });
+        }
+
+        const DESKTOP_COAST_UP_PX = 150;
+        const MOBILE_COAST_UP_PX = 138;
+        const MOBILE_COAST_UP_RAISED_PX = 184;
+        const MOBILE_COAST_UP_FREE_PX = 106;
+
+        function setOverviewView(animate = true) {
+            if (!map) return;
+            const coordValues = Object.values(COORDS);
+            const boundsPoints = coordValues.length ? coordValues : BEACHES.map((b) => [b.lat, b.lng]);
+            const bounds = L.latLngBounds(boundsPoints).pad(mobileQuery.matches ? 0.05 : 0.10);
+            map.stop();
+            markProgrammaticMove();
+
+            if (mobileQuery.matches) {
+                const zoom = map.getBoundsZoom(bounds, false, L.point(52, 80));
+                let coastUp = MOBILE_COAST_UP_PX;
+                if (currentMode === "intro" || currentMode === "all81" || currentMode === "top20") {
+                    coastUp = MOBILE_COAST_UP_RAISED_PX;
+                } else if (currentMode === "free") {
+                    coastUp = MOBILE_COAST_UP_FREE_PX;
+                }
+                const ptc = map.project(bounds.getCenter(), zoom);
+                ptc.y += coastUp;
+                const center = map.unproject(ptc, zoom);
+                map.flyTo(center, zoom, { animate, duration: animate ? 1.2 : 0 });
+                return;
+            }
+
+            const zoom = map.getBoundsZoom(bounds, false, L.point(96, 80));
+            const ptc = map.project(bounds.getCenter(), zoom);
+            ptc.y += DESKTOP_COAST_UP_PX;
+            const center = map.unproject(ptc, zoom);
+            map.flyTo(center, zoom, { animate, duration: animate ? 1.2 : 0 });
+        }
+
+        function focusBeach(beach) {
+            if (!map) return;
+            const zoom = mobileQuery.matches ? 9 : 10;
+            map.stop();
+            markProgrammaticMove();
+
+            let offsetX = 0;
+            let offsetY = 0;
+
+            if (currentMode === "free" && mobileQuery.matches) {
+
+                const desiredY = map.getSize().y * 0.15;
+                offsetY = (map.getSize().y / 2) - desiredY;
+            } else if (currentMode === "free") {
+
+                const desiredX = map.getSize().x * 0.3;
+                offsetX = (map.getSize().x / 2) - desiredX;
+                const desiredY = map.getSize().y * 0.22;
+                offsetY = (map.getSize().y / 2) - desiredY;
+            } else if (!mobileQuery.matches && currentMode === "podium") {
+                const card = document.querySelector(".step.is-active .step-card");
+                const mapEl = document.getElementById("map");
+                if (card && mapEl) {
+                    const mapRect = mapEl.getBoundingClientRect();
+                    const cardRect = card.getBoundingClientRect();
+                    const desiredX = (cardRect.left - mapRect.left) / 2;
+                    offsetX = (map.getSize().x / 2) - desiredX;
+                }
+                const desiredY = map.getSize().y * 0.28;
+                offsetY = (map.getSize().y / 2) - desiredY;
+            } else if (mobileQuery.matches && currentMode === "podium") {
+
+                const desiredY = map.getSize().y * 0.16;
+                offsetY = (map.getSize().y / 2) - desiredY;
+            }
+
+            let center = [beach.lat, beach.lng];
+            if (offsetX !== 0 || offsetY !== 0) {
+                const pt = map.project([beach.lat, beach.lng], zoom).add([offsetX, offsetY]);
+                center = map.unproject(pt, zoom);
+            }
+
+            map.flyTo(center, zoom, {
+                animate: true,
+                duration: 1.35,
+                easeLinearity: 0.28
+            });
+        }
+
+        let beachImagesPreloaded = false;
+        function preloadBeachImages() {
+            if (beachImagesPreloaded) return;
+            beachImagesPreloaded = true;
+            sortedAscending.forEach((beach) => {
+                if (!beach.img) return;
+                const img = new Image();
+                img.decoding = "async";
+                img.src = beach.img;
+            });
+        }
+
+        let mapWheelHandler = null;
+        let programmaticMove = false;
+
+        function enableMapInteraction() {
+            if (!map) return;
+            map.touchZoom.enable();
+            map.doubleClickZoom.enable();
+            const mapEl = document.getElementById("map");
+            if (mobileQuery.matches) {
+
+                map.dragging.disable();
+                mapEl.style.touchAction = "pan-y";
+            } else {
+                map.dragging.enable();
+                mapEl.style.touchAction = "auto";
+            }
+            if (!mapWheelHandler) {
+                mapWheelHandler = (e) => {
+                    if (!e.ctrlKey && !e.metaKey) return;
+                    hideFreeCta();
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const delta = e.deltaY < 0 ? 1 : -1;
+                    map.setZoom(map.getZoom() + delta);
+                };
+                mapEl.addEventListener("wheel", mapWheelHandler, { passive: false });
+            }
+        }
+
+        function disableMapInteraction() {
+            if (!map) return;
+            map.dragging.disable();
+            map.touchZoom.disable();
+            map.doubleClickZoom.disable();
+            const mapEl = document.getElementById("map");
+            if (mapWheelHandler) {
+                mapEl.removeEventListener("wheel", mapWheelHandler);
+                mapWheelHandler = null;
+            }
+            mapEl.style.touchAction = "pan-y";
+        }
+
+        function clearAllPointTimers() {
+            allPointTimers.forEach((timer) => window.clearTimeout(timer));
+            allPointTimers = [];
+        }
+
+        function clearRankRevealTimers() {
+            rankRevealTimers.forEach((timer) => window.clearTimeout(timer));
+            rankRevealTimers = [];
+        }
+
+        function animateTopMarkersReveal() {
+            clearRankRevealTimers();
+            markers.forEach((marker) => {
+                const el = marker.getElement();
+                if (!el) return;
+                el.classList.remove("is-visible", "is-explore", "is-active", "is-muted", "is-preview");
+            });
+            sortedAscending.forEach((beach, index) => {
+                const timer = window.setTimeout(() => {
+                    const marker = markers.get(beach.rank);
+                    if (!marker) return;
+                    const el = marker.getElement();
+                    if (!el) return;
+                    el.classList.add("is-visible", "is-explore");
+                }, 80 + index * 130);
+                rankRevealTimers.push(timer);
+            });
+        }
+
+        function setAllPointsRevealCount(n) {
+            n = Math.max(0, Math.min(allPointMarkers.length, n));
+            if (n === revealAllCount) return;
+            allPointMarkers.forEach((marker, index) => {
+                marker.setStyle(index < n ? { fillOpacity: 1, opacity: 1 } : { fillOpacity: 0, opacity: 0 });
+            });
+            revealAllCount = n;
+        }
+
+        function setTopMarkersRevealCount(n) {
+            n = Math.max(0, Math.min(sortedAscending.length, n));
+            if (n === revealTopCount) return;
+            sortedAscending.forEach((beach, index) => {
+                const marker = markers.get(beach.rank);
+                const el = marker && marker.getElement();
+                if (!el) return;
+                if (index < n) {
+                    el.classList.add("is-visible", "is-explore");
+                } else {
+                    el.classList.remove("is-visible", "is-explore", "is-active", "is-muted", "is-preview");
+                }
+            });
+            revealTopCount = n;
+        }
+
+        function getStepProgress(step) {
+            if (!step) return 1;
+            const rect = step.getBoundingClientRect();
+            if (rect.height <= 0) return 0;
+            const activationY = window.innerHeight * 0.56;
+            return Math.min(1, Math.max(0, (activationY - rect.top) / rect.height));
+        }
+
+        function updateTop20Preview() {
+            if (currentMode !== "top20" || !activeStep) return;
+            const threshold = activeStep.classList.contains("step-top20-intro")
+                ? (mobileQuery.matches ? 0.56 : 0.24)
+                : 0;
+            const showTop = getStepProgress(activeStep) >= threshold;
+            setTopMarkerState({ mode: showTop ? "top20" : "hidden" });
+            if (showTop !== top20Dimmed) {
+                top20Dimmed = showTop;
+                setAllPointsVisible(true, false, showTop ? 0.26 : 1);
+            }
+        }
+
+        function updatePointReveal() {
+            if (currentMode === "all81") {
+                if (activeStep && activeStep.classList.contains("step-calc")) {
+                    setAllPointsRevealCount(allPointMarkers.length);
+                } else {
+                    const p = Math.min(1, getStepProgress(activeStep) / 0.4);
+                    setAllPointsRevealCount(Math.round(p * allPointMarkers.length));
+                }
+            } else if (currentMode === "top20") {
+                updateTop20Preview();
+            } else if (currentMode === "free") {
+                if (!activeStep) {
+                    setTopMarkersRevealCount(sortedAscending.length);
+                } else {
+
+                    const prog = getStepProgress(activeStep);
+                    const p = Math.min(1, Math.max(0, (prog - 0.04) / 0.26));
+                    setTopMarkersRevealCount(Math.round(p * sortedAscending.length));
+                }
+            }
+        }
+
+        function setAllPointsVisible(visible, animate = false, opacity = 0.26) {
+            clearAllPointTimers();
+            revealAllCount = -1;
+            allPointMarkers.forEach((marker) => {
+                marker.setStyle({ fillOpacity: 0, opacity: 0 });
+            });
+
+            if (!visible) return;
+
+            allPointMarkers.forEach((marker, index) => {
+                const show = () => marker.setStyle({ fillOpacity: opacity, opacity: 1 });
+                if (animate) {
+                    allPointTimers.push(window.setTimeout(show, 80 + index * 22));
+                } else {
+                    show();
+                }
+            });
+        }
+
+        function setTopMarkerState({ mode, activeRank = null } = {}) {
+            revealTopCount = -1;
+            const visibleRanks = new Set();
+            if (mode === "top20" || mode === "free") {
+                sortedAscending.forEach((beach) => visibleRanks.add(beach.rank));
+            }
+            if (mode === "podium" && activeRank) {
+                sortedAscending
+                    .filter((beach) => beach.rank <= activeRank)
+                    .forEach((beach) => visibleRanks.add(beach.rank));
+            }
+
+            markers.forEach((marker, markerRank) => {
+                const el = marker.getElement();
+                if (!el) return;
+                const visible = visibleRanks.has(markerRank);
+                const wasPreview = el.classList.contains("is-preview");
+                el.classList.toggle("is-visible", visible);
+                el.classList.toggle("is-explore", mode === "free" && visible);
+                el.classList.toggle("is-active", markerRank === activeRank);
+                el.classList.toggle("is-muted", mode === "free" && Boolean(activeRank) && markerRank !== activeRank);
+                if (mode === "top20" && visible) {
+                    el.classList.add("is-preview");
+                } else if (wasPreview && !visible) {
+                    window.setTimeout(() => el.classList.remove("is-preview"), 280);
+                } else {
+                    el.classList.remove("is-preview");
+                }
+            });
+        }
+
+        function closePlaceDetail() {
+            placeDetailEl.style.transition = "none";
+            placeDetailEl.classList.remove("is-visible", "is-popup", "is-side");
+            activePlaceBeach = null;
+            placeDetailEl.style.top = "";
+            placeDetailEl.style.left = "";
+            placeDetailEl.style.removeProperty("--arrow-x");
+            placeDetailEl.style.removeProperty("--arrow-y");
+        }
+
+        function positionPlaceDetail() {
+            if (!map || !activePlaceBeach) return;
+            if (!placeDetailEl.classList.contains("is-popup")) return;
+            const mapEl = document.getElementById("map");
+            const mapRect = mapEl.getBoundingClientRect();
+            const pt = map.latLngToContainerPoint([activePlaceBeach.lat, activePlaceBeach.lng]);
+            const markerX = mapRect.left + pt.x;
+            const markerY = mapRect.top + pt.y;
+            const popupW = placeDetailEl.offsetWidth;
+            const popupH = placeDetailEl.offsetHeight;
+            const margin = 12;
+            const dotGap = 20;
+
+            if (placeDetailEl.classList.contains("is-side")) {
+                const sideGap = 34;
+                const left = markerX + sideGap;
+                const top = markerY - popupH / 2;
+                placeDetailEl.style.left = left + "px";
+                placeDetailEl.style.top = top + "px";
+                placeDetailEl.style.setProperty("--arrow-y", "50%");
+                return;
+            }
+
+            let left = markerX - popupW / 2;
+            left = Math.max(margin, Math.min(left, window.innerWidth - popupW - margin));
+            placeDetailEl.style.left = left + "px";
+            placeDetailEl.style.top = (markerY + dotGap) + "px";
+            placeDetailEl.style.setProperty("--arrow-x", (markerX - left) + "px");
+        }
+
+        function showPlaceDetail(beach) {
+            activePlaceBeach = beach;
+            placeDetailEl.innerHTML = `
+                <button class="place-detail-close" type="button" aria-label="Close">&times;</button>
+                <div class="place-detail-inner">
+                    <img class="place-detail-img" src="${escHtml(beach.img)}" alt="">
+                    <div class="place-detail-body">
+                        <div class="step-kicker">
+                            <span class="rank-pill" style="--rank-color:${rankColor(beach.rank)}">${beach.rank}</span>
+                            <span class="podium-place-label">place</span>
+                        </div>
+                        <h3 class="place-detail-title">${escHtml(beach.city)}</h3>
+                        <p class="place-detail-desc">${escHtml(beach.desc)}</p>
+                    </div>
+                </div>`;
+            placeDetailEl.style.transition = "";
+            placeDetailEl.classList.add("is-popup");
+            placeDetailEl.classList.toggle("is-side", !mobileQuery.matches);
+            placeDetailEl.classList.add("is-visible");
+            trackPlaceDetailOnScroll();
+            placeDetailEl.querySelector(".place-detail-close").addEventListener("click", () => {
+                activeRank = null;
+                setTopMarkerState({ mode: "free" });
+                closePlaceDetail();
+            });
+        }
+
+        function activateStep(step) {
+            hideHoverTip();
+            if (!step) {
+                if (currentMode === "free") return;
+                clearRankRevealTimers();
+                activeRank = null;
+                currentMode = "free";
+                activeStep = null;
+                heroBlurEl.style.opacity = "0";
+                heroBlurEl.classList.remove("is-hero-active");
+                document.querySelectorAll(".step.is-active").forEach((item) => item.classList.remove("is-active"));
+                closePlaceDetail();
+                setAllPointsVisible(false);
+                setOverviewView(true);
+                enableMapInteraction();
+                return;
+            }
+
+            if (activeStep === step) return;
+
+            activeStep = step;
+            document.querySelectorAll(".step.is-active").forEach((item) => item.classList.remove("is-active"));
+            step.classList.add("is-active");
+
+            const rank = step.dataset.rank ? Number(step.dataset.rank) : null;
+            const mode = step.dataset.mode || "";
+            currentMode = mode;
+
+            heroBlurEl.style.opacity = mode === "intro" ? "1" : "0";
+            heroBlurEl.classList.toggle("is-hero-active", mode === "intro");
+
+            if (mode !== "free") {
+                closePlaceDetail();
+                disableMapInteraction();
+            }
+
+            if (mode === "intro") {
+                clearRankRevealTimers();
+                activeRank = null;
+                setAllPointsVisible(false);
+                setTopMarkerState({ mode: "hidden" });
+                setOverviewView(true);
+                return;
+            }
+
+            if (mode === "all81") {
+                clearRankRevealTimers();
+                activeRank = null;
+                setTopMarkerState({ mode: "hidden" });
+                setOverviewView(true);
+
+                return;
+            }
+
+            if (mode === "top20") {
+                clearRankRevealTimers();
+                activeRank = null;
+                preloadBeachImages();
+                top20Dimmed = false;
+                setAllPointsVisible(true, false, 1);
+                updateTop20Preview();
+                setOverviewView(true);
+                return;
+            }
+
+            if (mode === "podium" && rank) {
+                clearRankRevealTimers();
+                const beach = beachByRank.get(rank);
+                activeRank = rank;
+                setAllPointsVisible(false);
+                setTopMarkerState({ mode: "podium", activeRank: rank });
+                focusBeach(beach);
+                return;
+            }
+
+            if (mode === "explore") {
+                activeRank = null;
+                setAllPointsVisible(false);
+                animateTopMarkersReveal();
+                setOverviewView(true);
+                return;
+            }
+
+            if (mode === "free") {
+                clearRankRevealTimers();
+                activeRank = null;
+                setAllPointsVisible(false);
+                setTopMarkersRevealCount(0);
+                setOverviewView(true);
+                enableMapInteraction();
+
+            }
+        }
+
+        function getStepAtActivationLine() {
+            const steps = [...document.querySelectorAll(".step")];
+            const activationY = window.innerHeight * 0.56;
+
+            const lastStep = steps[steps.length - 1];
+            if (lastStep && lastStep.getBoundingClientRect().bottom < 0) return null;
+
+            let nearestStep = steps[0];
+            let nearestDistance = Infinity;
+
+            for (const step of steps) {
+                const rect = step.getBoundingClientRect();
+                if (rect.top <= activationY && rect.bottom >= activationY) return step;
+
+                const distance = Math.min(
+                    Math.abs(rect.top - activationY),
+                    Math.abs(rect.bottom - activationY)
+                );
+
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestStep = step;
+                }
+            }
+
+            return nearestStep;
+        }
+
+        function updateScrollProgress() {
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const ratio = max > 0 ? window.scrollY / max : 0;
+            progressEl.style.width = `${Math.min(Math.max(ratio, 0), 1) * 100}%`;
+        }
+
+        function getPostSceneAtActivationLine() {
+            if (!postScenes.length || !postScrollyEl) return null;
+
+            const summaryRect = postScrollyEl.getBoundingClientRect();
+            if (summaryRect.bottom <= 0 || summaryRect.top >= window.innerHeight) return null;
+
+            const activationY = window.innerHeight * 0.54;
+            let nearestScene = postScenes[0];
+            let nearestDistance = Infinity;
+
+            for (const scene of postScenes) {
+                const rect = scene.getBoundingClientRect();
+                if (rect.top <= activationY && rect.bottom >= activationY) return scene;
+
+                const distance = Math.min(
+                    Math.abs(rect.top - activationY),
+                    Math.abs(rect.bottom - activationY)
+                );
+
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestScene = scene;
+                }
+            }
+
+            return nearestScene;
+        }
+
+        function updatePostScrolly() {
+            if (!postScenes.length || !postScrollyEl) return;
+
+            const activeScene = getPostSceneAtActivationLine();
+            const activePhoto = activeScene ? activeScene.dataset.postPhoto : "";
+            const summaryRect = postScrollyEl.getBoundingClientRect();
+            const isInPostScrolly = summaryRect.top < window.innerHeight * 0.82 && summaryRect.bottom > 0;
+
+            const shadeSide = activePhoto
+                ? (activeScene.classList.contains("post-scene-right") ? "right" : "left")
+                : "";
+
+            postScrollyEl.classList.toggle("is-photo-active", Boolean(activePhoto));
+            postScrollyEl.classList.toggle("is-shade-left", shadeSide === "left");
+            postScrollyEl.classList.toggle("is-shade-right", shadeSide === "right");
+            postScenes.forEach((scene) => scene.classList.toggle("is-active", scene === activeScene));
+            postPhotos.forEach((photo) => {
+                photo.classList.toggle("is-visible", Boolean(activePhoto) && photo.dataset.postPhoto === activePhoto);
+            });
+
+            if (isInPostScrolly) {
+                hideHoverTip();
+            }
+        }
+
+        function trackPlaceDetailOnScroll() {
+            if (!placeDetailEl.classList.contains("is-visible")) return;
+            if (placeDetailEl.classList.contains("is-popup")) {
+                positionPlaceDetail();
+            } else {
+                const mapRect = document.getElementById("map").getBoundingClientRect();
+                placeDetailEl.style.top = "calc(50% + " + mapRect.top + "px)";
+            }
+        }
+
+        function updateFromScroll() {
+            scrollTicking = false;
+            activateStep(getStepAtActivationLine());
+            updatePointReveal();
+            updateScrollProgress();
+            updatePostScrolly();
+            trackPlaceDetailOnScroll();
+        }
+
+        function requestStepUpdate() {
+            if (scrollTicking) return;
+            scrollTicking = true;
+            window.requestAnimationFrame(updateFromScroll);
+        }
+
+        renderSteps();
+        renderRankingTable();
+
+        const heroScrollBtn = document.getElementById("heroScroll");
+        if (heroScrollBtn) {
+            heroScrollBtn.addEventListener("click", () => {
+                const heroStep = document.querySelector(".step-hero");
+                const target = heroStep
+                    ? heroStep.getBoundingClientRect().bottom + window.scrollY
+                    : window.scrollY + window.innerHeight;
+                window.scrollTo({ top: target, behavior: "smooth" });
+            });
+        }
+
+        const freeCtaCloseBtn = document.querySelector("#freeCta .step-card-close");
+        if (freeCtaCloseBtn) {
+            freeCtaCloseBtn.addEventListener("click", hideFreeCta);
+        }
+
+        const freeHelpBtn = document.getElementById("freeHelpBtn");
+        if (freeHelpBtn) {
+            freeHelpBtn.addEventListener("click", showFreeCta);
+        }
+
+        window.addEventListener("scroll", requestStepUpdate, { passive: true });
+        window.addEventListener("resize", () => {
+            updateScrollProgress();
+            updatePostScrolly();
+            if (activeRank) {
+                const beach = beachByRank.get(activeRank);
+                focusBeach(beach);
+                positionPlaceDetail();
+            } else {
+                setOverviewView(false);
+            }
+        });
+
+        let mapBootstrapped = false;
+        function bootstrapMap() {
+            if (mapBootstrapped) return;
+            mapBootstrapped = true;
+            initMap();
+            requestStepUpdate();
+        }
+        if (window.L && window.L.maplibreGL) {
+            bootstrapMap();
+        } else {
+            const mapLibScript = document.getElementById("mapLibScript");
+            if (mapLibScript) mapLibScript.addEventListener("load", bootstrapMap);
+            window.addEventListener("DOMContentLoaded", bootstrapMap);
+        }
+    </script>
+</body>
+</html>

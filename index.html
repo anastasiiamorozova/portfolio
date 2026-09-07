@@ -43,6 +43,87 @@
       .columns.is-multiline {
         padding: 0 6%;
       }
+      .interactive-section {
+        padding-bottom: 0;
+      }
+      .interactive-heading {
+        padding: 0 6%;
+        margin-bottom: 1.5rem;
+      }
+      .interactive-heading .title {
+        margin-bottom: 0.65rem;
+      }
+      .interactive-heading .subtitle {
+        max-width: 42rem;
+        line-height: 1.45;
+      }
+      .preview-kicker {
+        margin-bottom: 0.45rem;
+        color: #6b645c;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+      .preview-card-link {
+        display: block;
+        height: 100%;
+        color: inherit;
+      }
+      .project-preview-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        background: #f4f1ec;
+        border: 1px solid rgba(46, 51, 61, 0.12);
+        border-radius: 0.85rem;
+        box-shadow: 0 8px 24px rgba(46, 51, 61, 0.08);
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+      .project-preview-card .card-content {
+        flex: 1;
+        padding: 1rem;
+        background: #f4f1ec;
+      }
+      .project-preview-card .title {
+        margin-bottom: 0.65rem;
+        line-height: 1.15;
+      }
+      .project-preview-card .subtitle {
+        margin-top: 0.75rem;
+        color: #535862;
+        line-height: 1.4;
+      }
+      .project-preview-card .image {
+        overflow: hidden;
+        background: #151515;
+      }
+      .project-preview-card .image img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        object-position: top;
+        transition: transform 240ms ease;
+      }
+      .preview-card-link:hover .project-preview-card {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 32px rgba(46, 51, 61, 0.14);
+      }
+      .preview-card-link:hover .project-preview-card img {
+        transform: scale(1.025);
+      }
+      .preview-card-link:focus-visible {
+        outline: 3px solid #2e333d;
+        outline-offset: 4px;
+        border-radius: 0.85rem;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .project-preview-card,
+        .project-preview-card .image img {
+          transition: none;
+        }
+      }
     </style>
 
     <title>Portfolio</title>
@@ -99,6 +180,77 @@
     </section>
 
     <div class="container">
+      <section class="section interactive-section" id="interactive-projects">
+        <div class="interactive-heading">
+          <p class="preview-kicker">Selected interactives</p>
+          <h2 class="title is-2">Explore the projects</h2>
+          <p class="subtitle is-5">Three data stories built around maps, original analysis, and playful visual explanation.</p>
+        </div>
+
+        <div class="columns is-multiline interactive-grid">
+          <div class="column is-half-tablet is-one-third-desktop">
+            <a class="preview-card-link" href="wypadki/" aria-label="Open Risk Map">
+              <article class="card project-preview-card">
+                <div class="card-image">
+                  <figure class="image is-5by3">
+                    <img src="assets/previews/wypadki.jpg" alt="Road collision map of Poland" />
+                  </figure>
+                </div>
+                <div class="card-content">
+                  <p class="title is-5">Risk Map</p>
+                  <div class="tags are-small">
+                    <span class="tag is-danger">DATA</span>
+                    <span class="tag is-dark">MAPPING</span>
+                  </div>
+                  <p class="subtitle is-7">Nearly 3.4 million police records reveal Poland’s most collision-prone municipalities, streets, and road sections.</p>
+                </div>
+              </article>
+            </a>
+          </div>
+
+          <div class="column is-half-tablet is-one-third-desktop">
+            <a class="preview-card-link" href="ranking-plaz/" aria-label="Open Poland’s 20 Best Beaches">
+              <article class="card project-preview-card">
+                <div class="card-image">
+                  <figure class="image is-5by3">
+                    <img src="assets/previews/ranking-plaz.jpg" alt="Illustrated ranking of Polish Baltic beaches" />
+                  </figure>
+                </div>
+                <div class="card-content">
+                  <p class="title is-5">Poland’s 20 Best Beaches</p>
+                  <div class="tags are-small">
+                    <span class="tag is-danger">DATA</span>
+                    <span class="tag is-dark">SCROLLYTELLING</span>
+                  </div>
+                  <p class="subtitle is-7">A reader-powered ranking combining 50,000 calculator responses, field reporting, and an interactive map.</p>
+                </div>
+              </article>
+            </a>
+          </div>
+
+          <div class="column is-half-tablet is-one-third-desktop">
+            <a class="preview-card-link" href="poland-china-import/" aria-label="Open A House from China">
+              <article class="card project-preview-card">
+                <div class="card-image">
+                  <figure class="image is-5by3">
+                    <img src="assets/previews/poland-china-import.jpg" alt="Cutaway illustration of a house and imported products" />
+                  </figure>
+                </div>
+                <div class="card-content">
+                  <p class="title is-5">A House from China</p>
+                  <div class="tags are-small">
+                    <span class="tag is-danger">DATA</span>
+                    <span class="tag is-dark">INTERACTIVE</span>
+                  </div>
+                  <p class="subtitle is-7">A room-by-room view of China’s share of Polish imports, from doors and furniture to electronics.</p>
+                </div>
+              </article>
+            </a>
+          </div>
+
+        </div>
+      </section>
+
       <section class="section">
         <div class="columns is-multiline content">
           <!-- GRU Parcel Bombs -->

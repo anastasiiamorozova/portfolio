@@ -1,0 +1,2089 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A House from China: From the Front Door to the Last Screw</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700&display=swap" fetchpriority="high">
+  <link id="firaSansStylesheet" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700&display=swap" fetchpriority="high">
+  <link rel="preload" as="image" href="m3_red%20min.png" fetchpriority="high">
+  <style>
+    :root {
+      --ink: #171717;
+      --muted: #575a56;
+      --paper: #f4f1e9;
+      --panel: rgba(255, 255, 255, 0.8);
+      --line: rgba(23, 23, 23, 0.15);
+      --scale-1: #ffd200;
+      --scale-2: #fba60b;
+	      --scale-3: #f87916;
+	      --scale-4: #f44d20;
+		      --scale-5: #f0202b;
+		      --shadow: 0 18px 42px rgba(0, 0, 0, 0.16);
+		      --site-header-height: 120px;
+		      --visual-safe-height: calc(100vh - var(--site-header-height));
+		      color: var(--ink);
+	      font-family: Georgia, "Times New Roman", serif;
+	      background: var(--paper);
+	    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    html::-webkit-scrollbar {
+      display: none;
+    }
+
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      width: 0;
+      background: #ffd200;
+      z-index: 100;
+      transition: width 0.05s linear;
+      pointer-events: none;
+    }
+
+    .premium-banner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 46px;
+      background: #1e1e1e;
+      color: #ffffff;
+      font-family: "Fira Sans", system-ui, sans-serif;
+      font-size: 15px;
+      pointer-events: none;
+    }
+
+    .premium-banner__logo {
+      max-width: 120px;
+      height: 32px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .premium-banner__logo path {
+      fill: #ffffff;
+    }
+
+    @media (max-width: 325px) {
+      .premium-banner__text {
+        display: none;
+      }
+    }
+
+    html.app-loading,
+    html.app-loading body {
+      overflow: hidden;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+
+    html.paywall-locked,
+    html.paywall-locked body {
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .step-paywall-gate {
+      min-height: 60vh;
+    }
+
+    .app-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: grid;
+      place-items: center;
+      background: #f0202b;
+      transition: opacity 0.7s ease;
+      will-change: opacity;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+
+    .app-loader.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .app-loader-house {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      z-index: 0;
+      width: min(98vw, calc(92vh * 1.792), 1900px);
+      aspect-ratio: 5504 / 3072;
+      height: auto;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .app-loader-box {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      padding: 0 24px;
+      transform: translateY(-8vh);
+    }
+
+    .app-loader-logo {
+      width: min(170px, 54vw);
+      height: auto;
+      display: block;
+    }
+
+    @media (min-width: 761px) {
+      .app-loader-box {
+        transform: translateY(-22vh);
+      }
+
+      .app-loader-logo {
+        width: 230px;
+      }
+    }
+
+    .app-loader-bar {
+      position: relative;
+      width: min(280px, 64vw);
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.22);
+      overflow: hidden;
+    }
+
+    .app-loader-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -45%;
+      width: 45%;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+      animation: appLoaderSweep 1.15s ease-in-out infinite;
+    }
+
+    @keyframes appLoaderSweep {
+      0%   { left: -45%; }
+      100% { left: 100%; }
+    }
+
+    .app-loader-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 46px;
+      background: #1e1e1e;
+      color: #ffffff;
+      font-family: "Fira Sans", system-ui, sans-serif;
+      font-size: 15px;
+      pointer-events: none;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+    }
+
+    main {
+      width: 100%;
+      overflow: clip;
+    }
+
+    .scrolly {
+      position: relative;
+      min-height: 0;
+      overflow-anchor: none;
+    }
+
+	    .sticky-visual {
+	      position: sticky;
+	      top: 0;
+	      height: 100vh;
+	      display: grid;
+	      place-items: center;
+	      overflow: hidden;
+	      background: #f7f5ee;
+      overflow-anchor: none;
+    }
+
+	    .house-wrap {
+	      position: relative;
+	      width: min(98vw, calc(var(--visual-safe-height) * 1.68), 1900px);
+	      aspect-ratio: 5504 / 3072;
+	      isolation: isolate;
+	      --base-pan-x: 0px;
+	      --base-pan-y: -140px;
+	      --pan-x: 0px;
+	      --pan-y: 0px;
+	      --zoom: 1;
+	      --label-scale: 1;
+	      --label-pop-scale: 0.96;
+	      transform: translate3d(calc(var(--base-pan-x) + var(--pan-x)), calc(var(--base-pan-y) + var(--pan-y)), 0) scale(var(--zoom));
+      transform-origin: center center;
+      transition: filter 180ms ease;
+      will-change: transform;
+      overflow-anchor: none;
+    }
+
+    .house-wrap.is-camera-ready {
+      transition: transform 2800ms cubic-bezier(0.22, 1, 0.36, 1), filter 180ms ease;
+    }
+
+    .house-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      filter: saturate(0.96) contrast(1.02);
+      transition:
+        opacity 320ms ease,
+        filter 360ms ease;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .house-image.is-active {
+      opacity: 1;
+    }
+
+    .house-image[data-image-layer="start"].is-active {
+      opacity: 0.7;
+    }
+
+    .sticky-visual.is-image-blurred .house-image {
+      filter: saturate(0.88) contrast(1.02);
+    }
+
+    .sticky-visual.is-image-blurred .house-wrap {
+      filter: blur(6px);
+    }
+
+    .image-dim {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.03);
+      pointer-events: none;
+      transition: background 320ms ease;
+    }
+
+    .sticky-visual.is-panel-article .image-dim {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .sticky-visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0);
+      pointer-events: none;
+      transition: background 320ms ease;
+    }
+
+    .sticky-visual.is-panel-article::after {
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .pin-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .pin {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.9);
+      transition:
+        opacity 240ms ease,
+        transform 240ms ease,
+        filter 240ms ease;
+      pointer-events: auto;
+      z-index: 2;
+    }
+
+    .pin.is-visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .pin.is-muted {
+      opacity: 0.24;
+      filter: grayscale(0.45);
+      z-index: 1;
+    }
+
+    .pin-dot {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(255, 255, 255, 0.96);
+      background: var(--pin-color);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+      color: #111;
+      font: 700 11px/1 "Fira Sans", sans-serif;
+      letter-spacing: 0;
+      padding: 0;
+      appearance: none;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .pin-dot:focus-visible {
+      outline: 2px solid #111;
+      outline-offset: 2px;
+    }
+
+    .pin-dot::before {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+    }
+
+	    .sticky-visual[data-current-room="kitchen"] .pin-dot,
+	    .sticky-visual[data-current-room="kitchenClose"] .pin-dot {
+	      width: 17px;
+	      height: 17px;
+	      display: flex;
+	      align-items: center;
+	      justify-content: center;
+	      padding: 0;
+	      border-width: 1.5px;
+	      font: 700 6px/1 "Fira Sans", sans-serif;
+	      text-align: center;
+	      letter-spacing: 0;
+	    }
+
+    .pin-card {
+      position: absolute;
+      left: 42px;
+      top: 50%;
+      width: 168px;
+      --label-shift-x: 0;
+      --label-shift-y: -50%;
+      --label-origin: left center;
+      opacity: 0;
+      visibility: hidden;
+      transform: translate(var(--label-shift-x), var(--label-shift-y)) scale(var(--label-pop-scale));
+      transform-origin: var(--label-origin);
+      transition:
+        opacity 180ms ease,
+        visibility 180ms ease,
+        transform 220ms ease;
+      padding: 7px 8px 8px;
+      border: 1px solid rgba(0, 0, 0, 0.13);
+      background: rgba(255, 255, 255, 0.86);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+      font-family: "Fira Sans", sans-serif;
+      font-size: 12px;
+      line-height: 1.17;
+      pointer-events: none;
+    }
+
+    .pin.is-visible.is-label-visible .pin-card,
+    .pin.is-visible.is-label-tapped .pin-card,
+    .pin.is-visible .pin-dot:hover + .pin-card,
+    .pin.is-visible:focus-within .pin-card {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(var(--label-shift-x), var(--label-shift-y)) scale(var(--label-scale));
+    }
+
+    .pin.is-label-tapped {
+      z-index: 8;
+    }
+
+    .pin[data-snap="w"] .pin-card {
+      left: auto;
+      right: 42px;
+      --label-origin: right center;
+    }
+
+    .pin[data-snap="n"] .pin-card {
+      left: 50%;
+      top: auto;
+      bottom: 42px;
+      --label-shift-x: -50%;
+      --label-shift-y: 0;
+      --label-origin: center bottom;
+    }
+
+    .pin[data-snap="s"] .pin-card {
+      left: 50%;
+      top: 42px;
+      --label-shift-x: -50%;
+      --label-shift-y: 0;
+      --label-origin: center top;
+    }
+
+    .pin[data-snap="ne"] .pin-card {
+      left: 34px;
+      top: auto;
+      bottom: 24px;
+      --label-shift-x: 0;
+      --label-shift-y: 0;
+      --label-origin: left bottom;
+    }
+
+    .pin[data-snap="nw"] .pin-card {
+      left: auto;
+      right: 34px;
+      top: auto;
+      bottom: 24px;
+      --label-shift-x: 0;
+      --label-shift-y: 0;
+      --label-origin: right bottom;
+    }
+
+    
+    .pin-card::after {
+      content: "";
+      position: absolute;
+      left: -7px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-style: solid;
+      border-width: 6px 7px 6px 0;
+      border-color: transparent rgba(255, 255, 255, 0.86) transparent transparent;
+    }
+
+    .pin[data-snap="w"] .pin-card::after {
+      left: auto;
+      right: -7px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-width: 6px 0 6px 7px;
+      border-color: transparent transparent transparent rgba(255, 255, 255, 0.86);
+    }
+
+    .pin[data-snap="n"] .pin-card::after {
+      left: 50%;
+      right: auto;
+      top: auto;
+      bottom: -7px;
+      transform: translateX(-50%);
+      border-width: 7px 6px 0 6px;
+      border-color: rgba(255, 255, 255, 0.86) transparent transparent transparent;
+    }
+
+    .pin[data-snap="s"] .pin-card::after {
+      left: 50%;
+      right: auto;
+      top: -7px;
+      bottom: auto;
+      transform: translateX(-50%);
+      border-width: 0 6px 7px 6px;
+      border-color: transparent transparent rgba(255, 255, 255, 0.86) transparent;
+    }
+
+    .pin[data-snap="ne"] .pin-card::after {
+      left: 16px;
+      right: auto;
+      top: auto;
+      bottom: -7px;
+      transform: none;
+      border-width: 7px 6px 0 6px;
+      border-color: rgba(255, 255, 255, 0.86) transparent transparent transparent;
+    }
+
+    .pin[data-snap="nw"] .pin-card::after {
+      left: auto;
+      right: 16px;
+      top: auto;
+      bottom: -7px;
+      transform: none;
+      border-width: 7px 6px 0 6px;
+      border-color: rgba(255, 255, 255, 0.86) transparent transparent transparent;
+    }
+
+    .pin-name {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .pin-kicker {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0;
+    }
+
+    
+    .pin-tip {
+      position: fixed;
+      z-index: 40;
+      max-width: 60vw;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(0, 0, 0, 0.13);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+      font-family: "Fira Sans", sans-serif;
+      font-size: 13px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: #111;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(2px);
+      transition: opacity 160ms ease, visibility 160ms ease, transform 160ms ease;
+    }
+
+    .pin-tip.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .legend {
+      position: absolute;
+      top: max(16px, 2.5vh);
+      right: 0;
+      z-index: 12;
+      display: flex;
+      align-items: stretch;
+      width: min(340px, 74vw);
+      font-family: "Fira Sans", sans-serif;
+      color: #111;
+      pointer-events: auto;
+      transition: transform 260ms ease, opacity 220ms ease;
+    }
+
+    .legend.is-collapsed {
+      transform: translateX(calc(100% - 32px));
+    }
+
+    .legend-toggle {
+      flex: 0 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--line);
+      border-right: 0;
+      border-radius: 8px 0 0 8px;
+      color: #111;
+      cursor: pointer;
+    }
+
+    .legend-arrow {
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+      transition: transform 200ms ease;
+    }
+
+    .legend.is-collapsed .legend-arrow {
+      transform: rotate(135deg);
+    }
+
+    .legend-body {
+      flex: 1 1 auto;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--line);
+      border-radius: 0;
+    }
+
+    .sticky-visual.legend-hidden .legend {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .legend-title {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .legend-scale {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      height: 13px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+
+    .legend-scale span:nth-child(1) { background: var(--scale-1); }
+    .legend-scale span:nth-child(2) { background: var(--scale-2); }
+    .legend-scale span:nth-child(3) { background: var(--scale-3); }
+    .legend-scale span:nth-child(4) { background: var(--scale-4); }
+    .legend-scale span:nth-child(5) { background: var(--scale-5); }
+
+    .legend-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .title-lockup {
+      position: absolute;
+      left: 50%;
+      top: max(72px, 9vh);
+      z-index: 7;
+      width: min(520px, calc(100vw - 48px));
+      text-align: center;
+      opacity: 0;
+      transform: translateX(-50%);
+      transition: opacity 280ms ease;
+      pointer-events: none;
+    }
+
+    .sticky-visual.is-panel-title .title-lockup,
+    .sticky-visual.is-panel-red .title-lockup {
+      opacity: 1;
+    }
+
+    .sticky-visual.is-title-covered .title-lockup {
+      opacity: 0;
+    }
+
+    .byline {
+      margin: 12px 0 0;
+      color: #2c2c2c;
+      font: 700 13px/1.35 Arial, Helvetica, sans-serif;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .hero-tytul {
+      display: block;
+      width: min(360px, 100%);
+      height: auto;
+      margin: 0 auto;
+    }
+
+    .hero-scroll {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-top: 28px;
+      color: #000000;
+      font-family: "Fira Sans", system-ui, sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .hero-scroll-arrow {
+      width: 20px;
+      height: 20px;
+      border-right: 3px solid #000000;
+      border-bottom: 3px solid #000000;
+      transform: rotate(45deg);
+      animation: heroScrollBounce 1.6s ease-in-out infinite;
+    }
+
+    @keyframes heroScrollBounce {
+      0%, 100% { transform: rotate(45deg) translate(0, 0); }
+      50%      { transform: rotate(45deg) translate(4px, 4px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-scroll-arrow { animation: none; }
+    }
+
+	    .steps {
+	      position: relative;
+	      margin-top: -100vh;
+	      z-index: 9;
+	      pointer-events: none;
+	    }
+
+    .step {
+      min-height: 108vh;
+      display: flex;
+      align-items: center;
+      padding: 8vh max(20px, 6vw);
+      pointer-events: none;
+    }
+
+    .step[data-side="right"] {
+      justify-content: flex-end;
+    }
+
+    .step[data-side="left"] {
+      justify-content: flex-start;
+    }
+
+    .step[data-side="center"],
+    .step[data-panel="article"] {
+      justify-content: center;
+      min-height: 100vh;
+      padding-top: 8vh;
+      padding-bottom: 8vh;
+    }
+
+    .step[data-panel="title"] {
+      pointer-events: none;
+    }
+
+    .step[data-blur="true"] {
+      min-height: 90vh;
+    }
+
+	    .step-final-card {
+	      min-height: 145vh;
+	      align-items: start;
+	      padding-top: 18vh;
+	      padding-bottom: 52vh;
+	    }
+
+	    .step-final-overview {
+	      min-height: 92vh;
+	    }
+
+    .step-card {
+      width: min(430px, calc(100vw - 40px));
+      padding: 20px 22px 22px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: none;
+      pointer-events: auto;
+    }
+
+    .step-card p {
+      margin: 0;
+      color: #000;
+      font-size: 18.5px;
+      line-height: 1.45;
+    }
+
+    .step-card p + p {
+      margin-top: 14px;
+    }
+
+	    .product-highlight {
+	      padding: 0;
+	      border-radius: 0;
+	      background: transparent;
+	      color: inherit;
+	      box-decoration-break: clone;
+	      -webkit-box-decoration-break: clone;
+	    }
+
+    .step[data-panel="article"] .step-card {
+      width: min(720px, calc(100vw - 44px));
+      padding: 22px 24px 24px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(23, 23, 23, 0.13);
+      border-radius: 8px;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    .step[data-panel="article"] .step-card p {
+      color: #000;
+      font-size: 18.5px;
+      line-height: 1.45;
+    }
+
+    .step.step-red {
+      position: relative;
+      justify-content: center;
+      align-items: center;
+      min-height: 0;
+      padding: 12vh max(20px, 6vw);
+      background: transparent;
+      pointer-events: auto;
+    }
+
+    .step-red::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: #f0202b;
+      transform: skewY(-10deg);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .step-red .step-card {
+      position: relative;
+      z-index: 1;
+      width: min(720px, calc(100vw - 44px));
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+
+    .step-red .step-card p {
+      color: #ffffff;
+      font-size: 18.5px;
+      line-height: 1.45;
+    }
+
+    .methodology-section {
+      position: relative;
+      z-index: 10;
+      padding: 80px max(20px, 7vw) 100px;
+      background: #f8f7f2;
+      border-top: 1px solid var(--line);
+    }
+
+    .methodology-inner {
+      max-width: 820px;
+      margin: 0 auto;
+      font-family: "Fira Sans", sans-serif;
+      color: #2d2d2a;
+    }
+
+    .methodology-inner h2 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(28px, 3.4vw, 44px);
+      line-height: 1.04;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .methodology-inner p {
+      margin: 16px 0 0;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 760px) {
+	      .sticky-visual {
+	        align-items: start;
+	        padding-top: 7vh;
+	      }
+
+	      .house-wrap {
+	        width: min(142vw, calc(var(--visual-safe-height) * 1.5));
+	        --base-pan-x: -10vw;
+	        --base-pan-y: -24px;
+	      }
+
+      .legend {
+        top: max(12px, 2vh);
+        right: 0;
+        left: auto;
+        width: min(320px, 88vw);
+      }
+
+      .step {
+        align-items: end;
+        justify-content: center;
+        min-height: 112vh;
+        padding: 12vh 20px 11vh;
+      }
+
+      .step[data-side="right"],
+      .step[data-side="left"],
+      .step[data-side="center"],
+      .step[data-panel="article"] {
+        justify-content: center;
+      }
+
+      .step[data-panel="article"] {
+        min-height: 100vh;
+        padding: 8vh 20px;
+      }
+
+      
+      .step[data-panel="article"]:has(+ .step[data-panel="article"]) {
+        min-height: 0;
+        padding-bottom: 0;
+      }
+
+      .step[data-panel="article"] + .step[data-panel="article"] {
+        min-height: 0;
+        padding-top: 0;
+        margin-top: 1.45em;
+      }
+
+      
+      .step[data-panel="article"] + .step[data-panel="card"] {
+        min-height: 150vh;
+      }
+
+      .step[data-blur="true"] {
+        
+        min-height: 135vh;
+        padding-bottom: 60vh;
+      }
+
+      .step-card,
+      .step[data-panel="article"] .step-card {
+        width: 100%;
+        
+        pointer-events: none;
+      }
+
+      
+      .step[data-panel="article"] .step-card {
+        border: none;
+        border-radius: 0;
+        background: transparent;
+      }
+
+      .step[data-panel="article"] .step-card p {
+        font-size: 18.5px;
+        line-height: 1.45;
+      }
+
+      .pin-dot {
+        width: 30px;
+        height: 30px;
+        font-size: 10px;
+      }
+
+      
+      .pin-card {
+        display: none;
+      }
+
+      .title-lockup {
+        width: min(400px, calc(100vw - 44px));
+        transform: translateX(-50%) translateY(28px);
+      }
+
+      .hero-tytul {
+        width: min(240px, 100%);
+      }
+
+      .hero-scroll {
+        margin-top: 20px;
+        font-size: 16px;
+      }
+    }
+
+    .stopka {
+      padding: 20px 16px 64px;
+      background: #f8f7f2;
+      font-family: "Fira Sans", system-ui, sans-serif;
+    }
+    .stopka .authors-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      margin-top: 20px;
+      color: #000000;
+    }
+    .stopka .stopka-profiles {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+    .stopka .profile {
+      text-align: center;
+      max-width: 160px;
+      flex: 1;
+    }
+    .stopka .profile a {
+      color: inherit;
+      text-decoration: none;
+      display: block;
+    }
+    .stopka .profile img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 5px;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      border: 5px solid #ffffff;
+    }
+    .stopka .profile img:hover { transform: scale(1.05); }
+    .stopka .profile img:active { transform: scale(1.1); }
+    .stopka .profile .name {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+      font-weight: 500;
+      color: #000000;
+      line-height: 1.3;
+    }
+    .stopka .profile .name span {
+      display: block;
+    }
+    .stopka .credits {
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 30px;
+      font-size: 14px;
+      color: #000000;
+      line-height: 1.5;
+    }
+    @media (min-width: 761px) {
+      .stopka .credits {
+        max-width: 620px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+    @media (max-width: 440px) {
+      .stopka .stopka-profiles {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        justify-content: center;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto 30px;
+      }
+      .stopka .profile { max-width: 140px; }
+      .stopka .profile:last-child {
+        grid-column: 1 / -1;
+        justify-self: center;
+      }
+    }
+  
+  .portfolio-link{
+    position:fixed; top:14px; left:14px; z-index:10050;
+    display:inline-flex; align-items:center; gap:7px;
+    padding:8px 13px; border:1px solid rgba(46,51,61,.2); border-radius:999px;
+    background:rgba(231,226,218,.94); color:#2e333d;
+    font:600 12px/1.1 "Fira Sans",Roboto,system-ui,sans-serif;
+    letter-spacing:.01em; text-decoration:none;
+    box-shadow:0 2px 12px rgba(0,0,0,.12); backdrop-filter:blur(8px);
+  }
+  .portfolio-link span{font-size:16px; line-height:.7}
+  .portfolio-link b{font-weight:400; opacity:.7}
+  .portfolio-link:hover{background:#fff; color:#111}
+  .portfolio-link:focus-visible{outline:3px solid #2e333d; outline-offset:3px}
+  @media(max-width:520px){.portfolio-link{top:10px;left:10px;padding:8px 11px}.portfolio-link b{display:none}}
+  @media print{.portfolio-link{display:none}}
+
+  .app-loader-title{font:800 clamp(30px,5vw,56px)/.82 "Fira Sans",sans-serif;letter-spacing:-.055em;text-align:center;color:#fff}
+  .app-loader-title span{color:#171717}
+  .hero-title-text{display:grid;justify-items:center;text-transform:uppercase;font-family:"Fira Sans",sans-serif;line-height:.82;letter-spacing:-.06em;color:#1e1e1e}
+  .hero-title-text span{font-size:clamp(42px,7vw,84px);font-weight:800}
+  .hero-title-text small{font-size:14px;line-height:1.5;letter-spacing:.18em}
+  .hero-title-text strong{font-size:clamp(58px,10vw,124px);font-weight:800;color:#f0202b}
+  .hero-title-text em{margin-top:14px;max-width:29ch;font:700 12px/1.2 "Fira Sans",sans-serif;letter-spacing:.08em;font-style:normal}
+  .profile-monogram{display:grid;place-items:center;width:88px;height:88px;margin:0 auto 8px;border-radius:50%;background:#e7e2da;color:#2e333d;font:700 24px/1 "Fira Sans",sans-serif}
+</style>
+</head>
+<body>
+  <a class="portfolio-link" href="https://anastasiiamorozova.github.io/portfolio/" aria-label="Back to Anastasiia Morozova’s portfolio"><span aria-hidden="true">←</span> Anastasiia Morozova <b>/ Portfolio</b></a>
+  <div class="app-loader" id="appLoader" role="status" aria-label="Loading">
+    <img class="app-loader-house" src="m3_red%20min.png" alt="" aria-hidden="true" fetchpriority="high">
+    <div class="app-loader-box">
+      <div class="app-loader-title">A HOUSE<br><span>FROM CHINA</span></div>
+      <div class="app-loader-bar"><span class="app-loader-fill"></span></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var loader = document.getElementById("appLoader");
+      var banner = document.getElementById("appLoaderBanner");
+      if (!loader) return;
+
+      document.documentElement.classList.add("app-loading");
+
+      function blockLoaderScroll(e) { e.preventDefault(); }
+      loader.addEventListener("touchmove", blockLoaderScroll, { passive: false });
+      loader.addEventListener("wheel", blockLoaderScroll, { passive: false });
+
+      window.mainVisualLoadingLocked = true;
+
+      var requiredSlideImages = [
+        "m3_white.png",
+	        "m0.png"
+      ];
+      var loaderImageElements = [
+        document.querySelector(".app-loader-house"),
+        document.querySelector(".app-loader-logo")
+      ].filter(Boolean);
+
+      function waitForImageElement(image) {
+        return new Promise(function (resolve) {
+          if (!image || image.complete) {
+            resolve();
+            return;
+          }
+          image.addEventListener("load", resolve, { once: true });
+          image.addEventListener("error", function () {
+            console.warn("[loader] image failed:", image.currentSrc || image.src);
+            resolve();
+          }, { once: true });
+        });
+      }
+
+      var preloadPromises = {};
+
+      function preloadImage(src) {
+        if (preloadPromises[src]) return preloadPromises[src];
+        preloadPromises[src] = new Promise(function (resolve) {
+          var image = new Image();
+          image.decoding = "async";
+          if ("fetchPriority" in image) image.fetchPriority = "high";
+          image.onload = resolve;
+          image.onerror = function () {
+            console.warn("[loader] image failed:", src);
+            resolve();
+          };
+          image.src = src;
+          if (image.complete) resolve();
+        });
+        return preloadPromises[src];
+      }
+
+      function whenDomReady() {
+        return new Promise(function (resolve) {
+          if (document.readyState !== "loading") {
+            resolve();
+            return;
+          }
+          document.addEventListener("DOMContentLoaded", resolve, { once: true });
+        });
+      }
+
+      function waitForStylesheet(link) {
+        return new Promise(function (resolve) {
+          if (!link || link.sheet) {
+            resolve();
+            return;
+          }
+          link.addEventListener("load", resolve, { once: true });
+          link.addEventListener("error", function () {
+            console.warn("[loader] stylesheet failed:", link.href);
+            resolve();
+          }, { once: true });
+        });
+      }
+
+      function waitForFiraSans() {
+        var stylesheet = document.getElementById("firaSansStylesheet");
+        var fontReady = waitForStylesheet(stylesheet).then(function () {
+          if (!document.fonts || !document.fonts.load) return;
+          return Promise.all([
+            document.fonts.load('400 16px "Fira Sans"'),
+            document.fonts.load('500 16px "Fira Sans"'),
+            document.fonts.load('700 16px "Fira Sans"')
+          ]).then(function () {
+            return document.fonts.ready;
+          });
+        });
+        var fontTimeout = new Promise(function (resolve) {
+          window.setTimeout(function () {
+            console.warn("[loader] Fira Sans load timeout");
+            resolve();
+          }, 5000);
+        });
+        return Promise.race([fontReady, fontTimeout]).catch(function (error) {
+          console.warn("[loader] Fira Sans load failed:", error);
+        });
+      }
+
+      function loadDeferredImage(image) {
+        if (!image || !image.dataset.src || image.getAttribute("src")) return;
+        if (image.dataset.fetchpriority && "fetchPriority" in image) {
+          image.fetchPriority = image.dataset.fetchpriority;
+        }
+        image.src = image.dataset.src;
+        image.removeAttribute("data-src");
+        image.removeAttribute("data-fetchpriority");
+      }
+
+      window.loadDeferredImage = function (image) {
+        if (window.mainVisualLoadingLocked) return;
+        loadDeferredImage(image);
+      };
+
+      function loadRequiredSlideImages() {
+        var required = new Set(requiredSlideImages);
+        document.querySelectorAll("img[data-src]").forEach(function (image) {
+          if (required.has(image.dataset.src)) loadDeferredImage(image);
+        });
+      }
+
+      function hideLoader() {
+        loader.classList.add("is-hidden");
+        window.setTimeout(function () {
+          document.documentElement.classList.remove("app-loading");
+          loader.removeEventListener("touchmove", blockLoaderScroll, { passive: false });
+          loader.removeEventListener("wheel", blockLoaderScroll, { passive: false });
+          loader.style.display = "none";
+          if (banner) banner.style.display = "none";
+        }, 700);
+      }
+
+      var minimumLoaderTime = new Promise(function (resolve) {
+        window.setTimeout(resolve, 1000);
+      });
+      var loaderImagesReady = Promise.all(loaderImageElements.map(waitForImageElement));
+      var requiredSlideImagesReady = loaderImagesReady.then(function () {
+        var requiredPreloads = requiredSlideImages.map(function (src) {
+          var ready = preloadImage(src);
+          return ready;
+        });
+        return Promise.all(requiredPreloads);
+      });
+
+      Promise.all([
+        waitForFiraSans(),
+        requiredSlideImagesReady,
+        minimumLoaderTime,
+        whenDomReady()
+      ]).then(function () {
+        window.mainVisualLoadingLocked = false;
+        loadRequiredSlideImages();
+        window.requestAnimationFrame(hideLoader);
+      });
+    })();
+  </script>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <div class="pin-tip" id="pinTip" aria-hidden="true"></div>
+  <main>
+    <section class="scrolly" aria-label="Home from China">
+      <div class="sticky-visual legend-right" id="stickyVisual">
+        <div class="house-wrap" id="houseWrap">
+          <img class="house-image is-active" data-image-layer="start" data-src="m3_white.png" data-fetchpriority="high" alt="Cross-cutting illustration of the house from China" aria-hidden="true">
+          <img class="house-image" data-image-layer="0" data-src="m0.png" data-fetchpriority="high" alt="Cross-cutting illustration of the house and garden">
+          <img class="house-image" data-image-layer="1" data-src="m1.png" alt="" aria-hidden="true">
+          <img class="house-image" data-image-layer="2" data-src="m2.png" alt="" aria-hidden="true">
+          <img class="house-image" data-image-layer="3" data-src="m3.png" alt="" aria-hidden="true">
+          <div class="image-dim" aria-hidden="true"></div>
+          <div class="pin-layer" id="pinLayer" aria-label="Labels for products in illustration"></div>
+        </div>
+        <div class="title-lockup" aria-hidden="true">
+          <div class="hero-title-text"><span>A house</span><small>from</small><strong>China</strong><em>from the front door to the last screw</em></div>
+          <div class="hero-scroll">
+            <span class="hero-scroll-label"><b>Scroll down</b></span>
+            <span class="hero-scroll-arrow"></span>
+          </div>
+        </div>
+        <div class="legend" id="legend">
+          <button type="button" class="legend-toggle" id="legendToggle" aria-expanded="true" aria-label="Collapse the legend">
+            <span class="legend-arrow" aria-hidden="true"></span>
+          </button>
+          <div class="legend-body">
+            <p class="legend-title">China's share of Polish imports</p>
+            <div class="legend-scale">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="legend-labels">
+              <span>0%</span>
+              <span>25%</span>
+              <span>50%</span>
+              <span>75%</span>
+              <span>100%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="steps" id="steps">
+        <section class="step" data-panel="title" data-room="top" data-legend="none" data-image-layer="start"></section>
+
+        <section class="step step-red" data-panel="redslide" data-room="top" data-legend="none">
+          <div class="step-card">
+            <p>China has moved into our homes for good. The question is no longer whether we depend on Chinese products, but how much. We analysed import data for the objects we use every day. See whether you could furnish a home without products from China—and what that choice would mean.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="top" data-legend="none" data-side="center" data-blur="true" data-image-layer="0">
+          <div class="step-card">
+            <p>Take a walk through our virtual house and see how likely each object is to have come from China.</p>
+          </div>
+        </section>
+
+        <section class="step" id="frontYardStep" data-panel="card" data-room="front yard" data-layers="1" data-side="right" data-legend="right" data-image-layer="1">
+          <div class="step-card">
+            <p>Outside the house is <mark class="product-highlight">garden equipment</mark>. If it is imported, there is nearly a 50% chance that it came from China. Factories in two of the country’s wealthiest provinces, Guangdong and Zhejiang, specialise in these goods. Their catalogues cover everything from <mark class="product-highlight">barbecues</mark> and <mark class="product-highlight">hammocks</mark> to <mark class="product-highlight">garden furniture</mark>, <mark class="product-highlight">composting systems</mark>, <mark class="product-highlight">sprinklers</mark>, <mark class="product-highlight">solar garden lights</mark> and <mark class="product-highlight">children’s toys</mark> for lawns and sandpits.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="overview" data-products="drzwi wewnętrzne drewniane" data-side="right" data-legend="right">
+          <div class="step-card">
+            <p>As we enter, we may literally bump into another Chinese product: the <mark class="product-highlight">front door</mark>. Imports of <mark class="product-highlight">steel doors</mark> from China have been rising for several years. In 2023, one in five imported doors of this type came from China. Nearly 105,000 arrived in Poland in 2024—more than 15,000 above the previous year, according to forumbranzowe.com.</p>
+            <p>Poland also imports <mark class="product-highlight">interior doors</mark>, <mark class="product-highlight">sliding doors</mark> and <mark class="product-highlight">windows</mark> from China—including floor-to-ceiling “French” windows. Those windows may be covered by Chinese <mark class="product-highlight">indoor roller blinds</mark> or <mark class="product-highlight">curtains</mark>.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="overview" data-legend="none">
+          <div class="step-card">
+            <p>Reliable information about the quality of these products is hard to find. No Polish consumer tests were available, so buyers’ experiences and accounts from people familiar with the manufacturing process offer some guidance.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="overview" data-legend="none">
+          <div class="step-card">
+            <p>Reddit users discussing renovations in the HomeImprovement community confirm that price is the main competitive advantage. One considered importing five sliding doors after US manufacturers quoted $12,000; comparable doors from China would cost about one tenth as much. But was it worth the risk?</p>
+            <p>Another user said he ran a Foshan office sourcing aluminium windows and doors for developers and interior designers abroad. He rated Chinese products highly, but advised buyers to verify the dimensions of the aluminium profiles first: reducing their thickness is an easy way to cut costs, and can shorten a product’s life.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="overview" data-legend="none">
+          <div class="step-card">
+            <p>He also suggested avoiding locally supplied fittings, hinges and handles, which he considered lower quality, and asking manufacturers to use imported parts. Finishing can be another concern because, as he put it, “Chinese standards for insulation and finishing differ significantly from Western standards.”</p>
+            <p>He added that Chinese aluminium windows and doors are generally very affordable and that an excellent product is possible with the right supplier—but the price will reflect it. The same principle applies to most goods ordered in China: better quality costs more.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="overview" data-legend="none">
+          <div class="step-card">
+            <p>The quality can vary dramatically with the price. A buyer can specify the required standard when ordering, and the manufacturer will use different materials or components to make the same item.</p>
+            <p>Even higher-quality, more expensive products can still be cost-effective, according to the Reddit accounts. For the price of one door in the United States, a buyer might purchase several in China.</p>
+            <p>Chinese suppliers also claim they can deliver faster than factories in Poland. A domestic order typically takes two or three weeks, and longer in peak season. Manufacturer websites promise delivery from China in 10–15 days after the details and payment are settled—roughly one third less time.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="bathroom" data-side="right" data-legend="right" data-show-pins="false">
+          <div class="step-card">
+            <p>Back inside, the <mark class="product-highlight">floors</mark> and <mark class="product-highlight">walls</mark> may be finished with Chinese <mark class="product-highlight">tiles</mark>. Imported <mark class="product-highlight">ceramic products</mark> can cost up to a quarter less than Polish-made equivalents.</p>
+            <p>There have also been safety concerns. In 2008, Gazeta Prawna reported that a privately imported batch posed a risk to health and life. Combined radiation from potassium-40, radium-226 and thorium-228 was as much as twice the permitted level.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="bedroomFloor" data-products="podłoga parkiet drewniany" data-side="right" data-legend="right">
+          <div class="step-card">
+            <p>Anyone who skips ceramic tiles may still walk on <mark class="product-highlight">wooden parquet</mark> imported from China.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="roof" data-products="panele fotowoltaiczne" data-side="left" data-legend="left">
+          <div class="step-card">
+            <p>If the house has <mark class="product-highlight">solar power</mark>, its equipment was almost certainly made in Zhejiang, Jiangsu or Guangdong. China produces more than 80% of the world’s <mark class="product-highlight">photovoltaic panels</mark>. According to Wysokie Napięcie, China supplies over 95% of the <mark class="product-highlight">PV panels</mark> installed in the European Union. Low prices encourage investment, and the same applies to the <mark class="product-highlight">associated hardware</mark>.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="storage" data-layers="1" data-side="left" data-legend="left" data-image-layer="3">
+          <div class="step-card">
+            <p>In the utility room, the electricity from those panels needs <mark class="product-highlight">inverters</mark>. Wysokie Napięcie reported that China supplied 80% of the <mark class="product-highlight">inverters</mark> newly installed in Europe in 2024. That may soon change: the European Commission wants to curb imports over concerns about the security of European power grids.</p>
+            <p>The <mark class="product-highlight">boiler</mark> or <mark class="product-highlight">water heater</mark> in this room may also have been made in China, as may the <mark class="product-highlight">radiators</mark>.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="all" data-rooms="bedroom,kitchen,bathroom,salon,storage" data-layers="2" data-side="right" data-legend="right" data-image-layer="3">
+          <div class="step-card">
+            <p>The same is true of <mark class="product-highlight">furniture</mark>: the <mark class="product-highlight">hall wardrobe</mark>, <mark class="product-highlight">living-room table</mark>, <mark class="product-highlight">chairs</mark>, <mark class="product-highlight">closet fittings</mark>, <mark class="product-highlight">beds</mark>, <mark class="product-highlight">kitchen cabinets</mark> and <mark class="product-highlight">bathroom cabinets</mark> all have a substantial chance of coming from China.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="all" data-legend="none">
+          <div class="step-card">
+            <p>A 2024 report by PKO Bank Polski’s Economic Analysis Department found that 41.6% of furniture imported into Poland came from China. The range includes tables, chairs, beds, wardrobes, upholstered and children’s furniture, garden and kitchen furniture, garage shelving and more. Manufacturers will even make reproductions of antique furniture to order.</p>
+            <p>Want furniture in the style of Louis XIV or Louis XVI? Chinese factories can make it.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="all" data-legend="none">
+          <div class="step-card">
+            <p>Until recently, that furniture might at least have contained Polish wood. Two years earlier, almost one fifth of Poland’s timber exports went to China. In the first three quarters of the following year, that figure halved, making it unlikely that Polish timber would return to Poland as furniture.</p>
+            <p>The price again depends on quality, but it can be as much as 50% below that of Polish or other European manufacturers.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="salonTableTop" data-products="serwetki,kubki ceramiczne" data-side="left" data-legend="left" data-image-layer="3">
+          <div class="step-card">
+            <p><mark class="product-highlight">Tables</mark> in the living or dining room may be covered by Chinese <mark class="product-highlight">tablecloths</mark>. Poland also imports <mark class="product-highlight">napkins</mark>, <mark class="product-highlight">table runners</mark> and similar textiles from China.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="bedroom" data-layers="2" data-side="left" data-legend="left">
+          <div class="step-card">
+            <p>In the bedroom are Chinese <mark class="product-highlight">home textiles</mark>: <mark class="product-highlight">towels</mark>, <mark class="product-highlight">sheets</mark>, <mark class="product-highlight">bedding</mark> and <mark class="product-highlight">blankets</mark>. These are among the categories with the highest Chinese share of Polish imports.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="kitchen" data-legend="none">
+          <div class="step-card">
+            <p>What about quality? Buyers say custom-made Chinese furniture depends not only on price, but also on luck. Australian consumers in Reddit’s AusRenovation community reported problems obtaining service when products arrived with defects.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="kitchen" data-legend="none">
+          <div class="step-card">
+            <p>One user warned: “If there is a defect, the supplier will first try to refund only the damaged part, then charge you to ship that part back for repair. … Manufacturers are also reluctant to make a single small replacement part they are not paid for, so repairs can take a long time.”</p>
+            <p>Another user, who worked for a customs-services company importing from China, warned that kitchen furniture sometimes exceeded chemical limits. He cited toxic formaldehyde used in fibreboard adhesives, ammonium bifluoride used to treat wood, and even carcinogenic asbestos.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="visual" data-room="all" data-legend="none" data-image-layer="3" data-show-pins="false"></section>
+
+        <section class="step" data-panel="card" data-room="all" data-products="lodówka,zamrażarka,kuchenka,telewizor,głośnik" data-side="right" data-legend="right" data-image-layer="3">
+          <div class="step-card">
+            <p>Now consider household appliances. There are more Chinese products in this category around us than we might expect. Polish companies can sell them under domestic brands: the logo and packaging are designed locally, while a factory in China makes the product and applies the name. Only a careful buyer notices the small “made in China” label underneath.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="all" data-legend="none">
+          <div class="step-card">
+            <p>Globalisation has reinforced the trend. The Slovenian appliance brand Gorenje, which makes nearly a quarter of Europe’s appliances, came under Chinese ownership eight years ago. It is now part of Qingdao-based Hisense Group in Shandong province, a major television manufacturer in its own right.</p>
+            <p>Another Qingdao company, Haier, entered Europe and built factories there. It began by licensing technology from a German refrigerator manufacturer, later acquired it, and ultimately became a global brand. In 2011 it also bought the Sanyo appliance business—including factories and research centres—from Panasonic.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="office" data-side="right" data-legend="right" data-show-pins="false">
+          <div class="step-card">
+            <p>Look at the <mark class="product-highlight">phone</mark> and <mark class="product-highlight">tablet</mark> on the Chinese <mark class="product-highlight">desk</mark>. Even if we avoid explicitly Chinese brands such as <mark class="product-highlight">Xiaomi</mark> and <mark class="product-highlight">Huawei</mark> by buying a <mark class="product-highlight">Motorola smartphone</mark>, the company and its logo have been Chinese-owned for years. The same is true of the <mark class="product-highlight">ThinkPad</mark> laptop brand acquired from IBM.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="card" data-room="kitchenClose" data-products="garnki stalowe,patelnie,deski do krojenia" data-side="right" data-legend="right">
+          <div class="step-card">
+            <p>If you reach for water, there is a good chance you will pour it into a Chinese <mark class="product-highlight">glass</mark>. Poland imports not only <mark class="product-highlight">enamelware</mark>—once a domestic speciality—but also <mark class="product-highlight">steel pots</mark>, <mark class="product-highlight">pans</mark>, <mark class="product-highlight">cutting boards</mark>, <mark class="product-highlight">cutlery</mark>, <mark class="product-highlight">plates</mark>, <mark class="product-highlight">mugs</mark> and <mark class="product-highlight">glasses</mark>.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="kitchen" data-legend="none">
+          <div class="step-card">
+            <p>Quality can be uncertain. In the first half of 2026 alone, Poland’s Chief Sanitary Inspector twice warned about Chinese-made goods and ordered their immediate withdrawal. One alert covered five types of drinking glass sold by a well-known Danish retail chain because lead and cadmium could migrate from the glass. The second found the same heavy metals on the rims of Chinese glasses sold by a German-owned discount chain.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="kitchen" data-legend="none">
+          <div class="step-card">
+            <p>Tests published in late 2025 tell a similar story. Independent consumer organisation Pro-Test checked 162 products sold on Temu and Shein; 110 failed to meet EU standards. In other words, two out of three were defective or unsafe. Tests commissioned by Belgium’s Testachats found a 70% failure rate on the same platforms. Common problems included overheating phone chargers and toxic metals or chemicals in jewellery and clothing.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="all" data-legend="none">
+          <div class="step-card">
+            <p>Asia specialist Radosław Pyffel says China is not entirely leaving its low-cost manufacturing model behind, but recent five-year plans have prioritised technology, electric vehicles, AI, robotics and self-sufficiency in technology and raw materials. Product quality and China’s position in supply chains are rising, he argues, especially as the country turns to Global South markets with a growing middle class.</p>
+            <p>Pyffel traces China’s current position partly to the short-term thinking of American and European corporations. Citing the proverb “a clever rabbit has three burrows,” he argues that companies pursuing the margins available from cheap production largely abandoned diversified supply chains. China gained monopolies or near-monopolies in strategic sectors; Western economies may need about 15 years to rebuild factories, technologies, components and raw-material supply while China continues to advance.</p>
+          </div>
+        </section>
+
+        <section class="step" data-panel="article" data-room="all" data-legend="none">
+          <div class="step-card">
+            <p>He compares the process with post-war Japan: Japanese electronics first had a reputation for poor quality, then the industry moved into a leading position. China, he says, is following the same path from low-quality equipment to high technology, but has proved much harder for the United States to contain and continues to move towards the global technological frontier.</p>
+          </div>
+        </section>
+
+        <section class="step step-final-card" data-panel="card" data-room="all" data-products="śruby" data-side="right" data-legend="right">
+          <div class="step-card">
+            <p>Even a house built with <mark class="product-highlight">furniture</mark> made only from Polish wood and <mark class="product-highlight">electronics</mark> assembled from Western parts may still contain Chinese components: <mark class="product-highlight">bolts</mark> and <mark class="product-highlight">screws</mark>. Poland imports those from China too.</p>
+          </div>
+        </section>
+
+        <section class="step step-final-overview" data-panel="visual" data-room="all" data-legend="none" data-image-layer="3" data-show-pins="false"></section>
+      </div>
+    </section>
+
+    <section class="methodology-section">
+      <div class="methodology-inner">
+        <h2>How we calculated it</h2>
+        <p>For each product category, we calculated the share of Poland’s imports that came from China.</p>
+        <p>Import data come from Eurostat’s Comext database. We matched product codes to the objects in the illustration and rounded label values to whole percentages.</p>
+        <p>Each figure shows China’s share of imports in that category—not its share of the entire Polish market or the exact proportion of those objects found in Polish homes.</p>
+      </div>
+    </section>
+
+  </main>
+
+	  <script>
+	    
+	    
+	    
+	    
+	    
+	    const products = [
+      { id: "bed", name: "bed", legacy: "łóżko", source: "wooden bedroom bed", room: "bedroom", layer: 2, share: 21.1, x: 33.6, y: 44.6, snap: "s" },
+      { id: "bedding", name: "bedding", legacy: "pościel", source: "cotton bed linen", room: "bedroom", layer: 3, share: 3.6, x: 33.8, y: 45.8, snap: "s" },
+      { id: "pillows", name: "decorative cushions", legacy: "poduszki dekoracyjne", source: "synthetic-fibre cushion and furniture covers", room: "bedroom", layer: 3, share: 46.2, x: 32.1, y: 44.0, snap: "n" },
+      { id: "bedroom-wardrobe", name: "wooden wardrobe", legacy: "szafa drewniana", source: "wooden bedroom wardrobes", room: "bedroom", layer: 2, share: 21.1, x: 26.3, y: 37.6, snap: "w" },
+      { id: "kitchen-cabinets", name: "kitchen cabinets", legacy: "szafki", source: "wooden kitchen cabinets", room: "kitchen", layer: 2, share: 6.1, x: 54.0, y: 36.8, snap: "n" },
+      { id: "napkins", name: "napkins", legacy: "serwetki", source: "cotton tablecloths and napkins", room: "salon", layer: 3, share: 8.0, x: 49.0, y: 66.3, snap: "s" },
+      { id: "fridge", name: "refrigerator", legacy: "lodówka", source: "domestic compressor refrigerator", room: "kitchen", layer: 3, share: 47.0, x: 45.4, y: 38.5, snap: "w" },
+      { id: "freezer", name: "freezer", legacy: "zamrażarka", source: "upright freezer", room: "kitchen", layer: 3, share: 43.2, x: 46.2, y: 43.0, snap: "w" },
+      { id: "hob", name: "induction hob", legacy: "płyta indukcyjna", source: "induction hob", room: "kitchen", layer: 3, share: 18.2, x: 50.9, y: 39.0, snap: "n" },
+      { id: "cooker", name: "electric cooker", legacy: "kuchenka", source: "electric cooker", room: "kitchen", layer: 3, share: 18.2, x: 48.9, y: 41.0, snap: "w" },
+      { id: "pots", name: "steel pots", legacy: "garnki stalowe", source: "stainless-steel pots", room: "kitchen", layer: 3, share: 41.5, x: 55.0, y: 36.6, snap: "n" },
+      { id: "pans", name: "pans", legacy: "patelnie", source: "aluminium pans", room: "kitchen", layer: 3, share: 51.7, x: 51.9, y: 36.4, snap: "n" },
+      { id: "boards", name: "cutting boards", legacy: "deski do krojenia", source: "wooden cutting boards", room: "kitchen", layer: 3, share: 34.3, x: 50.3, y: 32.9, snap: "n" },
+      { id: "cutlery", name: "cutlery", legacy: "sztućce", source: "cutlery sets", room: "kitchen", layer: 3, share: 56.7, x: 53.0, y: 46.7, snap: "s" },
+      { id: "plates", name: "plates", legacy: "talerze", source: "non-porcelain ceramic plates", room: "kitchen", layer: 3, share: 43.1, x: 56.2, y: 45.4, snap: "s" },
+      { id: "mugs", name: "ceramic mugs", legacy: "kubki ceramiczne", source: "non-porcelain ceramic mugs", room: "kitchen", layer: 3, share: 43.1, x: 50.7, y: 63.2, snap: "n" },
+      { id: "glasses", name: "drinking glasses", legacy: "szklanki", source: "drinking glasses", room: "kitchen", layer: 3, share: 27.7, x: 55.0, y: 45.7, snap: "s" },
+      { id: "grill", name: "barbecue", legacy: "grill", source: "iron or steel household articles", room: "front yard", layer: 1, share: 18.1, x: 7.6, y: 55.7, snap: "e" },
+      { id: "garden-furniture", name: "garden furniture", legacy: "meble ogrodowe", source: "metal garden furniture", room: "front yard", layer: 1, share: 47.1, x: 18.2, y: 59.5, snap: "e" },
+      { id: "bathroom-door", name: "wooden interior door", legacy: "drzwi wewnętrzne drewniane", source: "wooden doors and frames", room: "bathroom", layer: 1, share: 5.8, x: 66.9, y: 51.2, snap: "w" },
+      { id: "screws", name: "screws", legacy: "śruby", source: "iron or steel bolts", room: "general", layer: 1, share: 10.9, x: 78.0, y: 42.0, snap: "e" },
+      { id: "bathroom-cabinet", name: "bathroom cabinet", legacy: "szafki", source: "wooden bathroom cabinets", room: "bathroom", layer: 2, share: 17.7, x: 72.5, y: 58.5, snap: "e" },
+      { id: "washing-machine", name: "washing machine", legacy: "pralka", source: "automatic washing machine up to 10 kg", room: "bathroom", layer: 3, share: 45.0, x: 69.0, y: 56.8, snap: "w" },
+      { id: "living-table", name: "living-room table", legacy: "stół w salonie", source: "wooden tables", room: "salon", layer: 2, share: 17.7, x: 49.0, y: 66.3, snap: "s" },
+      { id: "parquet", name: "wooden parquet floor", legacy: "podłoga parkiet drewniany", source: "wooden parquet panels", room: "general", layer: 1, share: 97.1, x: 23.6, y: 50.0, snap: "s" },
+      { id: "living-table-chairs", name: "living-room table and chairs", legacy: "stół i krzesła w salonie", source: "wooden living-room table", room: "salon", layer: 2, share: 17.7, x: 55.8, y: 48.8, snap: "n" },
+      { id: "tv", name: "television", legacy: "telewizor", source: "colour television", room: "salon", layer: 3, share: 3.9, x: 44.5, y: 70.5, snap: "w" },
+      { id: "sofa", name: "upholstered sofa / armchair", legacy: "sofa / fotel tapicerowany", source: "upholstered furniture with a wooden frame", room: "salon", layer: 2, share: 40.9, x: 55.0, y: 63.0, snap: "e" },
+      { id: "speaker", name: "speaker", legacy: "głośnik", source: "single speaker", room: "salon", layer: 3, share: 20.1, x: 65.7, y: 72.5, snap: "e" },
+      { id: "pv", name: "photovoltaic panels", legacy: "panele fotowoltaiczne", source: "article data", room: "roof", layer: 1, share: 95.0, x: 55.0, y: 10.4, snap: "s" },
+      { id: "boiler", name: "boiler", legacy: "bojler", source: "non-electric gas water heaters", room: "storage", layer: 1, share: 12.1, x: 75.0, y: 39.8, snap: "e" },
+      { id: "radiator", name: "steel radiator", legacy: "grzejnik stalowy", source: "steel central-heating radiators", room: "storage", layer: 1, share: 13.1, x: 70.0, y: 49.1, snap: "w" },
+      { id: "metal-shelf", name: "metal shelving", legacy: "regał metalowy", source: "metal garage shelving", room: "storage", layer: 1, share: 47.1, x: 89.2, y: 46.8, snap: "w" },
+      { id: "storage-cabinet", name: "hall cabinet", legacy: "szafka", source: "wooden hall wardrobe", room: "storage", layer: 2, share: 17.7, x: 88.8, y: 39.6, snap: "w" }
+    ];
+
+	    
+	    
+	    
+	    
+	    
+    const roomFocus = {
+      top: { left: 0, top: 0, width: 100, height: 100, zoom: 0.94, mobileZoom: 1 },
+      overview: { left: 17, top: 17, width: 72, height: 65, zoom: 1.12, mobileZoom: 1.28 },
+      "front yard": { left: 3, top: 42, width: 31, height: 45, zoom: 1.85, mobileZoom: 2.25 },
+	      bathroom: { left: 60, top: 37, width: 28, height: 39, zoom: 1.72, mobileZoom: 2.45 },
+	      salon: { left: 37, top: 49, width: 33, height: 32, zoom: 1.75, mobileZoom: 2.05 },
+	      salonTableTop: { left: 36, top: 55, width: 34, height: 34, zoom: 2.05, mobileZoom: 2.35 },
+		      roof: { left: 37, top: 0, width: 38, height: 20, zoom: 1.7, mobileZoom: 2.35 },
+      storage: { left: 70, top: 25, width: 26, height: 35, zoom: 1.95, mobileZoom: 2.35 },
+      kitchen: { left: 41, top: 25, width: 30, height: 34, zoom: 1.95, mobileZoom: 2.35 },
+      kitchenClose: { left: 44, top: 28, width: 25, height: 26, zoom: 2.45, mobileZoom: 2.85 },
+      bedroom: { left: 20, top: 27, width: 25, height: 30, zoom: 2.05, mobileZoom: 2.45 },
+	      bedroomFloor: { left: 22, top: 42, width: 21, height: 19, zoom: 1.75, mobileZoom: 2.05 },
+      office: { left: 55, top: 66, width: 28, height: 27, zoom: 2.05, mobileZoom: 2.45 },
+      all: { left: 2, top: 8, width: 96, height: 84, zoom: 0.98, mobileZoom: 1.15 }
+    };
+
+    const roomLabels = {
+      bedroom: "Bedroom",
+      kitchen: "Kitchen",
+      "front yard": "Garden",
+      bathroom: "Bathroom",
+      salon: "Living room",
+      general: "General view",
+      roof: "Roof",
+      storage: "Utility room"
+    };
+
+	    const stickyVisual = document.getElementById("stickyVisual");
+	    const houseWrap = document.getElementById("houseWrap");
+	    const houseImages = [...document.querySelectorAll(".house-image")];
+	    const pinLayer = document.getElementById("pinLayer");
+	    const pinTip = document.getElementById("pinTip");
+	    const mobileQuery = window.matchMedia("(max-width: 760px)");
+	    let activeStep = null;
+	    let labelRevealTimer = null;
+	    let labelHideTimer = null;
+	    let labelPulseId = 0;
+	    let lastCameraState = "";
+	    let visiblePinSignature = null;
+	    const LABEL_REVEAL_DELAY_MS = 900;
+	    const LABEL_VISIBLE_MS = 7000;
+
+    function colorForShare(share) {
+      if (share >= 65) return "#f0202b";
+      if (share >= 40) return "#f44d20";
+      if (share >= 18) return "#f87916";
+      if (share >= 5) return "#fba60b";
+      return "#ffd200";
+    }
+
+    function formatShare(share, decimals = 0) {
+      return `${share.toLocaleString("en-GB", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}%`;
+    }
+
+    function normalize(value) {
+      return String(value || "").trim().toLocaleLowerCase("en-GB");
+    }
+
+    function capitalizeFirst(value) {
+      const text = String(value || "").trim();
+      if (!text) return "";
+      return text.charAt(0).toLocaleUpperCase("en-GB") + text.slice(1);
+    }
+
+    function escapeAttribute(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function metricLabel(product) {
+      const marker = normalize(product.metric || product.sourceDocument || product.sourceFile || product.source || "");
+      const isMarketShare = marker.includes("polskim rynku") || marker.includes("market");
+      if (isMarketShare) return `${formatShare(product.share, 1)} of the Polish market comes from China`;
+      return `${formatShare(product.share, 1)} of Polish imports come from China`;
+    }
+
+	    function parseList(value) {
+	      return String(value || "")
+	        .split(",")
+	        .map((item) => normalize(item))
+	        .filter(Boolean);
+	    }
+
+	    function getSiteHeaderHeight() {
+	      const value = getComputedStyle(document.documentElement).getPropertyValue("--site-header-height");
+	      return Number.parseFloat(value) || 0;
+	    }
+
+	    function getActivationY() {
+	      const headerHeight = getSiteHeaderHeight();
+	      return headerHeight + (window.innerHeight - headerHeight) * 0.56;
+	    }
+
+		    function renderPins() {
+		      pinLayer.innerHTML = products.map((product) => {
+		        const productName = capitalizeFirst(product.name);
+		        const metricText = metricLabel(product);
+		        const cardId = `pin-card-${product.id}`;
+		        const buttonLabel = `Show details: ${productName}. ${metricText}.`;
+
+		        return `
+		          
+		          <div class="pin" data-id="${escapeAttribute(product.id)}" data-room="${escapeAttribute(product.room)}" data-snap="${escapeAttribute(product.snap)}" style="--x:${product.x}%; --y:${product.y}%; --pin-color:${colorForShare(product.share)}">
+            <button type="button" class="pin-dot" aria-expanded="false" aria-controls="${escapeAttribute(cardId)}" aria-label="${escapeAttribute(buttonLabel)}">${formatShare(product.share)}</button>
+            <div class="pin-card" id="${escapeAttribute(cardId)}">
+              <span class="pin-name">${productName}</span>
+              <span class="pin-kicker">${metricText}</span>
+            </div>
+          </div>
+        `;
+		      }).join("");
+	    }
+
+	    function productMatchesStep(product, step) {
+	      if (step.dataset.showPins === "false") return false;
+	      if (step.dataset.panel === "article" || step.dataset.panel === "title") return false;
+
+      const productNames = parseList(step.dataset.products);
+      if (productNames.length) {
+        return productNames.includes(normalize(product.legacy)) || productNames.includes(normalize(product.name)) || productNames.includes(normalize(product.source));
+      }
+
+      const rooms = parseList(step.dataset.rooms || step.dataset.room);
+      const roomMatches = rooms.includes("all") || rooms.includes(normalize(product.room));
+      if (!roomMatches) return false;
+
+      const layers = parseList(step.dataset.layers);
+	      if (!layers.length) return true;
+	      return layers.includes(String(product.layer));
+	    }
+
+	    function getVisibleProductsForStep(step) {
+	      return products.filter((product) => productMatchesStep(product, step));
+	    }
+
+	    function getVisiblePinSignature(visibleProducts) {
+	      return visibleProducts.map((product) => product.id).sort().join("|");
+	    }
+
+	    function articleTextNeedsBackground() {
+	      const activationY = getActivationY();
+	      return steps.some((step, i) => {
+	        if (step.dataset.panel !== "article") return false;
+	        const textCard = step.querySelector(".step-card");
+	        if (!textCard) return false;
+	        const rect = textCard.getBoundingClientRect();
+	        
+	        if (rect.bottom > 0 && rect.top <= activationY) return true;
+	        
+	        
+	        
+	        const next = steps[i + 1];
+	        if (rect.bottom <= 0 && next && next.dataset.panel === "article") {
+	          const nextCard = next.querySelector(".step-card");
+	          if (nextCard && nextCard.getBoundingClientRect().top > activationY) return true;
+	        }
+	        return false;
+	      });
+	    }
+
+	    function updateTextBackgroundState(step) {
+	      if (!step) return;
+	      const panel = step.dataset.panel || "card";
+	      const keepArticleBackground = articleTextNeedsBackground();
+	      stickyVisual.classList.toggle("is-panel-article", keepArticleBackground);
+	      stickyVisual.classList.toggle("is-image-blurred", keepArticleBackground || panel === "redslide" || step.dataset.blur === "true");
+	    }
+
+	    function setVisualMode(step) {
+	      const panel = step.dataset.panel || "card";
+	      const legend = step.dataset.legend || "right";
+	      const roomValue = step.dataset.room || "top";
+	      stickyVisual.dataset.currentRoom = roomValue;
+	      stickyVisual.classList.toggle("is-panel-title", panel === "title");
+	      stickyVisual.classList.toggle("is-panel-red", panel === "redslide");
+	      updateTextBackgroundState(step);
+	      stickyVisual.classList.toggle("legend-hidden", legend === "none");
+	      stickyVisual.classList.toggle("legend-left", legend === "left");
+	      stickyVisual.classList.toggle("legend-right", legend !== "left");
+	    }
+
+    function setImageLayer(step) {
+      let layer = step.dataset.imageLayer || "0";
+      const stepIndex = steps.indexOf(step);
+      for (let index = stepIndex; index >= 0; index -= 1) {
+        if (steps[index].dataset.imageLayer) {
+          layer = steps[index].dataset.imageLayer;
+          break;
+        }
+      }
+
+      houseImages.forEach((image) => {
+        const isActive = image.dataset.imageLayer === layer;
+        if (isActive && window.loadDeferredImage) window.loadDeferredImage(image);
+        image.classList.toggle("is-active", isActive);
+      });
+    }
+
+    function setFocus(roomValue) {
+      const focus = roomFocus[roomValue] || roomFocus.all;
+      moveCameraToFocus(focus);
+    }
+
+	    function moveCameraToFocus(focus) {
+	      const zoom = mobileQuery.matches && focus.mobileZoom ? focus.mobileZoom : focus.zoom || 1;
+	      const centerX = focus.left + focus.width / 2;
+	      const centerY = focus.top + focus.height / 2;
+	      const panX = -((centerX - 50) / 100) * houseWrap.offsetWidth * zoom;
+	      const panY = -((centerY - 50) / 100) * houseWrap.offsetHeight * zoom;
+      const cameraState = `${zoom.toFixed(3)}|${panX.toFixed(1)}|${panY.toFixed(1)}`;
+
+      if (cameraState === lastCameraState) return;
+      lastCameraState = cameraState;
+
+      houseWrap.style.setProperty("--zoom", zoom.toFixed(3));
+      houseWrap.style.setProperty("--pan-x", `${panX.toFixed(1)}px`);
+      houseWrap.style.setProperty("--pan-y", `${panY.toFixed(1)}px`);
+      houseWrap.style.setProperty("--label-scale", (1 / zoom).toFixed(3));
+      houseWrap.style.setProperty("--label-pop-scale", (0.96 / zoom).toFixed(3));
+    }
+
+		    function clearLabels() {
+		      labelPulseId += 1;
+		      window.clearTimeout(labelRevealTimer);
+		      window.clearTimeout(labelHideTimer);
+		      document.querySelectorAll(".pin.is-label-visible").forEach((pin) => {
+		        pin.classList.remove("is-label-visible");
+		      });
+		      closeTappedLabels();
+	    }
+
+	    function hidePinTip() {
+	      if (pinTip) pinTip.classList.remove("is-visible");
+	    }
+
+	    
+	    
+	    function showPinTip(pin) {
+	      if (!pinTip) return;
+	      const dot = pin.querySelector(".pin-dot");
+	      const nameEl = pin.querySelector(".pin-name");
+	      if (!dot || !nameEl) return;
+	      pinTip.textContent = nameEl.textContent;
+	      pinTip.classList.add("is-visible");
+	      const dotRect = dot.getBoundingClientRect();
+	      const tipRect = pinTip.getBoundingClientRect();
+	      const margin = 8;
+	      const gap = 10;
+	      let left = dotRect.left + dotRect.width / 2 - tipRect.width / 2;
+	      left = Math.max(margin, Math.min(left, window.innerWidth - tipRect.width - margin));
+	      let top = dotRect.top - gap - tipRect.height; 
+	      if (top < margin) top = dotRect.bottom + gap; 
+	      top = Math.max(margin, Math.min(top, window.innerHeight - tipRect.height - margin));
+	      pinTip.style.left = `${Math.round(left)}px`;
+	      pinTip.style.top = `${Math.round(top)}px`;
+	    }
+
+	    function setTappedLabel(pin, isOpen) {
+	      pin.classList.toggle("is-label-tapped", isOpen);
+	      const button = pin.querySelector(".pin-dot");
+	      if (button) {
+	        button.setAttribute("aria-expanded", String(isOpen));
+	        if (!isOpen) button.blur();
+	      }
+	      if (mobileQuery.matches && isOpen) showPinTip(pin);
+	      else hidePinTip();
+	    }
+
+	    function closeTappedLabels(exceptPin = null) {
+	      document.querySelectorAll(".pin.is-label-tapped").forEach((pin) => {
+	        if (pin !== exceptPin) setTappedLabel(pin, false);
+	      });
+	    }
+
+	    function handlePinTap(event) {
+	      if (!mobileQuery.matches) return;
+	      const target = event.target;
+	      if (!(target instanceof Element)) return;
+
+	      const clickedPin = target.closest(".pin");
+	      if (!clickedPin) return;
+
+	      
+	      
+	      
+	      let pin = clickedPin;
+	      let best = Infinity;
+	      pinLayer.querySelectorAll(".pin.is-visible:not(.is-muted)").forEach((candidate) => {
+	        const dot = candidate.querySelector(".pin-dot");
+	        if (!dot) return;
+	        const r = dot.getBoundingClientRect();
+	        const cx = r.left + r.width / 2;
+	        const cy = r.top + r.height / 2;
+	        const dist = Math.hypot(event.clientX - cx, event.clientY - cy);
+	        const reach = r.width / 2 + 16; 
+	        if (dist <= reach && dist < best) {
+	          best = dist;
+	          pin = candidate;
+	        }
+	      });
+
+	      if (!pin.classList.contains("is-visible") || pin.classList.contains("is-muted")) return;
+
+	      event.preventDefault();
+	      event.stopPropagation();
+
+	      const shouldOpen = !pin.classList.contains("is-label-tapped");
+	      closeTappedLabels(pin);
+	      setTappedLabel(pin, shouldOpen);
+	    }
+
+	    function handleOutsideTap(event) {
+	      if (!mobileQuery.matches) return;
+	      const target = event.target;
+	      if (target instanceof Element && target.closest(".pin")) return;
+	      closeTappedLabels();
+	    }
+
+    function pulseStepLabels(step) {
+      clearLabels();
+      if (step.dataset.panel === "article" || step.dataset.panel === "title" || mobileQuery.matches) return;
+
+	      const pulseId = labelPulseId;
+	      const visiblePins = [...document.querySelectorAll(".pin.is-visible:not(.is-muted)")];
+	      window.requestAnimationFrame(() => {
+	        if (pulseId !== labelPulseId) return;
+	        labelRevealTimer = window.setTimeout(() => {
+	          if (pulseId !== labelPulseId) return;
+	          visiblePins.forEach((pin) => pin.classList.add("is-label-visible"));
+	          labelHideTimer = window.setTimeout(() => {
+	            if (pulseId !== labelPulseId) return;
+	            visiblePins.forEach((pin) => pin.classList.remove("is-label-visible"));
+	          }, LABEL_VISIBLE_MS);
+	        }, LABEL_REVEAL_DELAY_MS);
+	      });
+	    }
+
+	    function activateStep(step) {
+	      if (activeStep === step) return;
+	      activeStep = step;
+	      const roomValue = step.dataset.room || "top";
+	      const visibleProducts = getVisibleProductsForStep(step);
+	      const nextVisiblePinSignature = getVisiblePinSignature(visibleProducts);
+	      const visiblePinsChanged = nextVisiblePinSignature !== visiblePinSignature;
+	      const visibleProductIds = new Set(visibleProducts.map((product) => product.id));
+	      visiblePinSignature = nextVisiblePinSignature;
+	      setVisualMode(step);
+	      setImageLayer(step);
+	      setFocus(roomValue);
+	      steps.forEach((item) => item.classList.toggle("is-active", item === step));
+	      document.querySelectorAll(".pin").forEach((pin) => {
+	        const visible = visibleProductIds.has(pin.dataset.id);
+	        if (visiblePinsChanged) pin.classList.remove("is-label-visible");
+	        pin.classList.toggle("is-visible", visible);
+	        pin.classList.toggle("is-muted", false);
+	      });
+	      if (visiblePinsChanged) pulseStepLabels(step);
+	      
+      if (!legendAutoCollapsed && frontYardStepIndex >= 0 && steps.indexOf(step) > frontYardStepIndex) {
+        legendAutoCollapsed = true;
+        const lg = document.getElementById("legend");
+        const lgBtn = document.getElementById("legendToggle");
+        if (lg) {
+          lg.classList.add("is-collapsed");
+          if (lgBtn) {
+            lgBtn.setAttribute("aria-expanded", "false");
+            lgBtn.setAttribute("aria-label", "Expand legend");
+          }
+        }
+      }
+    }
+
+    
+    
+    
+    
+    let paywallFired = false;
+
+    function getEmbedSdk() {
+      window.paywallEmbed ??= {};
+      window.paywallEmbed.cmd ??= [];
+      return new Promise((resolve) => window.paywallEmbed.cmd.push(resolve));
+    }
+
+    const embedSdkReady = getEmbedSdk().then((sdk) => {
+      console.log("[paywall] SDK ready");
+      sdk.init().then(
+        () => console.log("[paywall] init OK"),
+        (err) => console.warn("[paywall] init failed", err)
+      );
+      return sdk;
+    });
+
+    function triggerPaywall(reason) {
+      if (paywallFired) return;
+      paywallFired = true;
+      console.log("[paywall] trigger:", reason);
+      embedSdkReady
+        .then((sdk) => sdk.pianoFeatures.showOfferModal({ lockScroll: true }))
+        .then(
+          (shown) => {
+            console.log("[paywall] showOfferModal ->", shown);
+            if (shown) document.documentElement.classList.add("paywall-locked");
+          },
+          (err) => {
+            paywallFired = false;
+            console.warn("[paywall] showOfferModal error", err);
+          }
+        );
+    }
+
+    if (new URLSearchParams(location.search).has("paywallTest")) {
+      embedSdkReady.then(() => triggerPaywall("?paywallTest"));
+    }
+
+	    renderPins();
+	    pinLayer.addEventListener("click", handlePinTap);
+	    document.addEventListener("click", handleOutsideTap);
+	    document.addEventListener("keydown", (event) => {
+	      if (event.key === "Escape") closeTappedLabels();
+	    });
+	    if (mobileQuery.addEventListener) {
+	      mobileQuery.addEventListener("change", clearLabels);
+	    } else {
+	      mobileQuery.addListener(clearLabels);
+	    }
+
+	    const steps = [...document.querySelectorAll(".step")];
+    let scrollTicking = false;
+    let legendAutoCollapsed = false;
+    const frontYardStepIndex = steps.findIndex((s) => s.id === "frontYardStep");
+
+	    function getStepAtActivationLine() {
+	      const activationY = getActivationY();
+	      let nearestStep = steps[0];
+      let nearestDistance = Infinity;
+
+      for (const step of steps) {
+        const rect = step.getBoundingClientRect();
+        if (rect.top <= activationY && rect.bottom >= activationY) return step;
+
+        const distance = Math.min(
+          Math.abs(rect.top - activationY),
+          Math.abs(rect.bottom - activationY)
+        );
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestStep = step;
+        }
+      }
+
+      return nearestStep;
+    }
+
+    const scrollProgress = document.getElementById("scrollProgress");
+
+    function updateScrollProgress() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = max > 0 ? window.scrollY / max : 0;
+      scrollProgress.style.width = (Math.min(Math.max(ratio, 0), 1) * 100).toFixed(2) + "%";
+    }
+
+    const redSlide = document.querySelector(".step-red");
+
+    function updateTitleCover() {
+      if (!redSlide) return;
+      const titleEl = document.querySelector(".title-lockup");
+      const threshold = titleEl ? titleEl.getBoundingClientRect().top : window.innerHeight / 2;
+      const rect = redSlide.getBoundingClientRect();
+      
+      
+      stickyVisual.classList.toggle("is-title-covered", rect.top <= threshold);
+    }
+
+	    function updateStepFromScroll() {
+	      scrollTicking = false;
+	      if (mobileQuery.matches) closeTappedLabels();
+	      activateStep(getStepAtActivationLine());
+	      updateTextBackgroundState(activeStep);
+	      updateTitleCover();
+	      updateScrollProgress();
+	    }
+
+    function requestStepUpdate() {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      window.requestAnimationFrame(updateStepFromScroll);
+    }
+
+    activateStep(getStepAtActivationLine());
+    window.requestAnimationFrame(() => {
+      houseWrap.classList.add("is-camera-ready");
+      window.addEventListener("scroll", requestStepUpdate, { passive: true });
+      requestStepUpdate();
+    });
+
+    window.addEventListener("resize", () => {
+      updateScrollProgress();
+      if (!activeStep) return;
+      const focus = roomFocus[activeStep.dataset.room || "top"] || roomFocus.all;
+      moveCameraToFocus(focus);
+    });
+
+    const legendEl = document.getElementById("legend");
+    const legendToggle = document.getElementById("legendToggle");
+    if (legendEl && legendToggle) {
+      legendToggle.addEventListener("click", () => {
+        const collapsed = legendEl.classList.toggle("is-collapsed");
+        legendToggle.setAttribute("aria-expanded", String(!collapsed));
+        legendToggle.setAttribute("aria-label", collapsed ? "Expand legend" : "Collapse legend");
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1086,18 +1086,18 @@
   
   .portfolio-link{
     position:fixed; top:14px; left:14px; z-index:10050;
-    display:inline-flex; align-items:center; gap:7px;
-    padding:8px 13px; border:1px solid rgba(46,51,61,.2); border-radius:999px;
-    background:rgba(231,226,218,.94); color:#2e333d;
-    font:600 12px/1.1 "Fira Sans",Roboto,system-ui,sans-serif;
-    letter-spacing:.01em; text-decoration:none;
-    box-shadow:0 2px 12px rgba(0,0,0,.12); backdrop-filter:blur(8px);
+    display:inline-flex; align-items:center; gap:8px;
+    min-height:44px; padding:0 14px;
+    background:#fff; color:#111;
+    font:500 14px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;
+    text-decoration:none;
+    box-shadow:0 2px 6px rgba(0,0,0,.18);
   }
   .portfolio-link span{font-size:16px; line-height:.7}
-  .portfolio-link b{font-weight:400; opacity:.7}
-  .portfolio-link:hover{background:#fff; color:#111}
-  .portfolio-link:focus-visible{outline:3px solid #2e333d; outline-offset:3px}
-  @media(max-width:520px){.portfolio-link{top:10px;left:10px;padding:8px 11px}.portfolio-link b{display:none}}
+  .portfolio-link b{font-weight:400; color:rgba(17,17,17,.7)}
+  .portfolio-link:hover{opacity:.65}
+  .portfolio-link:focus-visible{outline:2px solid #e2231a; outline-offset:4px}
+  @media(max-width:520px){.portfolio-link{top:10px;left:10px;padding:0 11px}.portfolio-link b{display:none}}
   @media print{.portfolio-link{display:none}}
 
   .app-loader-title{font:800 clamp(30px,5vw,56px)/.82 "Fira Sans",sans-serif;letter-spacing:-.055em;text-align:center;color:#fff}
@@ -1111,7 +1111,7 @@
 </style>
 </head>
 <body>
-  <a class="portfolio-link" href="https://anastasiiamorozova.github.io/portfolio/" aria-label="Back to Anastasiia Morozova’s portfolio"><span aria-hidden="true">←</span> Anastasiia Morozova <b>/ Portfolio</b></a>
+  <a class="portfolio-link" href="../#/data-viz" aria-label="Back to Anastasiia Morozova’s portfolio: data &amp; viz"><span aria-hidden="true">←</span> Anastasiia Morozova <b>/ data &amp; viz</b></a>
   <div class="app-loader" id="appLoader" role="status" aria-label="Loading">
     <img class="app-loader-house" src="m3_red%20min.png" alt="" aria-hidden="true" fetchpriority="high">
     <div class="app-loader-box">

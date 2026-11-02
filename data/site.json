@@ -1,0 +1,19 @@
+{
+  "name": "Anastasiia Morozova",
+  "description": "I’m marrying data, OSINT, and AI to produce cross-border investigations that create impact or at least win awards.",
+  "photo": null,
+  "links": [
+    {
+      "label": "LinkedIn",
+      "href": "https://www.linkedin.com/in/nst-morozova/"
+    },
+    {
+      "label": "nst.morozova13@gmail.com",
+      "href": "mailto:nst.morozova13@gmail.com"
+    }
+  ],
+  "display": {
+    "showPhoto": false,
+    "showContactLinks": true
+  }
+}

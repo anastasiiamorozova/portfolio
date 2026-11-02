@@ -1,0 +1,328 @@
+{
+  "categories": [
+    {
+      "slug": "osint",
+      "label": "OSINT investigations",
+      "handwritingImage": "assets/handwriting/osint.webp",
+      "order": 1
+    },
+    {
+      "slug": "data-viz",
+      "label": "data & viz",
+      "handwritingImage": "assets/handwriting/data-viz.webp",
+      "order": 2
+    },
+    {
+      "slug": "ai-tools",
+      "label": "AI-powered tools",
+      "handwritingImage": "assets/handwriting/ai-tools.webp",
+      "order": 3
+    }
+  ],
+  "projects": [
+    {
+      "slug": "gru-parcel-bombs",
+      "category": "osint",
+      "order": 1,
+      "title": "Crossing NATO Lines: Tracing Russia's GRU Explosive Parcel Bombs",
+      "summary": "An interactive scrollytelling piece built with custom JavaScript injected into a CMS that didn't support it. I added a moving-camera effect to guide readers through a dense network of names and connections across several countries. The Lithuanian prosecutor's office went public two days early, so I finished it in twenty minutes instead of two days. Named Innovation of the Year in media by Wirtualne Media in 2026.",
+      "tags": ["Visual investigation"],
+      "url": "https://vsquare.org/crossing-nato-lines-tracing-the-arson-sabotage-russia-gru-explosive-parcel-bombs/",
+      "behind": {
+        "title": "When the deadline is yesterday",
+        "date": "2025-09-17",
+        "body": "data/posts/gru-parcel-bombs.html"
+      },
+      "coverImage": "assets/covers/gru-parcel-bombs.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "nato-bases",
+      "category": "osint",
+      "order": 2,
+      "title": "Mapping Russia's War Machine on NATO's Doorstep",
+      "summary": "We used high-resolution satellite imagery to map Russian military base activity along NATO's eastern border. GRU special forces in Kaliningrad are being trained for sabotage operations, and new nuclear weapons infrastructure is taking shape in Belarus.",
+      "tags": ["Satellite images"],
+      "url": "https://vsquare.org/russia-military-bases-threat-europe-nato/",
+      "behind": null,
+      "coverImage": "assets/covers/nato-bases.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "red-cross",
+      "category": "osint",
+      "order": 3,
+      "title": "KREMLIN LEAKS: how Putin turned the Red Cross into a tool of propaganda and war",
+      "summary": "Leaked documents show how the Russian Red Cross, legally required to stay neutral, became a vehicle for Kremlin propaganda. We traced how Moscow uses it to extend influence abroad under the cover of the International Red Cross brand.",
+      "tags": ["Leaked documents"],
+      "url": "https://vsquare.org/kremlin-leaks-putin-red-cross-propaganda-war/",
+      "behind": {
+        "title": "KREMLIN LEAKS: how Putin turned the Red Cross into a tool of propaganda and war",
+        "date": "2024-03-01",
+        "body": "data/posts/red-cross.html"
+      },
+      "coverImage": "assets/covers/red-cross.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "andromeda",
+      "category": "osint",
+      "order": 4,
+      "title": "ANDROMEDA: Ukrainian puzzle",
+      "summary": "We tracked the yacht Andromeda, suspected in the Nord Stream pipeline explosions, by cross-referencing satellite imagery and AIS vessel tracking data. On-ground OSINT reporting led us to a Kyiv businessman whose company had rented the boat.",
+      "tags": ["Satellite images", "AIS tracking", "On-ground"],
+      "url": "https://frontstory.pl/andromeda-rurociag-nord-stream-wybuch-ukraina-trasa-rosja-niemcy/",
+      "behind": {
+        "title": "How a yacht with no trace led me over a fence in Kyiv",
+        "date": "2026-11-01",
+        "body": "data/posts/andromeda.html"
+      },
+      "coverImage": "assets/covers/andromeda.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "sigint",
+      "category": "osint",
+      "order": 5,
+      "title": "Russian diplomatic facilities serve as SIGINT nests in Europe",
+      "summary": "We identified signals intelligence (SIGINT) equipment mounted on rooftops of Russian diplomatic facilities across Europe. Verified through satellite imagery and open-source research, the same setup appeared from Warsaw to Budapest, Stockholm, and Brussels.",
+      "tags": ["Satellite images"],
+      "url": "https://vsquare.org/russian-diplomatic-facilities-serve-as-sigint-nests-in-europe/",
+      "behind": null,
+      "coverImage": "assets/covers/sigint.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "kremlin-leaks-reelection",
+      "category": "osint",
+      "order": 6,
+      "title": "KREMLIN LEAKS: secret files reveal how Putin pre-rigged his reelection",
+      "summary": "Leaked Kremlin documents reveal the infrastructure behind Putin's reelection: a pan-Russian propaganda network, internet censorship machinery, and coordinated information warfare operations. We analyzed the files as part of a cross-border team.",
+      "tags": ["Leaked documents"],
+      "url": "https://vsquare.org/kremlin-leaks-putin-elections-russia-propaganda-ukraine/",
+      "behind": null,
+      "coverImage": "assets/covers/kremlin-leaks-reelection.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "minsk",
+      "category": "osint",
+      "order": 7,
+      "title": "See Minsk and die",
+      "summary": "We traced financial flows linking companies in the Lukashenko regime's orbit to migrant smuggling networks bringing people from the Middle East into Europe. OSINT and on-ground reporting uncovered direct ties between the regime and the traffickers.",
+      "tags": ["Financial flows", "On-ground"],
+      "url": "https://vsquare.org/see-minsk-and-die-how-belarusian-firms-smuggle-refugees/",
+      "behind": null,
+      "coverImage": "assets/covers/minsk.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "russian-assets",
+      "category": "osint",
+      "order": 8,
+      "title": "RUSSIAN ASSET TRACKER",
+      "summary": "A joint OCCRP investigation with 25 newsrooms tracking the assets of Russian oligarchs on Navalny's Anti-Corruption Foundation list of 35. We covered Poland and Central Europe, cross-referencing property records, corporate filings, and public databases.",
+      "tags": ["Business records"],
+      "url": "https://vsquare.org/russian-assets-in-v4-countries/",
+      "behind": null,
+      "coverImage": "assets/covers/russian-assets.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "risk-map",
+      "category": "data-viz",
+      "order": 1,
+      "title": "Risk Map",
+      "summary": "Nearly 3.4 million police records reveal Poland’s most collision-prone municipalities, streets, and road sections.",
+      "tags": ["QGIS MCP"],
+      "url": "wypadki/",
+      "behind": null,
+      "coverImage": "assets/previews/wypadki.jpg",
+      "coverAlt": "Road collision map of Poland",
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "brain",
+      "category": "data-viz",
+      "order": 2,
+      "title": "Brain at Full Throttle",
+      "summary": "A 3D brain that turns and lights up as you scroll through 24 hours, showing which areas work hardest at each time of day. Built from the Neurotorium atlas models.",
+      "tags": ["3D image generation"],
+      "url": "https://anastasiiamorozova.github.io/portfolio/brain/",
+      "behind": null,
+      "coverImage": "assets/previews/brain.jpg",
+      "coverAlt": "A 3D brain with the prefrontal cortex highlighted in blue",
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "best-beaches",
+      "category": "data-viz",
+      "order": 11,
+      "title": "Poland’s 20 Best Beaches",
+      "summary": "A reader-powered ranking combining 50,000 calculator responses, field reporting, and an interactive map.",
+      "tags": ["QGIS MCP"],
+      "url": "ranking-plaz/",
+      "behind": null,
+      "coverImage": "assets/previews/ranking-plaz.jpg",
+      "coverAlt": "Illustrated ranking of Polish Baltic beaches",
+      "body": null,
+      "published": false
+    },
+    {
+      "slug": "house-from-china",
+      "category": "data-viz",
+      "order": 3,
+      "title": "A House from China",
+      "summary": "A room-by-room view of China’s share of Polish imports, from doors and furniture to electronics. The house itself was drawn by AI, after a bare-knuckle fight with two image generators over one stubborn white pillar.",
+      "tags": ["Image generation"],
+      "url": "https://anastasiiamorozova.github.io/portfolio/poland-china-import/",
+      "behind": {
+        "title": "How I drew the house with two AI tools",
+        "date": "2026-11-01",
+        "body": "data/posts/house-from-china.html"
+      },
+      "coverImage": "assets/previews/poland-china-import.jpg",
+      "coverAlt": "Cutaway illustration of a house and imported products",
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "polish-politics",
+      "category": "data-viz",
+      "order": 4,
+      "title": "Three decades of Polish politics, visualized",
+      "summary": "A Sankey diagram tracing thirty years of Polish political party history, built from Wikipedia election data scraped into Flourish and exported as SVG, then refined in Illustrator and InDesign for print. The same story also needed a radar diagram of political preferences. My first print commission, and the day I learned InDesign.",
+      "tags": ["Illustrator", "InDesign"],
+      "url": null,
+      "behind": {
+        "title": "My first job for printed press and how I learned InDesign in one day",
+        "date": "2025-12-01",
+        "body": "data/posts/polish-politics.html"
+      },
+      "coverImage": "assets/covers/polish-politics.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "telegram-drugs",
+      "category": "data-viz",
+      "order": 5,
+      "title": "Faster than Pizza Delivery: Poland's Online Drug Market Is Out of Control",
+      "summary": "I scraped 500,000 messages from 1,500 Telegram channels using Telethon and a snowballing method, then built a Doc2Vec classifier trained on 300 manually labeled drug ads to identify advertisements at scale. String matching against a custom drug slang library helped quantify substance frequency, while InPost and BLIK mentions mapped how the market actually works. Presented at Dataharvest 2025 and now being replicated for Germany.",
+      "tags": ["Telegram", "ML"],
+      "url": "https://vsquare.org/faster-than-pizza-delivery-polands-online-drug-market-telegram-parcel-lockers-inpost-blik-police/",
+      "behind": {
+        "title": "How I created an ML model to uncover drug-trafficking on Telegram",
+        "date": "2025-02-20",
+        "body": "data/posts/telegram-drugs.html"
+      },
+      "coverImage": "assets/covers/telegram-drugs.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "toxic-poland",
+      "category": "data-viz",
+      "order": 6,
+      "title": "The map of toxic Poland",
+      "summary": "We automated 3,000 FOIA requests to map illegal waste dumps across Poland, then used an LLM to extract location data from PDF responses. Ground-truthed on site, the dataset revealed nearly 200 hazardous dump sites nationwide — three of them caught fire in May 2024 alone.",
+      "tags": ["Text-extraction from PDF"],
+      "url": "https://smieci.frontstory.pl/",
+      "behind": null,
+      "coverImage": "assets/covers/toxic-poland.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": true
+    },
+    {
+      "slug": "sumy-shelters",
+      "category": "data-viz",
+      "order": 7,
+      "title": "How safe you are in Sumy during an air raid alert?",
+      "summary": "I used QGIS and official shelter location data from local authorities to map how well protected residents of Sumy region's largest cities actually are during air raid alerts. Visualized in Illustrator and published on Instagram. Made for my home region in Ukraine, dedicated to Kordon.Media.",
+      "tags": ["QGIS", "Illustrator"],
+      "url": "https://www.instagram.com/p/C9zrP7vu4WU/",
+      "behind": null,
+      "coverImage": "assets/covers/sumy-shelters.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": false
+    },
+    {
+      "slug": "orlen",
+      "category": "data-viz",
+      "order": 8,
+      "title": "Unpacking CEE's biggest oil company's promises to 'go green'",
+      "summary": "Orlen presents itself as a green energy leader. We dug into company filings and public data and found a company fighting to preserve oil refining profits, using Poland's slow green transition as cover. Published as a scrollytelling piece.",
+      "tags": ["Company filings", "Scrollytelling"],
+      "url": "https://vsquare.org/orlen-oil-green-transformation-poland-gas-usa/",
+      "behind": null,
+      "coverImage": "assets/covers/orlen.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": false
+    },
+    {
+      "slug": "midgard",
+      "category": "data-viz",
+      "order": 9,
+      "title": "Online neo-Nazi Store and Customers From Central Europe Exposed",
+      "summary": "A database of 20,000 purchases from the neo-Nazi webshop Midgård was leaked by the antifascist organization AFA. We analyzed the customer register to map how widespread its Central European sales network is, identifying buyers across Poland, Czechia, and Slovakia.",
+      "tags": ["Leaked data"],
+      "url": "https://vsquare.org/nazi-shop-sweden-poland-czech-slovak-politics/",
+      "behind": null,
+      "coverImage": "assets/covers/midgard.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": false
+    },
+    {
+      "slug": "firehose",
+      "category": "data-viz",
+      "order": 10,
+      "title": "FIREHOSE OF FALSEHOOD",
+      "summary": "We mapped a network of pro-Russian and alt-right disinformation sites operating across Central and Eastern Europe. Using network analysis, we showed how these sites cross-reference each other to amplify Russian narratives and spread conspiracy theories in local languages.",
+      "tags": ["Network analysis"],
+      "url": "https://vsquare.org/firehose-of-falsehood-russia-disinformation-propaganda-europe/",
+      "behind": null,
+      "coverImage": "assets/covers/firehose.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": false
+    },
+    {
+      "slug": "banknote-mulch",
+      "category": "ai-tools",
+      "order": 1,
+      "title": "Banknote mulch",
+      "summary": "During eight years of PiS rule, Polish forest districts funneled tens of millions in public funds to churches, nationalist organizations, and entities connected to the foresters themselves. We tracked the money using public spending data and a custom text classifier to categorize thousands of transfers.",
+      "tags": ["Public spending data", "Text classifier"],
+      "url": "https://frontstory.pl/lasy-panstwowe-pieniadze-fundusz-darowizny-kosciol-solidarna-polska/",
+      "behind": null,
+      "coverImage": "assets/covers/banknote-mulch.jpg",
+      "coverAlt": null,
+      "body": null,
+      "published": false
+    }
+  ]
+}

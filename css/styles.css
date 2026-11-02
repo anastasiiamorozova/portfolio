@@ -1,0 +1,442 @@
+/*
+ * Portfolio — styles
+ * Values are the ones set in the design canvas (see docs/DESIGN.md).
+ * Change the look from the tokens in :root, not in the rules below.
+ */
+
+:root {
+  /* Colour */
+  --bg: #ffffff;
+  --ink: #111111;
+  --accent: #e2231a;
+  --text: var(--ink);
+  --muted: color-mix(in srgb, var(--text) 86%, var(--bg));  /* secondary text */
+  --line: var(--bg);                                         /* divider lines: switched off in the design (0%) */
+  --fill: color-mix(in srgb, var(--ink) 8%, var(--bg));      /* image placeholders */
+
+  /* Type */
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --name-size: 76px;
+  --name-weight: 600;
+  --name-tracking: -0.015em;
+  --desc-size: 22px;
+  --desc-width: 760px;
+  --meta-size: 12px;
+  --link-size: 15px;
+  --card-title-size: 20px;
+  --card-title-weight: 600;
+  --card-desc-size: 17px;
+
+  /* Layout */
+  --max-width: 1200px;
+  --side-pad: 24px;
+  --hero-pad: 106px;      /* space above the name */
+  --section-gap: 88px;    /* space below each section */
+  --name-gap: 36px;       /* name → description */
+  --hero-gap: 16px;       /* photo → text */
+
+  /* Photo (hidden by default — see data/site.json) */
+  --photo-size: 228px;
+  --photo-radius: 50%;
+
+  /* Handwritten phrases */
+  --phrase-height: 180px;
+  --phrase-max-width: 340px;
+  --phrase-gap: 20px;
+  --scrap-rotate: -1deg;
+  --scrap-shadow: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.18));
+  --bar-thickness: 3px;
+
+  /* Cards */
+  --columns: 3;
+  --col-gap: 32px;
+  --row-gap: 32px;
+  --image-ratio: 4 / 3;
+
+  /* Tags (tools and methods on cards) */
+  --tag-size: 13px;
+
+  /* Behind-the-story pages */
+  --post-width: 720px;
+  --post-size: 18px;
+  --post-title-size: 52px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+button { font: inherit; color: inherit; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+.page {
+  position: relative;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--side-pad);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--hero-gap);
+  padding: var(--hero-pad) 0 var(--section-gap);
+}
+
+.hero__photo {
+  width: var(--photo-size);
+  height: var(--photo-size);
+  border-radius: var(--photo-radius);
+  background: var(--fill);
+  border: 1px solid var(--line);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.hero__text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--name-gap);
+  min-width: 0;
+}
+
+.hero__name {
+  margin: 0;
+  font-size: clamp(36px, 8vw, var(--name-size));
+  line-height: 1;
+  font-weight: var(--name-weight);
+  letter-spacing: var(--name-tracking);
+}
+
+.hero__desc {
+  margin: 0;
+  max-width: var(--desc-width);
+  font-size: var(--desc-size);
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.contact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 32px;
+  margin-top: 8px;
+}
+
+.contact a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--link-size);
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+.contact a:hover { opacity: 0.65; }
+
+.contact--side {
+  position: absolute;
+  top: 16px;
+  right: var(--side-pad);
+  justify-content: flex-end;
+  gap: 0 24px;
+  margin-top: 0;
+}
+
+/* ---------- Handwritten phrases ---------- */
+
+.fields {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: var(--phrase-gap);
+  padding-bottom: var(--section-gap);
+}
+
+.field {
+  flex: 1 1 300px;
+  max-width: var(--phrase-max-width);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.field__box {
+  width: 100%;
+  height: var(--phrase-height);
+  border: 1px dashed var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  transition: opacity 0.2s ease;
+}
+
+.field__box img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: rotate(var(--scrap-rotate));
+  filter: var(--scrap-shadow);
+}
+
+.field__bar {
+  display: block;
+  width: 100%;
+  height: var(--bar-thickness);
+  background: transparent;
+}
+
+.field:hover .field__box { opacity: 0.8; }
+.field[aria-pressed="true"] .field__bar { background: var(--accent); }
+
+/* ---------- Project grid ---------- */
+
+.projects {
+  border-top: 1px solid var(--line);
+  padding: 24px 0 var(--section-gap);
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: var(--row-gap) var(--col-gap);
+}
+
+.card,
+.card__link {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card__img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: var(--image-ratio);
+  background: var(--fill);
+  overflow: hidden;
+  font-size: var(--meta-size);
+  color: var(--muted);
+}
+
+.card__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.card__text { display: flex; flex-direction: column; gap: 6px; }
+
+.card__title {
+  font-size: var(--card-title-size);
+  font-weight: var(--card-title-weight);
+  letter-spacing: -0.01em;
+}
+
+.card__desc {
+  font-size: var(--card-desc-size);
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0; }
+
+.tag {
+  padding: 5px 8px;
+  font-size: var(--tag-size);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--bg);
+  background: var(--accent);
+}
+
+.card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: -6px;
+}
+
+.card__more {
+  font-size: var(--card-desc-size);
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+.card__more:hover { opacity: 0.65; }
+
+.projects__empty {
+  margin: 0;
+  text-align: center;
+  font-size: var(--card-desc-size);
+  color: var(--muted);
+}
+
+/* ---------- Project page ---------- */
+
+.project {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 40px 0 var(--section-gap);
+}
+
+.back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 500;
+  color: inherit;
+  text-decoration: none;
+}
+
+.back:hover { opacity: 0.65; }
+
+.project__meta { font-size: var(--meta-size); color: var(--muted); }
+
+.project__title {
+  margin: 0;
+  font-size: clamp(32px, 6vw, var(--name-size));
+  line-height: 1;
+  font-weight: var(--name-weight);
+  letter-spacing: var(--name-tracking);
+}
+
+.project__body {
+  border-top: 1px solid var(--line);
+  min-height: 560px;   /* empty for now — project content goes here */
+}
+
+/* Behind-the-story page: one centred column */
+
+.project--post {
+  width: 100%;
+  max-width: var(--post-width);
+  margin: 0 auto;
+  align-items: center;
+  text-align: center;
+}
+
+.project--post .back { align-self: center; }
+
+.project--post .project__title { font-size: clamp(32px, 5vw, var(--post-title-size)); }
+
+.project--post .post { width: 100%; text-align: left; }
+
+/* Behind-the-story post (HTML from data/posts) */
+
+.post {
+  max-width: var(--post-width);
+  font-size: var(--post-size);
+  line-height: 1.6;
+}
+
+.post p { margin: 0 0 1.1em; }
+
+.post strong { font-weight: 600; }
+
+.post a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.post a:hover { opacity: 0.65; }
+
+.post img,
+.post video {
+  display: block;
+  max-width: 100%;
+  max-height: 640px;
+  width: auto;
+  height: auto;
+  margin: 32px auto;
+}
+
+.post figure { margin: 32px 0; }
+
+.post figure img { margin: 0 auto; }
+
+.post figcaption {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.post blockquote {
+  margin: 32px 0;
+  padding: 0 32px;
+}
+
+.post hr {
+  margin: 40px 0;
+  border: 0;
+  border-top: 1px solid var(--muted);
+}
+
+.notfound { padding: var(--hero-pad) 0 var(--section-gap); text-align: center; }
+
+/* ---------- Motion ---------- */
+
+.anim { animation: pf-in 0.4s ease both; }
+
+@keyframes pf-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim { animation: none; }
+}
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 720px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+
+  /* Contact links move into the flow above the name. */
+  .contact--side { position: static; justify-content: center; padding-top: 16px; }
+  .contact--side + .hero { padding-top: 48px; }
+}

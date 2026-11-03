@@ -3,13 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Risk map</title>
+<title>Maps, maps, maps</title>
 
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" fetchpriority="high">
-<link id="firaSansStylesheet" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" fetchpriority="high">
 <link rel="preload" as="video" href="assets_sklad/tlo_vid_1.mp4" type="video/mp4" fetchpriority="high">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -1672,6 +1670,223 @@
 
   .hero__title span{color:#ffd200}
   .profile-monogram{display:grid;place-items:center;width:104px;height:104px;margin:0 auto 8px;border-radius:50%;background:#e7e2da;color:#2e333d;font:700 26px/1 var(--sans)}
+
+  /* ================= Redesign: dark minimal (Nov 2026) ================= */
+  :root{
+    --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    --rd-bg:#0c0c0c;
+    --rd-surface:#161618;
+    --rd-ink:#f2f2f2;
+    --rd-soft:color-mix(in srgb,#f2f2f2 88%,#0c0c0c);
+    --rd-muted:color-mix(in srgb,#f2f2f2 50%,#0c0c0c);
+    --rd-line:color-mix(in srgb,#f2f2f2 14%,#0c0c0c);
+    --rd-accent:#f26444;
+    --rd-shadow:0 1px 8px rgba(0,0,0,.85);
+    --rd-search:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='%23f2f2f2' stroke-width='1.6'%3E%3Ccircle cx='6' cy='6' r='4.5'/%3E%3Cpath d='M9.5 9.5 13 13'/%3E%3C/svg%3E");
+    --accent-yellow:var(--rd-accent);
+    --map-void:#0c0c0c;
+  }
+  html,body{background:var(--rd-bg)}
+  .scroll-progress{height:2px; background:var(--rd-accent)}
+
+  /* Opening screen */
+  .hero{background:var(--rd-bg); color:var(--rd-ink); text-align:left}
+  .hero__bg{filter:grayscale(1) contrast(1.1); transform:none; opacity:.22}
+  .hero__scrim{display:none}
+  .hero .wrap{width:min(1200px,calc(100% - 2*var(--gutter))); align-items:flex-start; text-align:left}
+  .hero__title{
+    margin:0 0 40px; color:var(--rd-ink);
+    font-size:clamp(64px,11vw,144px); line-height:.92; font-weight:600; letter-spacing:-.04em;
+  }
+  .hero__lead{max-width:600px; font-size:18px; line-height:1.55; font-weight:300; color:var(--rd-soft); text-wrap:pretty}
+  .hero__lead p{margin:0 0 16px}
+  .hero__scroll{font-size:11px; font-weight:400; letter-spacing:.12em; color:var(--rd-muted)}
+  .hero__scroll span{width:1px; height:44px; border-radius:0; background:rgba(242,242,242,.6)}
+  .hero__scroll span::after{display:none}
+  @media (max-width:760px){
+    .hero__title{font-size:clamp(56px,17vw,96px); margin-bottom:28px}
+    .hero__lead{font-size:16px}
+  }
+
+  /* Back to portfolio */
+  .portfolio-link{
+    top:20px; left:24px; padding:0;
+    background:none; color:var(--rd-ink); box-shadow:none; text-shadow:var(--rd-shadow);
+    font:400 13px/1 var(--sans);
+  }
+  .portfolio-link b{font-weight:400; color:inherit}
+  .portfolio-link span{font-size:14px}
+  .portfolio-link:focus-visible{outline-color:var(--rd-ink)}
+  @media (max-width:520px){ .portfolio-link{top:10px; left:16px; padding:0} }
+
+  /* Map stage: two colours */
+  .stage{
+    --ink:#f2f2f2; --ink-2:#f2f2f2; --ink-3:var(--rd-muted);
+    --card:var(--rd-surface); --panel:var(--rd-surface);
+    --rule:var(--rd-line); --rule-2:var(--rd-line);
+    --shadow:none; --accent:var(--rd-accent); --ui-radius:0px;
+  }
+
+  /* Story cards */
+  .map-story-card{
+    width:min(370px,calc(100vw - 44px)); padding:28px;
+    border:0; border-radius:0; background:var(--rd-surface); box-shadow:none;
+    color:var(--rd-soft); opacity:1; transform:none;
+  }
+  .map-story-step.is-active .map-story-card{background:var(--rd-surface)}
+  .map-story-card p{color:var(--rd-soft); font-size:16px; line-height:1.55}
+  .map-story-card p+p{margin-top:12px}
+  .map-story-card strong{color:var(--rd-ink)}
+  .map-story-card h2{color:var(--rd-ink); font-size:28px; line-height:1.1; font-weight:600; letter-spacing:-.02em}
+  .map-story-step[data-story="explore"].is-active .map-story-card--explore{background:var(--rd-surface); backdrop-filter:none}
+  .map-story-close{border-radius:0; color:var(--rd-ink)}
+  .map-story-close:hover{background:none; opacity:.65}
+  .map-story-card .map-story-tip{gap:0; margin:16px 0 0; color:var(--rd-ink); font-size:13px}
+  .map-story-tip__icon{display:none!important}
+  .map-story-tip kbd,.map-hint kbd,.map-legend__tip kbd{
+    display:inline; min-width:0; margin:0; padding:0; border:0; border-radius:0; background:none;
+    font:inherit; font-weight:600; color:var(--rd-ink); vertical-align:baseline;
+  }
+  @media (min-width:741px){
+    .map-story-step:not([data-story="explore"]),
+    .map-story-step:nth-child(even):not([data-story="explore"]){
+      justify-content:flex-start; padding-right:24px;
+      padding-left:min(calc(50% + 150px),calc(100% - 370px - 32px));
+    }
+  }
+  @media (max-width:740px){
+    .map-story-card{padding:20px 22px}
+    .map-story-card p{font-size:15px; line-height:1.5}
+    .map-story-card h2{font-size:24px}
+  }
+
+  /* Figures inside story cards and the town card */
+  .rd-figure{display:flex; flex-direction:column; gap:10px; margin:16px 0}
+  .rd-figure p{margin:0!important}
+  .rd-figure b,.rd-foot b{font-weight:600; color:var(--rd-accent)}
+  .map-story-card .rd-figure .rd-cmp{font-size:13px; color:var(--rd-soft)}
+  .rd-gauge{position:relative; height:10px}
+  .rd-gauge::before{content:""; position:absolute; left:0; right:0; top:5px; height:1px; background:var(--rd-ink)}
+  .rd-gauge__fill{position:absolute; left:0; top:4px; height:3px; background:var(--rd-accent)}
+  .rd-gauge__avg{position:absolute; left:47.8%; top:0; width:1px; height:10px; background:var(--rd-ink)}
+
+  /* Search and "colour the map by" (top left) */
+  .controls{text-shadow:var(--rd-shadow)}
+  .controls .search::before,
+  .controls .metric-picker::before{display:block; margin-bottom:2px; font-size:13px; line-height:1.4; color:var(--rd-ink)}
+  .controls .search::before{content:"Find a municipality"}
+  .controls .metric-picker::before{content:"Colour the map by"}
+  .controls .metric-picker{margin-top:14px}
+  .controls input,
+  .map-story-search input{
+    height:36px; padding:0 0 0 22px;
+    background:transparent var(--rd-search) no-repeat 0 50% / 13px 13px;
+    border:0; border-radius:0; box-shadow:none;
+    font-size:13px; font-weight:600; color:var(--rd-ink);
+  }
+  .map-story-search input{height:44px; margin-top:4px}
+  .controls input::placeholder,
+  .map-story-search input::placeholder{color:var(--rd-ink); opacity:.6; font-weight:400}
+  .controls input:focus-visible,
+  .map-story-search input:focus-visible{outline:1px solid var(--rd-ink); outline-offset:4px}
+  .metric-picker__button{
+    width:auto; max-width:100%; min-height:36px; padding:0 22px 0 0;
+    background:transparent; border:0; border-radius:0; box-shadow:none; backdrop-filter:none;
+    font:600 13px/1.3 var(--sans); color:var(--rd-ink);
+  }
+  .metric-picker__button:hover{background:transparent; opacity:.75}
+  .metric-picker__chevron{right:4px; color:var(--rd-ink)}
+  .metric-picker__menu,
+  .suggestions,
+  .map-story-search .suggestions{
+    background:var(--rd-surface); border:0; border-radius:0; box-shadow:none; backdrop-filter:none;
+    text-shadow:none;
+  }
+  .metric-picker__menu{padding:6px 0}
+  .metric-picker__option{border-radius:0; padding:9px 34px 9px 14px; color:var(--rd-ink); font:400 13px/1.3 var(--sans)}
+  .metric-picker__option:hover,.metric-picker__option:focus-visible{background:rgba(242,242,242,.06)}
+  .metric-picker__option[aria-selected="true"]{background:transparent; color:var(--rd-ink); font-weight:600}
+  .metric-picker__option[aria-selected="true"]::after{border-color:var(--rd-accent)}
+  .suggestion,.map-story-search .suggestion{color:var(--rd-ink); font-size:13px; border-bottom-color:var(--rd-line)}
+  .suggestion span,.map-story-search .suggestion span{color:var(--rd-muted)}
+  @media (min-width:741px){
+    .controls{top:68px; left:24px; width:min(320px,calc(100% - 48px))}
+  }
+  @media (max-width:740px){
+    .controls{top:56px; left:16px; width:calc(100% - 32px)}
+    .controls input,.map-story-search input{font-size:16px}
+  }
+
+  /* Town card */
+  .stats{
+    background:var(--rd-surface); border:0; border-radius:0; box-shadow:none; backdrop-filter:none;
+    color:var(--rd-ink); font-size:13px; line-height:1.4;
+  }
+  .stats__bar{display:none}
+  .stats__scroll{padding:18px; display:flex; flex-direction:column; gap:16px}
+  .rd-head{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px}
+  .rd-col{display:flex; flex-direction:column; gap:4px; min-width:0}
+  .rd-col--num{text-align:right}
+  .stats .rd-big{margin:0; font-size:28px; line-height:1; font-weight:600; letter-spacing:-.02em; color:var(--rd-ink); overflow-wrap:anywhere}
+  .stats .rd-col--num .rd-big{color:var(--rd-accent)}
+  .rd-foot{display:flex; justify-content:space-between; align-items:center; gap:12px}
+  .rd-close{
+    flex:0 0 auto; width:32px; height:32px; margin:-8px -8px -8px 0; padding:0;
+    display:grid; place-items:center; background:none; border:0; color:var(--rd-ink); cursor:pointer;
+  }
+  .rd-close:hover{opacity:.65}
+  .rd-close:focus-visible{outline:1px solid var(--rd-ink); outline-offset:-2px}
+  @media (min-width:741px){
+    .stats{top:24px; right:24px; width:340px}
+  }
+  @media (max-width:740px){
+    .stats__bar{display:flex; height:44px; padding:0; box-shadow:none}
+    .stats__handle{
+      flex:1 1 auto; height:44px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+      background:none; border:0; padding:0; color:var(--rd-ink); cursor:pointer;
+    }
+    .stats__grip{width:36px; height:4px; border-radius:2px; background:var(--rd-ink); opacity:.3}
+    .stats .stats__bar-title{display:none; flex:0 0 auto; font-size:13px; font-weight:600}
+    .stats.is-collapsed .stats__bar-title{display:block}
+    .stats.is-collapsed .stats__grip{display:none}
+    .stats.is-collapsed{max-height:44px}
+    .stats__scroll{padding:0 22px 20px}
+  }
+
+  /* Legends: same dark box as the cards */
+  .map-legend,.road-legend{
+    padding:14px 16px; background:var(--rd-surface)!important; border:0; border-radius:0; box-shadow:none; backdrop-filter:none!important;
+    color:var(--rd-ink); font-size:11px; text-shadow:none;
+  }
+  .map-legend .title,.road-legend .title{font-size:12px; font-weight:400; color:var(--rd-ink); margin-bottom:8px}
+  .map-legend .bar{height:6px; border-radius:0; background:transparent}
+  .map-legend .bar .ramp{border-radius:0; opacity:1}
+  .map-legend .bar .avg{width:1px; margin-left:0; top:-4px; bottom:-4px; border-radius:0; background:var(--rd-ink)}
+  .map-legend .bar .me{border-radius:0; box-shadow:none; background:var(--rd-ink)}
+  .map-legend .marks{color:var(--rd-ink); font-size:11px}
+  .road-legend .bar{height:6px; border-radius:0;
+    background:linear-gradient(90deg,#38383c 0%,#38383c 10%,#7a2e25 14%,#a8352a 30%,#d4452f 55%,#f26444 72%,#f26444 90%,#ff9b7a 100%)}
+  .map-legend__tip{display:none!important}
+  @media (min-width:741px){
+    .map-legend,.road-legend{left:24px; bottom:24px; width:272px}
+    .map-section.explore-dismissed .map-legend-stack{left:24px; bottom:24px}
+  }
+
+  /* Hints, tooltips, zoom, sources, loader */
+  .map-hint{border-radius:0; background:var(--rd-surface); box-shadow:none; backdrop-filter:none; color:var(--rd-ink); font-size:13px}
+  .stage .leaflet-tooltip.gmina-tip{border:0; border-radius:0; background:var(--rd-surface); box-shadow:none; backdrop-filter:none; font-size:13px; font-weight:400}
+  .stage .road-hover-popup .leaflet-popup-content-wrapper{border:0; border-radius:0; box-shadow:none; background:var(--rd-surface)}
+  .stage .road-hover-popup .leaflet-popup-tip{background:var(--rd-surface)}
+  .road-popup__name{color:var(--rd-ink); font-weight:400}
+  .stage .leaflet-bar{border:0; border-radius:0; box-shadow:none}
+  .stage .leaflet-bar a,.stage .leaflet-bar a:hover{background:var(--rd-surface); color:var(--rd-ink); border-radius:0!important; border-bottom-color:var(--rd-line)}
+  .stage .leaflet-bar a:hover{opacity:.8}
+  .attrib-toggle{background:none; border-color:var(--rd-ink); color:var(--rd-ink); backdrop-filter:none}
+  .attrib{background:var(--rd-surface); border:0; border-radius:0; box-shadow:none; backdrop-filter:none; color:var(--rd-ink)}
+  .attrib a{color:var(--rd-ink)}
+  .spin{background:rgba(12,12,12,.9); color:var(--rd-ink)}
+  .spin__track{stroke:var(--rd-line)}
+  .spin__value{stroke:var(--rd-accent); stroke-linecap:butt}
 </style>
 </head>
 <body>
@@ -1701,31 +1916,16 @@
 
     <div class="wrap">
 
-      <h1 class="hero__title">RISK<br><span>MAP</span></h1>
+      <h1 class="hero__title">Risk map</h1>
       <div class="hero__lead">
         <p>Poland’s roads are among the most dangerous in Europe. But the risk is not evenly distributed, and crashes do not happen at random. Every municipality has streets where another collision no longer surprises anyone.</p>
-        <p>We examined several million police records and every street in the country to identify Poland’s most dangerous places. Use the interactive map to see the pattern in your own area.</p>
+        <p>I analysed nearly 3.4 million police records of collisions and crashes from 2018–2025, mapped them onto almost 600,000 kilometres of road and compared all 2,479 municipalities in Poland. Readers can use the interactive map to see the pattern in their own area.</p>
       </div>
     </div>
 
     <div class="hero__scroll" aria-hidden="true">
       Scroll
       <span></span>
-    </div>
-  </section>
-
-
-  <section class="section">
-    <div class="wrap">
-      <h2 class="section__title">Millions of incidents, thousands of dangerous places</h2>
-
-      <p>Although the number of crashes in Poland is falling each year, the country remains among Europe’s worst performers. Police record more than a thousand road incidents every day—from minor collisions to crashes that cause serious injury or death.</p>
-
-      <p>We analysed nearly 3.4 million police records of collisions and crashes from 2018–2025, mapped them onto almost 600,000 kilometres of road and compared all 2,479 municipalities in Poland.</p>
-
-      <p>For the first time, this reveals the full scale of the problem: not only the municipalities with unusually high totals, but the exact streets, junctions and short road sections where incidents have recurred over the years.</p>
-
-      <p>The result is the interactive Risk Map—a view that moves from a nationwide comparison to detailed data on individual cities, streets and everyday routes.</p>
     </div>
   </section>
 
@@ -1781,7 +1981,7 @@
 	    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 	      <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/>
 	    </svg>
-	    <span>Hold      <kbd class="key-ctrl">Ctrl</kbd><kbd class="key-cmd">⌘ Cmd</kbd>      and scroll to zoom the map</span>
+	    <span>Hold      <kbd class="key-ctrl">Ctrl</kbd><kbd class="key-cmd">Cmd</kbd>      and scroll to zoom the map</span>
 	  </div>
 	  <div class="map-legend off" id="map-legend">
 	    <div class="title" id="mapLegendTitle">Incidents per 10,000 residents</div>
@@ -1805,7 +2005,7 @@
       
       
       
-      Hold      <kbd class="key-ctrl">Ctrl</kbd><kbd class="key-cmd">⌘ Cmd</kbd>      and scroll to zoom the map.
+      Hold      <kbd class="key-ctrl">Ctrl</kbd><kbd class="key-cmd">Cmd</kbd>      and scroll to zoom the map.
     
     
     
@@ -1843,20 +2043,17 @@
     <div class="map-story-steps" id="mapStorySteps">
       <section class="map-story-step is-active" id="map-story-start" data-story="overview">
         <article class="map-story-card">
-          <h2>More than three million incidents in one view</h2>
-          <p>First, we assign every incident to a municipality and divide by its population. This shows where a collision is more likely. A clear pattern quickly emerges: municipalities form distinct lines across the country.</p>
+          <p>First, I assign every incident to a municipality and divide by its population. This shows where a collision is more likely. You can see a clear pattern: municipalities form distinct lines across the country.</p>
         </article>
       </section>
       <section class="map-story-step" data-story="motorways">
         <article class="map-story-card">
-          <h2>The top ten follow the motorways</h2>
           <p>The reason becomes obvious when motorways and expressways are overlaid on the map. Chains of red municipalities cross successive regions along the exact paths of the A1, A4 and S7.</p>
           <p>A small resident population combined with a major national route produces the highest per-capita rates. A motorway or expressway crosses every municipality in the top ten. The rural municipality surrounding the border city of Zgorzelec, crossed by the A4, leads the first five, followed by Krotoszyce (A4 and S3), Kobierzyce (A4 and S8), Kostomłoty (A4) and Kamieńsk (A1).</p>
         </article>
       </section>
       <section class="map-story-step" data-story="accidents">
         <article class="map-story-card">
-          <h2>Crashes change the picture</h2>
           <p>Now leave only crashes that caused injury or death. They account for just 5.7% of the police records—fewer than 193,000 of 3.4 million.</p>
           <p>There is no single pattern here. Major transit routes and many large urban centres fade, particularly in Kuyavian-Pomeranian Voivodeship and the Warsaw metropolitan area.</p>
           <p>Southern Lesser Poland, Kashubia, the area around Kutno and a belt from southern Mazovia towards Łódź stand out in the opposite direction. Although casualty crashes occur most often outside built-up areas, Łódź has one of the country’s worst crash rates—and the worst among all large cities.</p>
@@ -1864,64 +2061,32 @@
       </section>
       <section class="map-story-step" data-story="torun">
         <article class="map-story-card">
-          <h2>Up close, the pattern becomes clearer</h2>
           <p>Toruń is a good example. The database contains 25,072 incidents there, including 354 crashes that caused injury or death. As in many large cities, its per-capita incident rate is above average. Yet the city performs very well on the share of the most serious incidents: just 1.4% of all reports, the lowest among Poland’s large cities.</p>
-          <div class="map-story-data-sample">
-            <div class="hero-stat">
-              <div class="hero-stat__value" style="color:#db2042">1,300.5</div>
-              <div class="hero-stat__unit">incidents per 10,000 residents, 2018–2025</div>
-              <div class="hero-stat__delta is-above">+42.8% above the national average</div>
-            </div>
-            <div class="gauge">
-              <span class="gauge__ramp"></span>
-              <i class="gauge__avg"></i>
-              <i class="gauge__me" style="left:77.3%"></i>
-            </div>
-            <div class="gauge-scale">
-              <span class="lo">280</span><span class="mid">average 910</span><span class="hi">1600+</span>
-            </div>
-            <div class="rank"><b>138.</b>      worst municipality in Poland out of 2,479</div>
-            <div class="tiles">
-              <div class="tile tile--all"><b>25 072</b><span>incidents</span></div>
-              <div class="tile tile--collision"><b>24 718</b><span>collisions</span><em>98.6% of incidents</em></div>
-              <div class="tile tile--hard"><b>314</b><span>injury crashes</span><em>1.3% of incidents</em></div>
-              <div class="tile tile--fatal"><b>40</b><span>fatal</span><em>0.2% of incidents</em></div>
-            </div>
+          <div class="rd-figure">
+            <p><b>1,300.5</b> incidents per 10,000 residents, 2018–2025</p>
+            <div class="rd-gauge" aria-hidden="true"><i class="rd-gauge__fill" style="width:77.3%"></i><i class="rd-gauge__avg"></i></div>
+            <p class="rd-cmp"><b>42.8%</b> above the national average</p>
           </div>
           <p>The map also reveals several places to which police returned unusually often: the junction of Podgórska and Poznańska streets beneath the railway overpass, familiar to residents on the left bank; the old bridge; and Szosa Lubicka. One location stands out far more than the rest.</p>
         </article>
       </section>
       <section class="map-story-step" data-story="torun-hotspot">
         <article class="map-story-card">
-          <h2>A perfect recipe for collisions</h2>
-          <p>Toruń’s densest cluster is beside the Plaza shopping centre. Police recorded more than 600 incidents within a 200-metre radius over seven years. A large, busy junction with trams, a shopping centre and retail park surrounded by huge car parks creates the city’s most collision-prone location.</p>
+          <p>Toruń’s densest cluster is beside the Plaza shopping centre. Police recorded more than 600 incidents within a 200-metre radius over seven years. A large, busy junction with trams, a shopping centre and retail park surrounded by huge car parks creates the city’s perfect recipe for collisions.</p>
         </article>
       </section>
       <section class="map-story-step" data-story="klodzko">
         <article class="map-story-card">
-          <h2>Take care in the car park</h2>
           <p>The same mechanism appears at the other end of Poland. The Twierdza Kłodzko shopping centre accounts for 434 incidents—one in every seven police reports in Kłodzko. The map contains dozens of similar places, including Manufaktura in Łódź, Dąbrówka in Katowice and Hetmańska in Białystok. Car parks make it very easy to dent a bumper.</p>
         </article>
       </section>
       <section class="map-story-step" data-story="kruszyna">
         <article class="map-story-card">
-          <h2>One route, a huge difference</h2>
           <p>Kruszyna confirms the motorway pattern. This rural municipality of 4,600 residents near Częstochowa is crossed by the A1, which accounts for more than two thirds of all collisions recorded there. With the motorway included, Kruszyna is near the top nationally. Without A1 incidents, it would fall to 1,809th place, close to the national average.</p>
-          <div class="map-story-data-sample">
-            <div class="hero-stat">
-              <div class="hero-stat__value" style="color:#db2042">1,667.7</div>
-              <div class="hero-stat__unit">incidents per 10,000 residents, 2018–2025</div>
-              <div class="hero-stat__delta is-above">+83.2% above the national average</div>
-            </div>
-            <div class="gauge">
-              <span class="gauge__ramp"></span>
-              <i class="gauge__avg"></i>
-              <i class="gauge__me" style="left:96%"></i>
-            </div>
-            <div class="gauge-scale">
-              <span class="lo">280</span><span class="mid">average 910</span><span class="hi">1600+</span>
-            </div>
-            <div class="rank"><b>44.</b>      worst municipality in Poland out of 2,479</div>
+          <div class="rd-figure">
+            <p><b>1,667.7</b> incidents per 10,000 residents, 2018–2025</p>
+            <div class="rd-gauge" aria-hidden="true"><i class="rd-gauge__fill" style="width:96%"></i><i class="rd-gauge__avg"></i></div>
+            <p class="rd-cmp"><b>83.2%</b> above the national average</p>
           </div>
         </article>
       </section>
@@ -1930,7 +2095,7 @@
         <article class="map-story-card map-story-card--explore">
           <button class="map-story-close" id="exploreDismiss" type="button" aria-label="Close and go to the map">×</button>
           <h2>Now check your municipality</h2>
-          <p>In one municipality the motorway drives the result; elsewhere it may be a shopping-centre car park, a market square or a single busy junction. Search for a place or select it on the map to inspect the data and its most dangerous locations.</p>
+          <p>Search for a place or select it on the map to explore the data and the most dangerous locations.</p>
           <div class="search map-story-search">
             <input id="story-gmina-search" type="text" autocomplete="off" inputmode="search" spellcheck="false" placeholder="Search for your town" role="combobox" aria-autocomplete="list" aria-label="Place" aria-controls="suggestions" aria-expanded="false" />
             <div id="suggestions" class="suggestions" role="listbox"></div>
@@ -1942,403 +2107,12 @@
             <svg class="map-story-tip__icon map-story-tip__icon--touch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M12 3v18M3 12h18M12 3 9 6M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>
             </svg>
-            <span class="map-story-tip__mouse">Hold      <kbd class="key-ctrl">Ctrl</kbd><kbd class="key-cmd">⌘ Cmd</kbd>      and scroll to zoom the map</span>
+            <span class="map-story-tip__mouse">Hold      <kbd class="key-ctrl">Ctrl</kbd><kbd class="key-cmd">Cmd</kbd>      and scroll to zoom the map</span>
             <span class="map-story-tip__touch">Use two fingers to pan or zoom the map</span>
           </p>
         </article>
         </div>
       </section>
-    </div>
-  </section>
-
-
-  <div class="act-two" id="akt-2">
-    <section class="section">
-      <div class="wrap">
-        <h2 class="section__title">Between Łódź and Toruń</h2>
-
-        <p>The map shows the gulf that can separate municipalities in different parts of Poland. To make that variation clearer, we identified the places at the wrong end of the ranking—and those with the safest roads.</p>
-
-        <p>For total incidents per resident, the motorway municipalities already described dominate the ranking. Among the largest cities, collisions are most common in Katowice, Kielce and Opole.</p>
-
-        <figure class="figure figure--wide act2-figure act2-visual act2-rank-figure--worst" aria-labelledby="act2-rank-worst-title">
-          <figcaption class="figure__head">
-            <div class="figure__title" id="act2-rank-worst-title">Highest-rate municipalities</div>
-            <div class="figure__sub" data-rank-unit="worst">Incidents per 10,000 residents, 2018–2025</div>
-          </figcaption>
-          <div class="act2-rank-switch" data-rank-switch="worst" role="group" aria-label="Select the type of events in the ranking of the worst results">
-            <button type="button" class="is-active" data-rank-side="worst" data-rank-metric="events" aria-pressed="true">All incidents</button>
-            <button type="button" data-rank-side="worst" data-rank-metric="accidents" aria-pressed="false">Accidents</button>
-          </div>
-          <div class="figure__body act2-rank-grid">
-            <div class="act2-rank-column">
-              <div class="act2-rank-column__title"><span>All municipalities</span></div>
-              <div data-rank-list="worst-all"></div>
-            </div>
-            <div class="act2-rank-column">
-              <div class="act2-rank-column__title"><span>Cities above 100,000 residents</span></div>
-              <div data-rank-list="worst-large"></div>
-            </div>
-          </div>
-          <div class="figure__note"><b>Source:</b>      Project calculations, SEWiK 2018–2025, Statistics Poland</div>
-        </figure>
-
-        <p>The picture changes when only casualty crashes are counted. Strzelce, crossed by the A1 and national road DK60, moves into first place. Łódź ranks worst among large cities: incidents there have tragic consequences almost four times as often as in Warsaw and seven times as often as in Toruń. Rzeszów, Radom and Poznań also perform poorly.</p>
-
-        <p>At the other end is Wietrzychowice, with almost six times fewer police reports than the national average and nearly 26 times fewer than the highest-rate municipality, Zgorzelec.</p>
-
-        <figure class="figure figure--wide act2-figure act2-visual act2-rank-figure--best" aria-labelledby="act2-rank-best-title">
-          <figcaption class="figure__head">
-            <div class="figure__title" id="act2-rank-best-title">Lowest-rate municipalities</div>
-            <div class="figure__sub" data-rank-unit="best">Incidents per 10,000 residents, 2018–2025</div>
-          </figcaption>
-          <div class="act2-rank-switch" data-rank-switch="best" role="group" aria-label="Select the type of events in the ranking of the best results">
-            <button type="button" class="is-active" data-rank-side="best" data-rank-metric="events" aria-pressed="true">All incidents</button>
-            <button type="button" data-rank-side="best" data-rank-metric="accidents" aria-pressed="false">Accidents</button>
-          </div>
-          <div class="figure__body act2-rank-grid">
-            <div class="act2-rank-column">
-              <div class="act2-rank-column__title"><span>All municipalities</span></div>
-              <div data-rank-list="best-all"></div>
-            </div>
-            <div class="act2-rank-column">
-              <div class="act2-rank-column__title"><span>Cities above 100,000 residents</span></div>
-              <div data-rank-list="best-large"></div>
-            </div>
-          </div>
-          <div class="figure__note"><b>Source:</b>      Project calculations, SEWiK 2018–2025, Statistics Poland</div>
-        </figure>
-
-        <p>The safest municipalities in the data tend to have no national road and less through traffic, both of which usually inflate incident rates. Most are in Lesser Poland and Subcarpathia. Greater changes in elevation also produce more winding roads, naturally reducing speed and keeping drivers alert.</p>
-
-        <p>For casualty crashes alone, Rybczewice sits at the bottom of the table. Of 79 incidents recorded over eight years, only one caused casualties and none was fatal. Across Poland, 106 municipalities recorded no fatal incident, and ten of them reported no serious incident either.</p>
-
-        <p>Toruń has the lowest per-capita crash rate among large cities, followed in this respect by Koszalin, Białystok and Gorzów Wielkopolski.</p>
-      </div>
-    </section>
-
-    <section class="section section--tint">
-      <div class="wrap">
-        <h2 class="section__title">More frequent in cities, more tragic in the countryside</h2>
-
-        <p>Heavier traffic, car parks and junctions make collisions exactly 36% more frequent in urban municipalities than in rural ones.</p>
-
-        <p>For serious and fatal incidents, the order reverses. Rural municipalities record 24.5 per 10,000 residents, compared with 17.6 in urban municipalities—a rural rate 39% higher.</p>
-
-        <p>We also identified the individual road sections where drivers need to be most alert.</p>
-
-        <p>The highest total—2,324 incidents in eight years—occurred on a roughly two-kilometre section of Aleja Roździeńskiego in Katowice. This is one of Poland’s busiest areas, where a crowded expressway passes the Dąbrówka retail complex. Close behind are Warsaw’s S8 between the Powązkowska and Marymoncka junctions (1,601 incidents) and Chorzowska Street near Silesia City Center in Katowice (1,424).</p>
-
-        <p>The three road sections with the highest absolute numbers of casualty crashes are all in Łódź: two parts of the east–west route along Piłsudskiego and Mickiewicza avenues, and a section of Zachodnia Street.</p>
-
-        <p>The most fatal incidents were recorded on national road DK62 east of Wyszków, just beyond the S8 junction: seven deaths among only 95 reports. A section of the S1 near Katowice Airport and the forested DW631 between Wólka Radzymińska and Struga followed, each with six fatal incidents.</p>
-
-        <p>Among motorways, a ten-kilometre section of the A4 between Mysłowice and Katowice recorded the most incidents (2,035). The most tragic was another A4 section near the Wrocław Południe junction with the A8/S8, with nine fatal incidents. The S17 between Lipówki and Kołbiel also recorded nine, while eight occurred on the A4 between Kraków Airport and the Kraków Południe junction.</p>
-      </div>
-    </section>
-
-    <section class="section section--dark section--video">
-      <div class="section-bg" aria-hidden="true">
-        <div class="section-bg__media">
-          <video id="darkSectionVideo" autoplay muted loop playsinline preload="metadata">
-            <source src="assets_sklad/vid2.mp4" type="video/mp4">
-          </video>
-        </div>
-      </div>
-      <div class="section-scrim" aria-hidden="true"></div>
-      <div class="wrap">
-        <h2 class="section__title">Dark, fast and straight</h2>
-
-        <p>A July weekend at four in the morning; a rural municipality in Świętokrzyskie Voivodeship; a straight, dark, single-carriageway road outside a built-up area. Statistically, this is one of the most dangerous situations on Poland’s roads.</p>
-
-        <p>In 2025, built-up areas accounted for 70.5% of crashes but 38.4% of all road deaths. Outside them, the proportions reverse: for every 100 crashes, almost four times as many people died as within built-up areas.</p>
-
-        <figure class="figure figure--wide act2-figure act2-visual" aria-labelledby="act2-area-title">
-          <figcaption class="figure__head">
-            <div class="figure__title" id="act2-area-title">Fewer crashes, most road deaths</div>
-            <div class="figure__sub">Share of crashes and deaths inside and outside built-up areas, 2025</div>
-            <div class="act2-area-legend" aria-hidden="true"><span><i style="--legend:var(--act2-blue)"></i>built-up areas</span><span><i style="--legend:var(--act2-yellow)"></i>outside built-up areas</span></div>
-          </figcaption>
-          <div class="figure__body act2-area-grid">
-            <div class="act2-area-pie-card">
-              <div class="act2-area-pie-card__title">Accidents</div>
-              <div class="act2-area-pie" style="--built:70.5%" role="img" aria-label="Accidents: 70.5 per cent in the built-up area and 29.5 per cent outside">
-                <span class="act2-area-pie__value" style="--x:70%;--y:29%" aria-hidden="true">70.5%</span>
-                <span class="act2-area-pie__value act2-area-pie__value--outside" style="--x:30%;--y:72%" aria-hidden="true">29.5%</span>
-              </div>
-            </div>
-            <div class="act2-area-pie-card">
-              <div class="act2-area-pie-card__title">Road deaths</div>
-              <div class="act2-area-pie" style="--built:38.4%" role="img" aria-label="Fatal victims: 38.4 per cent in the built-up area and 61.6 per cent outside of it">
-                <span class="act2-area-pie__value" style="--x:38%;--y:25%" aria-hidden="true">38.4%</span>
-                <span class="act2-area-pie__value act2-area-pie__value--outside" style="--x:63%;--y:69%" aria-hidden="true">61.6%</span>
-              </div>
-            </div>
-          </div>
-          <div class="figure__note"><b>Source:</b>      Polish National Police Headquarters</div>
-        </figure>
-
-        <p>Speed is one of the main reasons. It was responsible for 21.7% of crashes caused by drivers and almost 40% of deaths. Police reports show that speed killed three times as often as failure to yield.</p>
-
-        <p>Darkness makes crashes more deadly. There were 22 deaths per 100 crashes on unlit roads, compared with seven on lit roads. Four in five crashes occurred on two-way, single-carriageway roads. Head-on collisions accounted for 10% of crashes but almost 20% of deaths.</p>
-
-        <p>Police records support our calculations. Traffic almost disappears before dawn: at 4 a.m., police record nine times fewer incidents than at 4 p.m. Yet incidents between 2 and 5 a.m. have the worst outcomes, with a fatality rate three times higher than in the afternoon.</p>
-
-        <figure class="figure figure--wide act2-figure act2-visual" aria-labelledby="act2-fatal-hour-title">
-          <figcaption class="figure__head">
-            <div class="figure__title" id="act2-fatal-hour-title">When incidents are more likely to be fatal</div>
-            <div class="figure__sub" id="act2-fatal-heatmap-sub" aria-live="polite">Fatal incidents as a share of all incidents, by weekday and hour</div>
-          </figcaption>
-          <div class="figure__body">
-            <div class="act2-heatmap-scroll"><div class="act2-heatmap" id="act2-fatal-heatmap" role="img" aria-label="Heat map of the percentage of fatal events in all events by week and hour"></div></div>
-            <div class="act2-heatmap-key" aria-hidden="true"><span>lower share</span><i class="act2-heatmap-key__ramp"></i><span>higher share</span></div>
-          </div>
-          <div class="figure__note"><b>Source:</b>      Project calculations, SEWiK 2018–2025</div>
-        </figure>
-
-        <p>The fatal share peaks in July and August at about 0.55% and is lowest in February at 0.4%. In absolute terms, October recorded the most fatal incidents.</p>
-
-        <figure class="figure figure--wide act2-figure act2-visual" aria-labelledby="act2-monthly-figure-title">
-          <figcaption class="figure__head">
-            <div class="figure__title" id="act2-monthly-figure-title">How the fatality rate changes through the year</div>
-            <div class="figure__sub" id="act2-period-chart-sub">Fatal incidents as a share of all incidents by month, 2018–2025</div>
-          </figcaption>
-          <div class="figure__body">
-            <div class="act2-rank-switch act2-period-switch" role="group" aria-label="Select graph split">
-              <button type="button" class="is-active" data-period-chart-button="months" aria-pressed="true">Months</button>
-              <button type="button" data-period-chart-button="days" aria-pressed="false">Days of the week</button>
-              <button type="button" data-period-chart-button="hours" aria-pressed="false">Hours</button>
-            </div>
-            <div data-period-chart="months">
-              <div class="act2-monthly__scroll">
-                <svg class="act2-monthly__chart" viewBox="0 0 840 240" role="img" aria-labelledby="act2-monthly-title act2-monthly-desc">
-                  <title id="act2-monthly-title">Fatal incidents as a share of all incidents by month</title>
-                  <desc id="act2-monthly-desc">The lowest share is in February: 0.40%. The highest is in July and August: 0.55%.</desc>
-                  <g aria-hidden="true">
-                    <g>
-                      <rect class="act2-monthly__bar" x="32" y="130.3" width="36" height="69.7" rx="5" fill="#fed777"></rect><text class="act2-monthly__value" x="50" y="122.3">0.44%</text>
-                      <rect class="act2-monthly__bar" x="98.4" y="158.5" width="36" height="41.5" rx="5" fill="#fff4c2"></rect><text class="act2-monthly__value" x="116.4" y="150.5">0.40%</text>
-                      <rect class="act2-monthly__bar" x="164.7" y="145.8" width="36" height="54.2" rx="5" fill="#fee9a2"></rect><text class="act2-monthly__value" x="182.7" y="137.8">0.42%</text>
-                      <rect class="act2-monthly__bar" x="231.1" y="122.6" width="36" height="77.4" rx="5" fill="#feca5c"></rect><text class="act2-monthly__value" x="249.1" y="114.6">0.45%</text>
-                      <rect class="act2-monthly__bar" x="297.5" y="111.6" width="36" height="88.4" rx="5" fill="#feb249"></rect><text class="act2-monthly__value" x="315.5" y="103.6">0.46%</text>
-                      <rect class="act2-monthly__bar" x="363.8" y="66.9" width="36" height="133.1" rx="5" fill="#dc2442"></rect><text class="act2-monthly__value" x="381.8" y="58.9">0.51%</text>
-                      <rect class="act2-monthly__bar" x="430.2" y="38.7" width="36" height="161.3" rx="5" fill="#9d0f3d"></rect><text class="act2-monthly__value" x="448.2" y="30.7">0.55%</text>
-                      <rect class="act2-monthly__bar" x="496.5" y="38.8" width="36" height="161.2" rx="5" fill="#9d0f3d"></rect><text class="act2-monthly__value" x="514.5" y="30.8">0.55%</text>
-                      <rect class="act2-monthly__bar" x="562.9" y="69.1" width="36" height="130.9" rx="5" fill="#e02842"></rect><text class="act2-monthly__value" x="580.9" y="61.1">0.51%</text>
-                      <rect class="act2-monthly__bar" x="629.3" y="40.3" width="36" height="159.7" rx="5" fill="#a10f3d"></rect><text class="act2-monthly__value" x="647.3" y="32.3">0.55%</text>
-                      <rect class="act2-monthly__bar" x="695.6" y="72" width="36" height="128" rx="5" fill="#e42d42"></rect><text class="act2-monthly__value" x="713.6" y="64">0.51%</text>
-                      <rect class="act2-monthly__bar" x="762" y="119" width="36" height="81" rx="5" fill="#fec552"></rect><text class="act2-monthly__value" x="780" y="111">0.45%</text>
-                    </g>
-                    <g class="act2-monthly__axis" text-anchor="middle">
-                      <text x="50" y="222">Jan</text><text x="116.4" y="222">Feb</text><text x="182.7" y="222">Mar</text><text x="249.1" y="222">Apr</text>
-                      <text x="315.5" y="222">May</text><text x="381.8" y="222">Jun</text><text x="448.2" y="222">Jul</text><text x="514.5" y="222">Aug</text>
-                      <text x="580.9" y="222">Sep</text><text x="647.3" y="222">Oct</text><text x="713.6" y="222">Nov</text><text x="780" y="222">Dec</text>
-                    </g>
-                  </g>
-                </svg>
-              </div>
-            </div>
-            <div data-period-chart="days" hidden>
-              <div class="act2-monthly__scroll">
-                <svg class="act2-monthly__chart" viewBox="0 0 840 240" role="img" aria-labelledby="act2-weekday-title act2-weekday-desc">
-                  <title id="act2-weekday-title">Fatal incidents as a share of all incidents by weekday</title>
-                  <desc id="act2-weekday-desc">The lowest share is on Tuesday: 0.41%. The highest is on Sunday: 0.74%.</desc>
-                  <g aria-hidden="true">
-                    <g>
-                      <rect class="act2-monthly__bar" x="15" y="154.8" width="70" height="45.2" rx="6" fill="#fee89e"></rect><text class="act2-monthly__value" x="50" y="146.8">0.45%</text>
-                      <rect class="act2-monthly__bar" x="136.7" y="173.2" width="70" height="26.8" rx="6" fill="#fff4c2"></rect><text class="act2-monthly__value" x="171.7" y="165.2">0.41%</text>
-                      <rect class="act2-monthly__bar" x="258.3" y="163.8" width="70" height="36.2" rx="6" fill="#ffeeb0"></rect><text class="act2-monthly__value" x="293.3" y="155.8">0.43%</text>
-                      <rect class="act2-monthly__bar" x="380" y="163.5" width="70" height="36.5" rx="6" fill="#ffeeaf"></rect><text class="act2-monthly__value" x="415" y="155.5">0.43%</text>
-                      <rect class="act2-monthly__bar" x="501.7" y="154.4" width="70" height="45.6" rx="6" fill="#fee79e"></rect><text class="act2-monthly__value" x="536.7" y="146.4">0.45%</text>
-                      <rect class="act2-monthly__bar" x="623.3" y="83.6" width="70" height="116.4" rx="6" fill="#f45f3f"></rect><text class="act2-monthly__value" x="658.3" y="75.6">0.61%</text>
-                      <rect class="act2-monthly__bar" x="745" y="21.7" width="70" height="178.3" rx="6" fill="#9d0f3d"></rect><text class="act2-monthly__value" x="780" y="13.7">0.74%</text>
-                    </g>
-                    <g class="act2-monthly__axis" text-anchor="middle">
-                      <text x="50" y="222">Mon</text><text x="171.7" y="222">Tue</text><text x="293.3" y="222">Wed</text><text x="415" y="222">Thu</text>
-                      <text x="536.7" y="222">Fri</text><text x="658.3" y="222">Sat</text><text x="780" y="222">Sun</text>
-                    </g>
-                  </g>
-                </svg>
-              </div>
-            </div>
-            <div data-period-chart="hours" hidden>
-              <div class="act2-monthly__scroll act2-monthly__scroll--hours">
-                <svg class="act2-monthly__chart act2-monthly__chart--hours" viewBox="0 0 1080 308.57" role="img" aria-labelledby="act2-hourly-title act2-hourly-desc">
-                  <title id="act2-hourly-title">Fatal incidents as a share of all incidents by hour</title>
-                  <desc id="act2-hourly-desc">The lowest share is at 8 a.m.: 0.33%. The highest is at 4 a.m.: 1.53%.</desc>
-                  <g aria-hidden="true">
-                    <g>
-                      <rect class="act2-monthly__bar" x="20" y="117" width="24" height="140.1" rx="5" fill="#ef4c40"></rect><text class="act2-monthly__value" x="32" y="109">0.92%</text>
-                      <rect class="act2-monthly__bar" x="64" y="102.7" width="24" height="154.4" rx="5" fill="#e73a41"></rect><text class="act2-monthly__value" x="76" y="94.7">1.02%</text>
-                      <rect class="act2-monthly__bar" x="108" y="44" width="24" height="213.1" rx="5" fill="#ad123d"></rect><text class="act2-monthly__value" x="120" y="36">1.41%</text>
-                      <rect class="act2-monthly__bar" x="152" y="31.9" width="24" height="225.2" rx="5" fill="#9d0f3d"></rect><text class="act2-monthly__value" x="164" y="23.9">1.49%</text>
-                      <rect class="act2-monthly__bar" x="196" y="25.7" width="24" height="231.4" rx="5" fill="#8f0a3c"></rect><text class="act2-monthly__value" x="208" y="17.7">1.53%</text>
-                      <rect class="act2-monthly__bar" x="240" y="85" width="24" height="172.1" rx="5" fill="#d92242"></rect><text class="act2-monthly__value" x="252" y="77">1.14%</text>
-                      <rect class="act2-monthly__bar" x="284" y="142.8" width="24" height="114.3" rx="5" fill="#f66a3d"></rect><text class="act2-monthly__value" x="296" y="134.8">0.75%</text>
-                      <rect class="act2-monthly__bar" x="328" y="195.6" width="24" height="61.5" rx="5" fill="#fed879"></rect><text class="act2-monthly__value" x="340" y="187.6">0.41%</text>
-                      <rect class="act2-monthly__bar" x="372" y="207.6" width="24" height="49.5" rx="5" fill="#fff4c2"></rect><text class="act2-monthly__value" x="384" y="199.6">0.33%</text>
-                      <rect class="act2-monthly__bar" x="416" y="204" width="24" height="53.1" rx="5" fill="#feecad"></rect><text class="act2-monthly__value" x="428" y="196">0.35%</text>
-                      <rect class="act2-monthly__bar" x="460" y="206.2" width="24" height="50.9" rx="5" fill="#fff1b8"></rect><text class="act2-monthly__value" x="472" y="198.2">0.34%</text>
-                      <rect class="act2-monthly__bar" x="504" y="206.4" width="24" height="50.7" rx="5" fill="#fff1b8"></rect><text class="act2-monthly__value" x="516" y="198.4">0.34%</text>
-                      <rect class="act2-monthly__bar" x="548" y="206.4" width="24" height="50.7" rx="5" fill="#fff1b8"></rect><text class="act2-monthly__value" x="560" y="198.4">0.34%</text>
-                      <rect class="act2-monthly__bar" x="592" y="200.3" width="24" height="56.8" rx="5" fill="#fee39a"></rect><text class="act2-monthly__value" x="604" y="192.3">0.38%</text>
-                      <rect class="act2-monthly__bar" x="636" y="204.4" width="24" height="52.7" rx="5" fill="#feecad"></rect><text class="act2-monthly__value" x="648" y="196.4">0.35%</text>
-                      <rect class="act2-monthly__bar" x="680" y="206.7" width="24" height="50.4" rx="5" fill="#fff1b8"></rect><text class="act2-monthly__value" x="692" y="198.7">0.33%</text>
-                      <rect class="act2-monthly__bar" x="724" y="191.2" width="24" height="65.9" rx="5" fill="#fed067"></rect><text class="act2-monthly__value" x="736" y="183.2">0.44%</text>
-                      <rect class="act2-monthly__bar" x="768" y="176.7" width="24" height="80.4" rx="5" fill="#fca349"></rect><text class="act2-monthly__value" x="780" y="168.7">0.53%</text>
-                      <rect class="act2-monthly__bar" x="812" y="175.4" width="24" height="81.7" rx="5" fill="#fca349"></rect><text class="act2-monthly__value" x="824" y="167.4">0.54%</text>
-                      <rect class="act2-monthly__bar" x="856" y="162.3" width="24" height="94.8" rx="5" fill="#fa853f"></rect><text class="act2-monthly__value" x="868" y="154.3">0.63%</text>
-                      <rect class="act2-monthly__bar" x="900" y="160.3" width="24" height="96.8" rx="5" fill="#fa853f"></rect><text class="act2-monthly__value" x="912" y="152.3">0.64%</text>
-                      <rect class="act2-monthly__bar" x="944" y="140.7" width="24" height="116.4" rx="5" fill="#f66a3d"></rect><text class="act2-monthly__value" x="956" y="132.7">0.77%</text>
-                      <rect class="act2-monthly__bar" x="988" y="142.1" width="24" height="115" rx="5" fill="#f66a3d"></rect><text class="act2-monthly__value" x="1000" y="134.1">0.76%</text>
-                      <rect class="act2-monthly__bar" x="1032" y="115.6" width="24" height="141.5" rx="5" fill="#ef4c40"></rect><text class="act2-monthly__value" x="1044" y="107.6">0.93%</text>
-                    </g>
-                    <g class="act2-monthly__axis" text-anchor="middle">
-                      <text x="32" y="285.4">0</text><text x="76" y="285.4">1</text><text x="120" y="285.4">2</text><text x="164" y="285.4">3</text>
-                      <text x="208" y="285.4">4</text><text x="252" y="285.4">5</text><text x="296" y="285.4">6</text><text x="340" y="285.4">7</text>
-                      <text x="384" y="285.4">8</text><text x="428" y="285.4">9</text><text x="472" y="285.4">10</text><text x="516" y="285.4">11</text>
-                      <text x="560" y="285.4">12</text><text x="604" y="285.4">13</text><text x="648" y="285.4">14</text><text x="692" y="285.4">15</text>
-                      <text x="736" y="285.4">16</text><text x="780" y="285.4">17</text><text x="824" y="285.4">18</text><text x="868" y="285.4">19</text>
-                      <text x="912" y="285.4">20</text><text x="956" y="285.4">21</text><text x="1000" y="285.4">22</text><text x="1044" y="285.4">23</text>
-                    </g>
-                  </g>
-                </svg>
-              </div>
-            </div>
-          </div>
-          <div class="figure__note"><b>Source:</b>      Project calculations, SEWiK 2018–2025</div>
-        </figure>
-
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap">
-        <h2 class="section__title">Friday, 3 p.m.</h2>
-
-        <p>Road incidents have a weekly rhythm. Police record the most towards the end of the working week, when shopping and weekend departures overlap with the daily commute. The peak arrives at about 3 p.m. on Friday.</p>
-
-        <figure class="figure figure--wide act2-figure act2-visual" aria-labelledby="act2-hour-title">
-          <figcaption class="figure__head">
-            <div class="figure__title" id="act2-hour-title">The weekly rhythm of road incidents</div>
-            <div class="figure__sub" id="act2-heatmap-sub">Number of incidents by weekday and hour</div>
-          </figcaption>
-          <div class="figure__body">
-            <div class="act2-rank-switch act2-heatmap-switch" role="group" aria-label="Select the type of events on the heat map">
-              <button type="button" class="is-active" data-heatmap-metric="events" aria-pressed="true">All incidents</button>
-              <button type="button" data-heatmap-metric="accidents" aria-pressed="false">Accidents</button>
-              <button type="button" data-heatmap-metric="fatal" aria-pressed="false">Fatal crashes</button>
-            </div>
-            <div class="act2-heatmap-scroll"><div class="act2-heatmap" id="act2-heatmap" role="img" aria-label="Heat map of all events by week and hour"></div></div>
-            <div class="act2-heatmap-key" aria-hidden="true"><span id="act2-heatmap-key-low">fewer incidents</span><i class="act2-heatmap-key__ramp"></i><span id="act2-heatmap-key-high">more incidents</span></div>
-          </div>
-          <div class="figure__note"><b>Source:</b>      Project calculations, SEWiK 2018–2025</div>
-        </figure>
-
-        <p>The peak shifts with severity. The largest number of casualty crashes occurs an hour later, while fatal crashes peak at about 5 p.m.</p>
-
-        <p>Weekend traffic falls, but outcomes become more serious. Police recorded almost twice as many incidents on Fridays as on Sundays, yet the difference in casualty crashes was much smaller: an average of 76 on Friday and 51 on Sunday. Crashes therefore made up 7.1% of all Sunday reports, compared with 5.5% on Friday.</p>
-
-      </div>
-    </section>
-
-    <section class="section section--tint">
-      <div class="wrap">
-        <h2 class="section__title">More cars, fewer victims</h2>
-
-        <p>Poland’s roads become more crowded each year. Statistics Poland reports that households privately used 11.4 million passenger cars in 2018 and about 12.5 million in 2024—an increase of roughly 9% in six years.</p>
-
-        <p>One might expect dangerous incidents to rise with the number of cars, but police data show the opposite. From 2018 to 2025, all reports fell by 11.8% and collisions alone by 10.2%.</p>
-
-        <p>The real change appears when property-damage collisions are separated from incidents involving casualties. Over eight years, crashes fell by 33.9% and fatal incidents by 41.4%. Road incidents remain common, but they end in tragedy much less often.</p>
-
-        <p>The decline was not steady. Most of the reduction in collisions came in the first year of the pandemic; from 2020 to 2025, the number of police reports edged upwards.</p>
-
-        <figure class="figure figure--wide act2-figure act2-visual" aria-labelledby="act2-trend-title">
-          <figcaption class="figure__head">
-            <div class="figure__title" id="act2-trend-title">The more serious the outcome, the greater the improvement</div>
-            <div class="figure__sub">Change by outcome, 2018–2025; 2018 = 100</div>
-          </figcaption>
-          <div class="figure__body">
-            <div class="act2-trend__legend" aria-hidden="true"><span><i style="--legend:var(--act2-gold)"></i>collisions</span><span><i style="--legend:var(--act2-red)"></i>accidents</span><span><i style="--legend:var(--ink)"></i>fatal events</span></div>
-            <div class="act2-trend-wrap">
-              <svg class="act2-trend act2-trend--desktop" viewBox="0 0 820 300" role="img" tabindex="0" aria-label="Change in collisions, crashes and fatal incidents from 2018 to 2025. Hover or use the arrow keys to read values.">
-                <line class="act2-trend__grid" x1="52" y1="7" x2="720" y2="7"></line><line class="act2-trend__grid" x1="52" y1="53" x2="720" y2="53"></line><line class="act2-trend__grid" x1="52" y1="145" x2="720" y2="145"></line><line class="act2-trend__grid" x1="52" y1="237" x2="720" y2="237"></line>
-                <text class="act2-trend__axis" x="8" y="12">110</text><text class="act2-trend__axis" x="8" y="58">100</text><text class="act2-trend__axis" x="17" y="150">80</text><text class="act2-trend__axis" x="17" y="242">60</text>
-                <text class="act2-trend__axis" x="52" y="282" text-anchor="middle">2018</text><text class="act2-trend__axis" x="147.4" y="282" text-anchor="middle">2019</text><text class="act2-trend__axis" x="242.9" y="282" text-anchor="middle">2020</text><text class="act2-trend__axis" x="338.3" y="282" text-anchor="middle">2021</text><text class="act2-trend__axis" x="433.7" y="282" text-anchor="middle">2022</text><text class="act2-trend__axis" x="529.1" y="282" text-anchor="middle">fatal incidents</text><text class="act2-trend__axis" x="624.6" y="282" text-anchor="middle">2024</text><text class="act2-trend__axis" x="720" y="282" text-anchor="middle">2025</text>
-                <polyline class="act2-trend__line act2-trend__line--collision" pathLength="1" points="52,53 147.4,32.9 242.9,110.3 338.3,67.5 433.7,131.1 529.1,127.2 624.6,101.3 720,100"></polyline>
-                <polyline class="act2-trend__line act2-trend__line--accident" pathLength="1" points="52,53 147.4,73.1 242.9,171.1 338.3,181.6 433.7,203.3 529.1,208.9 624.6,200.5 720,209.1"></polyline>
-                <polyline class="act2-trend__line act2-trend__line--fatal" pathLength="1" points="52,53 147.4,47.1 242.9,114.4 338.3,151.3 433.7,206.1 529.1,211 624.6,211.5 720,243.6"></polyline>
-                <g aria-hidden="true"><line class="act2-trend__guide" x1="52" y1="7" x2="52" y2="246"></line><circle class="act2-trend__point act2-trend__point--collision" r="5"></circle><circle class="act2-trend__point act2-trend__point--accident" r="5"></circle><circle class="act2-trend__point act2-trend__point--fatal" r="5"></circle></g>
-                <text class="act2-trend__end act2-trend__end--collision" x="738" y="104">−10.2%</text><text class="act2-trend__end act2-trend__end--accident" x="738" y="213">−33.9%</text><text class="act2-trend__end act2-trend__end--fatal" x="738" y="248">−41.4%</text>
-              </svg>
-              <svg class="act2-trend act2-trend--mobile" viewBox="0 0 328 280" role="img" aria-label="Change in collisions, crashes and fatal incidents from 2018 to 2025">
-                <line class="act2-trend__grid" x1="36" y1="7" x2="270" y2="7"></line><line class="act2-trend__grid" x1="36" y1="53" x2="270" y2="53"></line><line class="act2-trend__grid" x1="36" y1="145" x2="270" y2="145"></line><line class="act2-trend__grid" x1="36" y1="237" x2="270" y2="237"></line>
-                <text class="act2-trend__axis" x="3" y="12">110</text><text class="act2-trend__axis" x="3" y="58">100</text><text class="act2-trend__axis" x="11" y="150">80</text><text class="act2-trend__axis" x="11" y="242">60</text>
-                <text class="act2-trend__axis" x="69.4" y="274" text-anchor="middle">2019</text><text class="act2-trend__axis" x="169.7" y="274" text-anchor="middle">2022</text><text class="act2-trend__axis" x="270" y="274" text-anchor="middle">2025</text>
-                <polyline class="act2-trend__line act2-trend__line--collision" pathLength="1" points="36,53 69.4,32.9 102.9,110.3 136.3,67.5 169.7,131.1 203.1,127.2 236.6,101.3 270,100"></polyline>
-                <polyline class="act2-trend__line act2-trend__line--accident" pathLength="1" points="36,53 69.4,73.1 102.9,171.1 136.3,181.6 169.7,203.3 203.1,208.9 236.6,200.5 270,209.1"></polyline>
-                <polyline class="act2-trend__line act2-trend__line--fatal" pathLength="1" points="36,53 69.4,47.1 102.9,114.4 136.3,151.3 169.7,206.1 203.1,211 236.6,211.5 270,243.6"></polyline>
-                <text class="act2-trend__end act2-trend__end--collision" x="276" y="104">−10.2%</text><text class="act2-trend__end act2-trend__end--accident" x="276" y="213">−33.9%</text><text class="act2-trend__end act2-trend__end--fatal" x="276" y="248">−41.4%</text>
-              </svg>
-              <div class="act2-trend-tooltip" role="tooltip" aria-hidden="true"></div>
-            </div>
-          </div>
-          <div class="figure__note"><b>Source:</b>      Project calculations, SEWiK 2018–2025, Statistics Poland</div>
-        </figure>
-      </div>
-    </section>
-
-    <section class="section section--dark section--video">
-      <div class="section-bg" aria-hidden="true">
-        <div class="section-bg__media">
-          <video autoplay muted loop playsinline preload="metadata">
-            <source src="assets_sklad/vid2.mp4" type="video/mp4">
-          </video>
-        </div>
-      </div>
-      <div class="section-scrim" aria-hidden="true"></div>
-      <div class="wrap">
-        <h2 class="section__title">The fastest roads are not the deadliest</h2>
-
-        <p>Motorways and expressways stand out on the map because enormous traffic volumes are concentrated on a relatively short network. That does not mean incidents there are more likely to cause serious injury.</p>
-
-        <p>From 2018–2025, every kilometre of motorway or expressway accounted for 13 police reports. Major urban arteries averaged 24 and regional roads 18.</p>
-
-        <p>Outcomes differ too. Motorways and expressways recorded 22.8 serious or fatal incidents per 1,000 reports, compared with 26.4 on major arteries, 27.9 on regional roads and 29.6 on local roads.</p>
-
-        <figure class="figure figure--wide act2-figure act2-visual act2-roads-figure" aria-labelledby="act2-roads-title">
-          <figcaption class="figure__head">
-            <div class="figure__title" id="act2-roads-title">Serious and fatal incidents per 1,000 reports</div>
-          </figcaption>
-          <div class="figure__body">
-            <div class="act2-road-row act2-road-row--highlight"><span class="act2-road-row__name">motorways and highest-class roads</span><div class="act2-bar__track"><span class="act2-bar__fill" style="--act2-w:76.9%"></span></div><span class="act2-road-row__value">22.8</span></div>
-            <div class="act2-road-row"><span class="act2-road-row__name">major arteries</span><div class="act2-bar__track"><span class="act2-bar__fill" style="--act2-w:89.2%"></span></div><span class="act2-road-row__value">26.4</span></div>
-            <div class="act2-road-row"><span class="act2-road-row__name">Regional roads</span><div class="act2-bar__track"><span class="act2-bar__fill" style="--act2-w:94.1%"></span></div><span class="act2-road-row__value">27.9</span></div>
-            <div class="act2-road-row act2-road-row--worst"><span class="act2-road-row__name">Local roads</span><div class="act2-bar__track"><span class="act2-bar__fill" style="--act2-w:100%"></span></div><span class="act2-road-row__value">29.6</span></div>
-            <div class="act2-road-row"><span class="act2-road-row__name">residential streets and access roads</span><div class="act2-bar__track"><span class="act2-bar__fill" style="--act2-w:44.6%"></span></div><span class="act2-road-row__value">13.2</span></div>
-          </div>
-          <div class="figure__note"><b>Source:</b>      Project calculations, SEWiK 2018–2025, OpenStreetMap</div>
-        </figure>
-      </div>
-    </section>
-  </div>
-
-
-  <section class="meta">
-    <div class="wrap">
-      <h2 class="meta__title">How we calculated it</h2>
-      <p>We analysed 3,398,937 public records from Poland’s Accident and Collision Registration System (SEWiK) for 2018–2025: 3,205,960 property-damage collisions and 192,977 casualty crashes. Each incident was classified by the most serious outcome among its participants. A collision caused property damage only; a crash involved casualties.</p>
-
-      <p>We assigned every incident to one of Poland’s 2,479 current municipalities and compared the totals with 2025 population data from Statistics Poland. Within each municipality, we also matched an incident to the nearest drivable road within 50 metres and divided the road network into sections up to 200 metres long. Because we used the current road network and classifications, the analysis does not reproduce every change made between 2018 and 2025.</p>
-
-      <p>We could match 94.1% of database incidents to a drivable road within 50 metres. The remaining 200,850 incidents, or 5.9%, were excluded from road-section analysis but retained in municipality statistics and hotspot calculations.</p>
-
-      <p>Public sources do not provide accurate, comparable traffic volumes for every road and municipality. The map and rankings therefore do not show the probability of a crash on any single journey. A high collision total may simply reflect heavy traffic, through traffic or tourism.</p>
-
-      <p>Accuracy also depends on the locations recorded by police. When a precise site was missing, many incidents received the same coordinates—for example, a fallback point for all of Warsaw or the midpoint of Puławska Street. Clusters of at least five identical locations contain 4.9% of incidents; clusters of more than 100 contain 0.4% of the database.</p>
-
-      <p>A naive ranking of the raw records would therefore make a 67-metre car-park access road at National Police Headquarters in Warsaw the most dangerous road in Poland. Such cases form only a small share, however, and after appropriate cleaning the nationwide data provide a reliable picture.</p>
     </div>
   </section>
 
@@ -2979,7 +2753,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	  var allRoadsMode = false;
 
 
-  var HEAT_STOPS = ['#fff4c2', '#fee391', '#fec44f', '#fd8d3c', '#ed3941', '#d01443', '#9d0f3d'];
+  var HEAT_STOPS = ['#2a2523', '#4a2a24', '#7a2e25', '#a8352a', '#d4452f', '#f26444', '#ff9b7a'];
 
 
   var HEAT_MIN = 280;
@@ -3023,7 +2797,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var map = L.map('map', {
     zoomControl:false, attributionControl:false, preferCanvas:true,
 
-    zoomSnap:.25, zoomDelta:1, minZoom:5, maxZoom:OVERVIEW_MAX_ZOOM,
+    zoomSnap:.05, zoomDelta:1, minZoom:5, maxZoom:OVERVIEW_MAX_ZOOM,
 
     scrollWheelZoom:false
   }).setView([52.05, 19.2], 6);
@@ -3225,8 +2999,8 @@ document.addEventListener('DOMContentLoaded', function () {
           style:function (feature) {
             var isMotorway = feature && feature.properties && feature.properties.class === 'A';
             return {
-              color:isMotorway ? '#8ec5ff' : '#63e6d7',
-              weight:isMotorway ? 2.5 : 2,
+              color:isMotorway ? '#f2f2f2' : '#9a9a9a',
+              weight:isMotorway ? 2.4 : 1.5,
               opacity:.95,
               lineCap:'round',
               lineJoin:'round'
@@ -3708,30 +3482,30 @@ document.addEventListener('DOMContentLoaded', function () {
 	  }
 
 	  var ROAD_STOPS = [
-	    [0,    [254, 232, 166]],
-	    [0.25, [240, 149,  47]],
-	    [0.55, [226,  86,  74]],
-	    [1,    [194,  32,  56]]
+	    [0,    [122,  46,  37]],
+	    [0.25, [168,  53,  42]],
+	    [0.55, [212,  69,  47]],
+	    [1,    [242, 100,  68]]
 	  ];
-	  var ROAD_PURPLE = [118, 42, 131];
+	  var ROAD_PURPLE = [255, 155, 122];
 	  var ALL_ROAD_STOPS = [
-	    [0,    [254, 232, 166]],
-	    [0.42, [240, 149,  47]],
-	    [0.72, [226,  86,  74]],
-	    [0.90, [194,  32,  56]],
-	    [1,    [194,  32,  56]]
+	    [0,    [122,  46,  37]],
+	    [0.42, [168,  53,  42]],
+	    [0.72, [212,  69,  47]],
+	    [0.90, [242, 100,  68]],
+	    [1,    [242, 100,  68]]
 	  ];
 
 	  function roadColor(value) {
 	    value = Number(value || 0);
-	    if (value <= 0) return '#2f8f60';
-	    if (!(currentRoadRef > 0)) return '#fee8a6';
+	    if (value <= 0) return '#38383c';
+	    if (!(currentRoadRef > 0)) return '#7a2e25';
 	    if (value > currentRoadExtreme) {
-	      if (!(currentRoadMax > currentRoadExtreme)) return '#762a83';
+	      if (!(currentRoadMax > currentRoadExtreme)) return '#ff9b7a';
 	      var extremeT = Math.min(1, (value - currentRoadExtreme) / (currentRoadMax - currentRoadExtreme));
 	      return mixColor(ROAD_STOPS[ROAD_STOPS.length - 1][1], ROAD_PURPLE, extremeT);
 	    }
-	    if (value > currentRoadRef) return '#c22038';
+	    if (value > currentRoadRef) return '#f26444';
 	    var t = Math.min(1, value / currentRoadRef);
 	    for (var i = 1; i < ROAD_STOPS.length; i++) {
 	      if (t <= ROAD_STOPS[i][0] || i === ROAD_STOPS.length - 1) {
@@ -3740,12 +3514,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	        return mixColor(a[1], b[1], span > 0 ? (t - a[0]) / span : 0);
 	      }
 	    }
-	    return '#762a83';
+	    return '#ff9b7a';
 	  }
 	  function allRoadsColor(value, purpleAt) {
 	    value = Number(value || 0);
-	    if (value <= 0) return '#2f8f60';
-	    if (!(currentRoadRef > 0)) return '#fee8a6';
+	    if (value <= 0) return '#38383c';
+	    if (!(currentRoadRef > 0)) return '#7a2e25';
 	    if (value > currentRoadRef) {
 	      var purpleT = purpleAt > currentRoadRef
 	        ? Math.min(1, (value - currentRoadRef) / (purpleAt - currentRoadRef))
@@ -3760,7 +3534,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	        return mixColor(a[1], b[1], span > 0 ? (t - a[0]) / span : 0);
 	      }
 	    }
-	    return '#a81b48';
+	    return '#ff9b7a';
 	  }
 	  function roadImportance(highway) {
 	    highway = String(highway || '');
@@ -3830,8 +3604,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	    roadLegendMax.textContent = currentRoadMax ? fmt(currentRoadMax) : 'more';
 	    roadLegendBar.style.background = 'linear-gradient(90deg,' +
-	      '#2f8f60 0%,#2f8f60 10%,#fee8a6 14%,#f0952f 30%,' +
-	      '#e2564a 55%,#c22038 72%,#c22038 90%,#762a83 100%)';
+	      '#38383c 0%,#38383c 10%,#7a2e25 14%,#a8352a 30%,' +
+	      '#d4452f 55%,#f26444 72%,#f26444 90%,#ff9b7a 100%)';
 
 	    return fc;
 	  }
@@ -3950,41 +3724,36 @@ document.addEventListener('DOMContentLoaded', function () {
         '</div>'
       : '';
 
+    var pct = Number(p.procent_sredniej_krajowej_na_10k);
+    var cmp = !hasNumber(p.procent_sredniej_krajowej_na_10k)
+      ? 'No population data'
+      : (pct - 100 >= 0
+          ? '<b>' + fmt1(pct - 100) + '%</b> above the national average'
+          : '<b>' + fmt1(100 - pct) + '%</b> below the national average');
+    var region = meta && meta.woj ? meta.woj : '';
+    var lineGauge = hasNumber(v)
+      ? '<div class="rd-gauge" aria-hidden="true"><i class="rd-gauge__fill" style="width:' + gaugePos(v) + '%"></i><i class="rd-gauge__avg"></i></div>'
+      : '';
+
     stats.innerHTML =
       '<div class="stats__bar">' +
-        '<button class="stats__back" type="button" id="statsClose" aria-label="Back to general view of Poland">' +
-          ICON_CHEVRON('stats__back-icon', 'M10 3.5 5.5 8 10 12.5') + '<span>Back</span>' +
-        '</button>' +
-        '<span class="stats__bar-title" aria-hidden="true">' + p.admin_nazwa + '</span>' +
-        '<button class="stats__collapse" type="button" data-stats-sheet-toggle aria-expanded="true" aria-label="Collapse Data Panel">' +
-          '<span class="stats__collapse-label" aria-hidden="true"></span>' + ICON_CHEVRON('stats__collapse-icon', 'M3.5 5.75 8 10.25 12.5 5.75') +
+        '<button class="stats__handle" type="button" data-stats-sheet-toggle aria-expanded="true" aria-label="Collapse data panel">' +
+          '<span class="stats__grip" aria-hidden="true"></span>' +
+          '<span class="stats__bar-title" aria-hidden="true">' + p.admin_nazwa + '</span>' +
         '</button>' +
       '</div>' +
       '<div class="stats__scroll">' +
-      '<h2>' + p.admin_nazwa + '</h2>' +
-      '<div class="sub">' + place + '</div>' +
-
-      '<div class="hero-stat">' +
-        '<div class="hero-stat__value" style="color:' + heatColor(v) + '">' + fmt1(v) + '</div>' +
-        '<div class="hero-stat__unit">incidents per 10,000 residents, 2018–2025</div>' +
-        '<div class="hero-stat__delta ' + delta.cls + '">' + delta.text + '</div>' +
-      '</div>' +
-      gauge +
-      rank +
-
-      '<div class="tiles">' +
-        '<div class="tile tile--all"><b>' + fmt(p.zdarzenia) + '</b><span>incidents</span></div>' +
-        '<div class="tile tile--collision"><b>' + fmt(p.kolizje) + '</b><span>collisions</span>' + share(p.kolizje, p.zdarzenia) + '</div>' +
-        '<div class="tile tile--hard"><b>' + fmt(injured) + '</b><span>injury crashes</span>' + share(injured, p.zdarzenia) + '</div>' +
-        '<div class="tile tile--fatal"><b>' + fmt(p.smiertelne) + '</b><span>fatal</span>' + share(p.smiertelne, p.zdarzenia) + '</div>' +
-      '</div>' +
-      trendSpark(p) +
-
-      '<div class="modes" role="group" aria-label="Map layer">' +
-        '<button class="mode" type="button" data-mode="roads">Road sections</button>' +
-        '<button class="mode" type="button" data-mode="hotspot">Highest-rate area</button>' +
-      '</div>' +
-      '<div class="mode-info"></div>' +
+        '<div class="rd-head">' +
+          '<div class="rd-col"><h2 class="rd-big">' + p.admin_nazwa + '</h2>' + (region ? '<span>' + region + '</span>' : '') + '</div>' +
+          '<div class="rd-col rd-col--num"><b class="rd-big">' + (hasNumber(v) ? fmt1(v) : '–') + '</b><span>per 10,000 residents</span></div>' +
+        '</div>' +
+        lineGauge +
+        '<div class="rd-foot">' +
+          '<span>' + cmp + '</span>' +
+          '<button class="rd-close" type="button" id="statsClose" aria-label="Close and go back to the map of Poland">' +
+            '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8"/></svg>' +
+          '</button>' +
+        '</div>' +
       '</div>';
 
     stats.classList.remove('is-collapsed');
@@ -4003,7 +3772,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (mobileQuery.matches) {
       return mobileUpperHalfPadding();
     }
-    return { paddingTopLeft:[28, 78], paddingBottomRight:[330, 42] };
+    return { paddingTopLeft:[28, 78], paddingBottomRight:[440, 42] };
   }
   function overviewFitOptions(duration) {
     var mapSection = document.getElementById('mapa');
@@ -4015,13 +3784,15 @@ document.addEventListener('DOMContentLoaded', function () {
       padding.paddingBottomRight = [12, Math.max(12, padding.paddingBottomRight[1] - 16)];
     } else if (mobileQuery.matches) {
       padding = { paddingTopLeft:[12, 12], paddingBottomRight:[12, 132] };
+    } else if (!centerInViewport && typeof activeMapStory === 'string' && activeMapStory && activeMapStory !== 'explore') {
+      padding = { paddingTopLeft:[0, 0], paddingBottomRight:[260, 0] };
     } else {
       padding = { paddingTopLeft:[18, 18], paddingBottomRight:[18, 18] };
     }
     if (duration !== undefined) padding.duration = duration;
     return padding;
   }
-  var OVERVIEW_TIGHTEN = .06;
+  var OVERVIEW_TIGHTEN = .03;
   var OVERVIEW_TIGHTEN_MOBILE = .06;
   function overviewBounds() {
     return overviewLayer.getBounds()
@@ -4148,7 +3919,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return L.circleMarker(latlng, {
 
       pane:'pointPane', radius:4, interactive:false,
-      color:'rgba(12,12,12,.85)', weight:1.2, fillColor:'#ffd85e', fillOpacity:.95
+      color:'rgba(12,12,12,.85)', weight:1, fillColor:'#ffffff', fillOpacity:.95
     });
   }
 
@@ -4290,7 +4061,7 @@ document.addEventListener('DOMContentLoaded', function () {
         boundaryLayer = L.geoJSON(data.boundary, {
           pane:'selectedPane',
           interactive:false,
-          style:{ color:'#f2efeb', weight:1.8, opacity:.85, fill:false }
+          style:{ color:'#e8e8e8', weight:1.2, opacity:.8, fill:false }
         });
         if (!storyFly) boundaryLayer.addTo(map);
         if (storyFly && overviewLayer) overviewLayer.setStyle(overviewStyle);
@@ -4327,7 +4098,7 @@ document.addEventListener('DOMContentLoaded', function () {
           hotspotLayer = L.geoJSON(data.hotspot, {
             pane:'hotspotPane',
             interactive:false,
-            style:{ color:'#ff6a5a', weight:1.6, opacity:.95, fillColor:'#e2564a', fillOpacity:.28 }
+            style:{ color:'#f26444', weight:1.4, opacity:1, fillColor:'#d4452f', fillOpacity:.16 }
           });
           roadLayer = L.geoJSON(roads, {
             renderer:canvas,
@@ -4560,8 +4331,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	      var purpleAt = currentRoadMax;
 	      roadLegendMax.textContent = currentRoadMax ? fmt(currentRoadMax) : 'more';
 	      roadLegendBar.style.background = 'linear-gradient(90deg,' +
-	        '#fee8a6 0%,#f0952f 42%,#e2564a 72%,' +
-	        '#c22038 90%,#c22038 95%,#762a83 100%)';
+	        '#7a2e25 0%,#a8352a 42%,#d4452f 72%,' +
+	        '#f26444 90%,#f26444 95%,#ff9b7a 100%)';
 	      setLoadingProgress(1, 1, 'Drawing ' + fmt(paths.length) + ' coloured road sections…');
 	      window.setTimeout(function () {
 	        if (seq !== requestSeq) return;

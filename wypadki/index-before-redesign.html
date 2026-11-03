@@ -1,0 +1,4549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Maps, maps, maps</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" fetchpriority="high">
+<link id="firaSansStylesheet" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" fetchpriority="high">
+<link rel="preload" as="video" href="assets_sklad/tlo_vid_1.mp4" type="video/mp4" fetchpriority="high">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script defer src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
+
+<script defer src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+
+<style>
+
+
+  :root{
+    color-scheme:light;
+
+
+
+    --sans:"Fira Sans",system-ui,sans-serif;
+
+
+
+    --paper:#ffffff;
+    --paper-2:#f9f7f4;
+    --paper-3:#12100e;
+    --card:#ffffff;
+    --ink:#12100e;
+    --ink-2:#57514c;
+    --ink-3:#8b847e;
+    --ink-inv:#f4f1ed;
+    --rule:#e6e1da;
+    --rule-2:#cfc8bf;
+    --rule-3:#12100e;
+    --accent:#9e2b25;
+    --accent-2:#c1554a;
+    --accent-yellow:#ffd200;
+    --panel:rgba(255,255,255,.94);
+    --shadow:0 6px 24px rgba(17,20,26,.13);
+
+
+    --map-void:#0c0c0c;
+    --ui-radius:8px;
+    --ui-gap:14px;
+    --ui-field-h:42px;
+    --bottom-safe:0px;
+
+
+
+    --screen:100vh;
+
+
+    --banner-h:46px;
+    --map-lock:calc(var(--screen) * .75);
+
+
+
+    --measure:640px;
+    --measure-wide:1080px;
+    --gutter:clamp(20px,5vw,44px);
+    --section-gap:clamp(64px,calc(var(--screen) * .1),124px);
+
+
+
+    --hero-dim:.46;
+    --hero-blur:11.2px;
+    --hero-sat:1.34;
+    --hero-contrast:1.14;
+    --hero-bright:1.04;
+    --hero-xfade:1.1s;
+
+    color:var(--ink);
+    font-family:var(--sans);
+    background:var(--paper);
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:16px;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    text-rendering:optimizeLegibility;
+  }
+  img{max-width:100%}
+
+
+
+  html{scrollbar-width:none; -ms-overflow-style:none}
+  html::-webkit-scrollbar{display:none}
+  .suggestions,.stats{scrollbar-width:thin; scrollbar-color:#c0c4c8 #f8f8f8}
+  .suggestions::-webkit-scrollbar,.stats::-webkit-scrollbar{width:9px; height:9px; display:block}
+  .suggestions::-webkit-scrollbar-track,.stats::-webkit-scrollbar-track{background-color:#f8f8f8; border-radius:5px}
+  .suggestions::-webkit-scrollbar-thumb,.stats::-webkit-scrollbar-thumb{background-color:#c0c4c8; border-radius:5px}
+
+
+  @supports (-webkit-touch-callout:none){
+    @media (any-pointer:coarse){
+      .story p,.story h1,.story h2,.story h3{-webkit-user-select:none; user-select:none}
+    }
+  }
+
+
+
+  .scroll-progress{
+    position:fixed; top:0; left:0; z-index:100;
+    width:0; height:4px; background:var(--accent-yellow);
+    pointer-events:none; transition:width .05s linear;
+  }
+
+  .premium-banner{
+    position:fixed; top:0; left:0; right:0; z-index:11;
+    display:flex; align-items:center; justify-content:center; gap:4px;
+    height:var(--banner-h); background:#f4f3ee; color:#000;
+    font-size:15px; pointer-events:none;
+  }
+  .premium-banner__logo{max-width:120px; height:32px; display:inline-block; vertical-align:middle}
+  @media (max-width:325px){ .premium-banner__text{display:none} }
+
+  html.paywall-locked,html.paywall-locked body{overflow:hidden; touch-action:none}
+
+
+
+  .story{display:block}
+
+  .wrap{
+    width:min(var(--measure),calc(100% - 2*var(--gutter)));
+    margin-inline:auto;
+  }
+  .wrap--wide{width:min(var(--measure-wide),calc(100% - 2*var(--gutter)))}
+
+
+
+
+
+  .hero{
+    position:relative; overflow:hidden;
+    min-height:max(560px, var(--screen));
+    display:grid; grid-template-rows:minmax(0,1fr) auto;
+    justify-items:center; align-items:center;
+    row-gap:clamp(18px,calc(var(--screen) * .03),34px);
+    padding:calc(var(--banner-h) + clamp(24px,calc(var(--screen) * .04),40px)) 0 clamp(18px,calc(var(--screen) * .03),30px);
+    background:var(--paper-3); color:var(--ink-inv);
+    text-align:center;
+  }
+
+
+
+  .hero__bg{
+    position:absolute; inset:0; z-index:0; overflow:hidden;
+    background:var(--paper-3);
+    filter:
+      blur(var(--hero-blur))
+      saturate(var(--hero-sat))
+      contrast(var(--hero-contrast))
+      brightness(var(--hero-bright));
+    transform:scale(1.12);
+    will-change:transform;
+  }
+  .hero__bg > img{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+
+
+  .hero__bg > video{
+    position:absolute; inset:0;
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .hero__bg > video + video{opacity:0}
+  @media (max-width:760px){
+    .hero__bg > video{object-position:right center}
+  }
+
+
+
+  .hero__scrim{
+    position:absolute; inset:0; z-index:1;
+    background:
+      radial-gradient(ellipse 88% 72% at 50% 46%,
+        rgba(18,16,14,calc(var(--hero-dim) * .45)) 0%,
+        rgba(18,16,14,calc(var(--hero-dim) * 1.15)) 100%),
+      linear-gradient(180deg,
+        rgba(18,16,14,calc(var(--hero-dim) * .75)) 0%,
+        rgba(18,16,14,0) 26%,
+        rgba(18,16,14,0) 68%,
+        rgba(18,16,14,calc(var(--hero-dim) * .9)) 100%);
+  }
+
+
+  .hero .wrap{
+    position:relative; z-index:2;
+    grid-row:1; align-self:center;
+    width:min(760px,calc(100% - 2*var(--gutter)));
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .hero__scroll{z-index:2}
+
+  @media (prefers-reduced-motion:reduce){ .hero__bg{will-change:auto} }
+
+  .hero__brands{
+    display:block; width:min(360px,62vw); height:auto;
+    margin:0 auto 34px;
+  }
+  @media (max-width:760px){ .hero__brands{width:min(280px,72vw); margin-bottom:26px} }
+
+
+
+
+
+
+  .hero__title{
+    margin:0 0 clamp(34px,calc(var(--screen) * .055),64px);
+    font-family:var(--sans); font-weight:600; color:var(--ink-inv);
+    font-size:clamp(40px,8vw,72px); line-height:1.05; letter-spacing:-.02em;
+  }
+  .hero__title img{
+	  display:block; width:min(530px,82vw); height:auto; margin-inline:auto;
+  }
+  @media (max-height:720px){
+	  .hero__title img{width:min(410px,70vw)}
+  }
+
+
+  .hero__lead{
+    margin:0; font-family:var(--sans); font-weight:300;
+    font-size:clamp(17px,1.85vw,21px); line-height:1.6;
+    color:rgba(244,241,237,1); max-width:64ch; text-wrap:pretty;
+  }
+  .hero__lead p{margin:0 0 1.05em}
+  .hero__lead p:last-child{margin-bottom:0}
+
+
+  .byline{
+    display:flex; align-items:center; gap:14px;
+    margin-top:36px; padding-top:22px; border-top:1px solid var(--rule);
+    font-family:var(--sans);
+  }
+
+  .share{
+    display:flex; justify-content:center; align-items:center; gap:14px;
+    margin:42px 0 0;
+  }
+  .share__link{
+    display:grid; place-items:center;
+    width:44px; height:44px; padding:0; border:0; border-radius:50%;
+    background:rgba(244,241,237,.14); color:var(--ink-inv);
+    font-size:20px; cursor:pointer; text-decoration:none;
+    backdrop-filter:blur(6px);
+    transition:background .15s ease, color .15s ease;
+  }
+  .share__link:hover{background:rgba(244,241,237,.28)}
+  .share__link:focus-visible{outline:2px solid var(--ink-inv); outline-offset:3px}
+  .share__icon{display:block; width:1em; height:1em}
+  .share__link--copy .share__icon--check,
+  .share__link--copy.is-copied .share__icon--copy{display:none}
+  .share__link--copy.is-copied .share__icon--check{display:block}
+  .share__link--copy.is-copied{background:var(--accent-yellow); color:#12100e}
+  @media (max-width:760px){
+    .share{gap:10px; margin-top:34px}
+    .share__link{width:40px; height:40px; font-size:18px}
+  }
+
+
+  .hero__scroll{
+    position:relative; z-index:2;
+    grid-row:2; align-self:end;
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    font-family:var(--sans); font-size:.68rem; font-weight:600;
+    letter-spacing:normal; text-transform:uppercase;
+    color:rgba(244,241,237,.82); pointer-events:none;
+  }
+
+  .hero__scroll span{
+    position:relative; display:block; width:2px; height:42px;
+    border-radius:2px; overflow:hidden;
+    background:rgba(244,241,237,.28);
+  }
+  .hero__scroll span::after{
+    content:""; position:absolute; left:0; right:0; height:16px;
+    border-radius:2px; background:#ffffff;
+    box-shadow:0 0 10px rgba(255,255,255,.85);
+    animation:heroScroll 1.8s cubic-bezier(.65,0,.35,1) infinite;
+  }
+  @keyframes heroScroll{
+    0%     {top:-16px; opacity:0}
+    18%    {opacity:1}
+    82%    {opacity:1}
+    100%   {top:42px;  opacity:0}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .hero__scroll span::after{animation:none; top:13px}
+  }
+  .byline__avatar{
+    width:46px; height:46px; border-radius:50%; overflow:hidden;
+    background:var(--rule); flex:0 0 auto;
+  }
+  .byline__avatar img{width:100%; height:100%; object-fit:cover; display:block}
+  .byline__name{
+    font-weight:600; font-size:.88rem; line-height:1.2; letter-spacing:.01em;
+  }
+  .byline__meta{
+    color:var(--ink-3); font-size:.76rem; margin-top:3px;
+    letter-spacing:.03em;
+  }
+
+
+
+  .section{
+    padding:var(--section-gap) 0;
+    position:relative; z-index:10; background:var(--paper);
+  }
+  .section--tint{background:var(--paper-2); border-block:1px solid var(--rule)}
+  .section--dark{
+    background:var(--paper-3); color:var(--ink-inv);
+    border-block:1px solid var(--paper-3);
+  }
+  .section--dark .section__title{color:var(--ink-inv); border-bottom-color:rgba(244,241,237,.25)}
+  .section--dark .story p{color:rgba(244,241,237,.86)}
+
+  .section--video{overflow:hidden; overflow:clip}
+  .section--video .section-bg{
+    position:absolute; inset:0; z-index:0;
+    background:var(--paper-3);
+  }
+  .section--video .section-bg__media{
+    position:sticky; top:0;
+    height:var(--screen); min-height:560px;
+    filter:
+      blur(var(--hero-blur))
+      saturate(var(--hero-sat))
+      contrast(var(--hero-contrast))
+      brightness(var(--hero-bright));
+    transform:scale(1.12);
+    will-change:transform;
+  }
+  .section--video .section-bg__media > video{
+    position:absolute; inset:0;
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .section--video .section-scrim{
+    position:absolute; inset:0; z-index:1;
+    background:linear-gradient(180deg,
+      rgba(14,13,12,.8) 0%,
+      rgba(14,13,12,.62) 22%,
+      rgba(14,13,12,.62) 78%,
+      rgba(14,13,12,.8) 100%);
+  }
+  .section--video .wrap{position:relative; z-index:2}
+  @media (prefers-reduced-motion:reduce){ .section--video .section-bg__media{will-change:auto} }
+
+  .section__title{
+    margin:0 0 26px; padding-bottom:16px;
+    font-family:var(--sans); font-weight:600;
+    font-size:clamp(26px,3.7vw,42px); line-height:1.1; letter-spacing:-.018em;
+    max-width:20ch; text-wrap:balance;
+    border-bottom:1px solid var(--rule-3);
+  }
+
+
+  .story p{
+    margin:0 0 22px; font-family:var(--sans); font-weight:400;
+    font-size:clamp(17px,1.6vw,19.5px); line-height:1.68; letter-spacing:.002em;
+    text-wrap:pretty; orphans:2; widows:2;
+  }
+  .story p:last-child{margin-bottom:0}
+  .story strong{font-weight:600}
+  .story em{font-style:italic}
+
+  .story h3{
+    margin:44px 0 14px; font-family:var(--sans); font-weight:600;
+    font-size:clamp(20px,2.3vw,25px); line-height:1.24; letter-spacing:-.012em;
+  }
+
+
+  .stat-row{
+    display:grid; gap:0; margin:40px 0;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    border-top:1px solid var(--rule-3);
+    font-family:var(--sans);
+  }
+  .stat{
+    padding:20px 22px 22px 0; border-right:1px solid var(--rule);
+  }
+  .stat:last-child{border-right:0}
+  .stat__value{
+    font-size:clamp(30px,4.2vw,44px); font-weight:600; line-height:1;
+    letter-spacing:-.028em; font-variant-numeric:tabular-nums lining-nums;
+  }
+  .stat__label{
+    margin-top:10px; color:var(--ink-2); font-size:.8rem; line-height:1.4;
+    max-width:22ch;
+  }
+  @media (max-width:560px){
+    .stat{border-right:0; border-bottom:1px solid var(--rule); padding-right:0}
+    .stat:last-child{border-bottom:0}
+  }
+
+
+  .pull{
+    margin:44px 0; padding:0; border:0;
+    font-family:var(--sans); font-weight:400; font-style:italic;
+    font-size:clamp(22px,2.9vw,30px); line-height:1.32; letter-spacing:-.012em;
+    color:var(--ink); text-wrap:balance;
+  }
+  .pull::before{
+    content:""; display:block; width:56px; height:2px;
+    background:var(--accent); margin-bottom:22px;
+  }
+
+
+  .figure{margin:44px 0}
+  .figure--wide{
+    width:min(var(--measure-wide),calc(100vw - 2*var(--gutter)));
+    margin-inline:calc(50% - min(var(--measure-wide),100vw - 2*var(--gutter))/2);
+  }
+  .figure__head{margin-bottom:16px; font-family:var(--sans)}
+  .figure__title{
+    margin:0; font-size:1rem; font-weight:600; line-height:1.3; letter-spacing:-.005em; text-wrap:balance;
+  }
+  .figure__sub{
+    margin:5px 0 0; color:var(--ink-2); font-size:.83rem; line-height:1.4; text-wrap:balance;
+  }
+  .figure__body{position:relative}
+  .figure__note{
+    margin:14px 0 0; font-family:var(--sans);
+    color:var(--ink-3); font-size:.74rem; line-height:1.45;
+  }
+  .figure__note b{color:var(--ink-2); font-weight:600}
+
+
+  .chart-slot{
+    display:grid; place-items:center; min-height:300px;
+    border:1px dashed var(--rule-2); background:var(--paper-2);
+    color:var(--ink-3); font-family:var(--sans); font-size:.8rem; letter-spacing:.04em;
+  }
+
+  .act-two{
+    position:relative; z-index:12;
+    --act2-low:#fff4c2;
+    --act2-yellow:#fee391;
+    --act2-gold:#fec44f;
+    --act2-orange:#fd8d3c;
+    --act2-coral:#ed3941;
+    --act2-red:#d01443;
+    --act2-dark:#9d0f3d;
+    --act2-blue:#0373fc;
+  }
+  .act-two .section__title{max-width:18ch}
+  .act2-figure{
+    padding:clamp(20px,3.8vw,42px);
+    border:1px solid var(--rule); border-radius:14px;
+    background:var(--paper); overflow:hidden;
+    font-family:var(--sans);
+  }
+  .section--tint .act2-figure{background:rgba(255,255,255,.74)}
+  .section--dark .act2-figure{
+    background:#1c1917; border-color:rgba(244,241,237,.14); color:var(--ink-inv);
+  }
+  .section--video .act2-figure{background:rgba(28,25,23,.2)}
+  .section--dark .figure__sub,
+  .section--dark .figure__note{color:rgba(244,241,237,.58)}
+  .section--dark .figure__note b{color:rgba(244,241,237,.82)}
+  .act2-figure .figure__head{margin-bottom:clamp(24px,4vw,38px)}
+  .act2-figure .figure__title{
+    margin:0; font-size:clamp(18px,2.2vw,23px); font-weight:600;
+    line-height:1.22; letter-spacing:-.012em; text-wrap:balance;
+  }
+  .act2-figure .figure__sub{max-width:68ch}
+  .act2-bar__track{height:10px; border-radius:999px; background:#ece7e1; overflow:hidden}
+  .section--dark .act2-bar__track{background:rgba(244,241,237,.12)}
+  .act2-bar__fill{
+    display:block; width:var(--act2-w); height:100%; border-radius:inherit;
+    background:var(--act2-color,var(--accent)); transform-origin:left center;
+  }
+  .act-two.is-animated .act2-visual .act2-bar__fill{transform:scaleX(0)}
+  .act-two.is-animated .act2-visual.is-visible .act2-bar__fill{
+    transform:scaleX(1); transition:transform .85s cubic-bezier(.22,.8,.3,1);
+  }
+
+  .act2-heatmap-scroll{
+    overflow-x:auto; padding-bottom:8px;
+    touch-action:pan-y; overscroll-behavior-x:contain; -webkit-overflow-scrolling:touch;
+  }
+  .act2-heatmap-scroll.is-dragging{user-select:none}
+  .act2-heatmap{
+    display:grid; grid-template-columns:62px repeat(24,minmax(17px,1fr)); gap:3px;
+    min-width:680px; align-items:center;
+  }
+  .act2-heatmap__corner,.act2-heatmap__hour,.act2-heatmap__day{
+    color:var(--ink-3); font-size:.62rem; line-height:1; font-variant-numeric:tabular-nums;
+  }
+  .act2-heatmap__hour{text-align:center}
+  .act2-heatmap__day{padding-right:7px; text-align:right}
+  .act2-heatmap__cell{
+    position:relative; aspect-ratio:1; min-height:17px; border-radius:3px;
+    background:var(--heat-color); transition:opacity .35s ease,transform .35s ease;
+  }
+  .act2-heatmap__cell.is-focus{z-index:1; outline:3px solid var(--ink); outline-offset:2px}
+  .section--dark .act2-heatmap__cell.is-focus{outline-color:var(--ink-inv)}
+  .act2-heatmap__cell.is-focus::after{
+    content:attr(data-hour); position:absolute; inset:0; display:grid; place-items:center;
+    color:#fff; font-size:.55rem; font-weight:700;
+  }
+  .act2-heatmap-key{
+    display:flex; align-items:center; justify-content:flex-end; gap:9px;
+    margin-top:12px; color:var(--ink-3); font-size:.65rem;
+  }
+  .section--dark .act2-heatmap__corner,
+  .section--dark .act2-heatmap__hour,
+  .section--dark .act2-heatmap__day,
+  .section--dark .act2-heatmap-key{color:rgba(244,241,237,.58)}
+  .act2-heatmap-key__ramp{
+    width:min(190px,42vw); height:8px; border-radius:99px;
+    background:linear-gradient(90deg,var(--act2-low) 0%,var(--act2-yellow) 16.7%,var(--act2-gold) 33.3%,var(--act2-orange) 50%,var(--act2-coral) 66.7%,var(--act2-red) 83.3%,var(--act2-dark) 100%);
+  }
+  .act2-heatmap-switch{width:fit-content; max-width:100%; margin-bottom:26px; overflow-x:auto}
+  .act2-heatmap-switch button{flex:0 0 auto; white-space:nowrap}
+  .act2-monthly{margin-top:34px; padding-top:28px; border-top:1px solid rgba(244,241,237,.14)}
+  .act2-monthly__title{font-size:.88rem; font-weight:600}
+  .act2-monthly__sub{margin-top:5px; color:rgba(244,241,237,.58); font-size:.74rem; line-height:1.45}
+  .act2-monthly__scroll{margin-top:20px; overflow-x:auto; padding-bottom:6px}
+  .act2-monthly__chart{display:block; width:100%; min-width:680px; height:auto}
+  .act2-monthly__scroll--hours{overflow-x:hidden}
+  .act2-monthly__chart--hours{min-width:0}
+  .act2-monthly__axis{fill:rgba(244,241,237,.58); font-size:11px}
+  .act2-monthly__value{fill:#fff; font-size:11px; font-weight:600; text-anchor:middle}
+  .act2-period-mobile{display:none}
+  .act2-trend{width:100%; height:auto; display:block; overflow:visible}
+  .act2-trend--mobile{display:none}
+  .act2-trend-wrap{position:relative}
+  .act2-trend__grid{stroke:#e6e1da; stroke-width:1}
+  .act2-trend__axis{fill:var(--ink-3); font-size:13px}
+  .act2-trend__line{
+    fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round;
+  }
+  .act2-trend__line--collision{stroke:var(--act2-gold)}
+  .act2-trend__line--accident{stroke:var(--act2-red)}
+  .act2-trend__line--fatal{stroke:var(--ink)}
+  .act2-trend__end{font-size:13px; font-weight:700}
+  .act2-trend__end--collision{fill:var(--act2-gold)}
+  .act2-trend__end--accident{fill:var(--act2-red)}
+  .act2-trend__end--fatal{fill:var(--ink)}
+  .act2-trend__legend{display:flex; flex-wrap:wrap; gap:10px 22px; margin:0 0 18px; font-size:.75rem}
+  .act2-trend__legend span{display:flex; align-items:center; gap:7px}
+  .act2-trend__legend i{width:20px; height:3px; border-radius:2px; background:var(--legend)}
+  .act2-trend__guide{stroke:var(--ink-2); stroke-width:1; stroke-dasharray:4 4; opacity:0; pointer-events:none}
+  .act2-trend__point{stroke:#fff; stroke-width:2.5; opacity:0; pointer-events:none}
+  .act2-trend__point--collision{fill:var(--act2-gold)}
+  .act2-trend__point--accident{fill:var(--act2-red)}
+  .act2-trend__point--fatal{fill:var(--ink)}
+  .act2-trend.is-interacting .act2-trend__guide,
+  .act2-trend.is-interacting .act2-trend__point{opacity:1}
+  .act2-trend:focus-visible{outline:2px solid var(--act2-red); outline-offset:5px; border-radius:4px}
+  .act2-trend-tooltip{
+    position:absolute; z-index:3; top:12px; width:220px; padding:12px 14px;
+    border:1px solid rgba(25,23,20,.12); border-radius:9px;
+    background:var(--paper); color:var(--ink); box-shadow:0 8px 24px rgba(25,23,20,.14);
+    font-family:var(--sans); font-size:.7rem; line-height:1.3;
+    pointer-events:none; opacity:0; transform:translate(-50%,-4px);
+    transition:opacity .14s ease,transform .14s ease;
+  }
+  .act2-trend-tooltip.is-visible{opacity:1; transform:translate(-50%,0)}
+  .act2-trend-tooltip strong{display:block; margin-bottom:8px; font-size:.84rem}
+  .act2-trend-tooltip span{display:grid; grid-template-columns:8px 1fr auto; align-items:center; gap:7px; margin-top:5px}
+  .act2-trend-tooltip i{width:8px; height:8px; border-radius:50%; background:var(--tooltip-color)}
+  .act2-trend-tooltip b{font-variant-numeric:tabular-nums}
+  .act2-trend-tooltip small{display:block; margin-top:8px; color:var(--ink-3)}
+  .act-two.is-animated .act2-visual .act2-trend__line{
+    stroke-dasharray:1; stroke-dashoffset:1;
+  }
+  .act-two.is-animated .act2-visual.is-visible .act2-trend__line{
+    stroke-dashoffset:0; transition:stroke-dashoffset 1.2s cubic-bezier(.22,.8,.3,1);
+  }
+
+  .act2-rank-grid{display:grid; grid-template-columns:1fr 1fr; gap:clamp(30px,5vw,68px)}
+  .act2-rank-switch{
+    display:flex; width:max-content; margin:0 0 26px; padding:3px;
+    border:1px solid var(--rule); border-radius:999px; background:var(--paper-2);
+    font-family:var(--sans);
+  }
+  .act2-rank-switch button{
+    appearance:none; border:0; border-radius:999px; padding:8px 15px;
+    background:transparent; color:var(--ink-2); font:600 .75rem/1 var(--sans);
+    cursor:pointer; transition:background .18s ease,color .18s ease;
+  }
+  .act2-rank-switch button.is-active{background:var(--ink); color:var(--paper)}
+  .act2-rank-switch button:focus-visible{outline:2px solid var(--act2-red); outline-offset:2px}
+  .section--dark .act2-period-switch{border-color:rgba(244,241,237,.18); background:rgba(244,241,237,.06)}
+  .section--dark .act2-period-switch button{color:rgba(244,241,237,.7)}
+  .section--dark .act2-period-switch button.is-active{background:#fff; color:#1c1917}
+  .section--dark .act2-period-switch button:focus-visible{outline-color:var(--ink-inv)}
+  .act2-rank-figure--worst,.act2-rank-figure--best{position:relative}
+  .act2-rank-figure--worst .figure__head,.act2-rank-figure--best .figure__head{padding-right:210px}
+  .act2-rank-figure--worst .act2-rank-switch,.act2-rank-figure--best .act2-rank-switch{
+    position:absolute; top:clamp(20px,3.8vw,42px); right:clamp(20px,3.8vw,42px); margin:0;
+  }
+  .act2-rank-column__title{display:grid; grid-template-columns:minmax(104px,1fr) minmax(0,2.3fr) 4ch; gap:5px; margin-bottom:22px; font-size:.92rem; font-weight:600}
+  .act2-rank-column__title span{grid-column:1/-1; text-align:left}
+  .act2-rank-row{display:grid; grid-template-columns:minmax(104px,1fr) minmax(0,2.3fr) 4ch; align-items:center; gap:5px; margin:12px 0}
+  .act2-rank-row__name{text-align:left; font-size:.76rem; line-height:1.2}
+  .act2-rank-row__value{text-align:left; font-size:.76rem; font-weight:700; font-variant-numeric:tabular-nums}
+  .act2-rank-figure--worst .act2-bar__fill{--act2-color:var(--act2-red)}
+  .act2-rank-figure--best .act2-bar__fill{--act2-color:var(--act2-gold)}
+  .act2-area-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(36px,7vw,80px); max-width:650px; margin-inline:auto}
+  .act2-area-pie-card{text-align:center}
+  .act2-area-pie-card__title{margin-bottom:18px; font-size:.88rem; font-weight:600}
+  .act2-area-pie{
+    position:relative; width:min(100%,250px); aspect-ratio:1; margin-inline:auto;
+    border-radius:50%; background:conic-gradient(from -90deg,var(--act2-blue) 0 var(--built),var(--act2-yellow) var(--built) 100%);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 12px 30px rgba(0,0,0,.12);
+  }
+  .act2-area-pie__value{
+    position:absolute; left:var(--x); top:var(--y); transform:translate(-50%,-50%);
+    color:#fff; font-size:clamp(.82rem,1.8vw,1.05rem); font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .act2-area-pie__value--outside{color:#1c1917; text-shadow:none}
+  .act2-area-legend{display:flex; flex-wrap:wrap; justify-content:flex-start; gap:10px 24px; margin-top:14px; font-size:.84rem; color:var(--ink-2)}
+  .act2-area-legend span{display:flex; align-items:center; gap:7px}
+  .act2-area-legend i{width:12px; height:12px; border:1px solid rgba(0,0,0,.16); border-radius:2px; background:var(--legend)}
+  .section--dark .act2-area-legend{color:rgba(244,241,237,.84)}
+
+  .act2-city-pair{display:grid; grid-template-columns:1fr 1fr; gap:clamp(24px,5vw,62px)}
+  .act2-city-card{padding-top:18px; border-top:1px solid var(--rule-3)}
+  .act2-city-card__name{font-size:1rem; font-weight:600}
+  .act2-city-card__metric{margin-top:24px}
+  .act2-city-card__metric-head{display:flex; justify-content:space-between; gap:12px; margin-bottom:7px; color:var(--ink-2); font-size:.76rem}
+  .act2-city-card__metric-head b{color:var(--ink); font-size:.92rem; font-variant-numeric:tabular-nums}
+  .act2-city-card__metric:not(.act2-city-card__metric--severe) .act2-bar__fill{--act2-color:var(--act2-orange)}
+  .act2-city-card__metric--severe .act2-bar__fill{--act2-color:var(--act2-dark)}
+  .act2-city-pair__result{
+    grid-column:1/-1; display:grid; grid-template-columns:auto 1fr; align-items:center; gap:14px;
+    padding-top:22px; border-top:1px solid var(--rule); color:var(--ink-2); font-size:.82rem; line-height:1.45;
+  }
+  .act2-city-pair__result b{color:var(--act2-dark); font-size:2rem; line-height:1; letter-spacing:-.04em}
+
+  .act2-road-row{display:grid; grid-template-columns:minmax(150px,1.1fr) 3fr max-content; align-items:center; gap:5px; margin:15px 0}
+  .act2-road-row__name{font-size:.77rem; line-height:1.25}
+  .act2-road-row__value{text-align:left; font-size:.78rem; font-weight:700; font-variant-numeric:tabular-nums}
+  .act2-road-row:nth-child(1) .act2-bar__fill{--act2-color:var(--act2-gold)}
+  .act2-road-row:nth-child(2) .act2-bar__fill{--act2-color:var(--act2-coral)}
+  .act2-road-row:nth-child(3) .act2-bar__fill{--act2-color:var(--act2-red)}
+  .act2-road-row:nth-child(4) .act2-bar__fill{--act2-color:var(--act2-dark)}
+  .act2-road-row:nth-child(5) .act2-bar__fill{--act2-color:var(--act2-yellow)}
+  .section--dark .act2-road-row__name{color:rgba(244,241,237,.82)}
+  .act2-roads-figure .act2-road-row:last-child{margin-bottom:0}
+  .act2-roads-figure .figure__note{margin-top:clamp(24px,3.2vw,36px)}
+  .section--dark .act2-road-row__value{color:#fff}
+  @media (max-width:700px){
+    .act2-figure{border-radius:10px}
+    .act2-rank-figure--worst .figure__head,.act2-rank-figure--best .figure__head{padding-right:0}
+    .act2-rank-figure--worst .act2-rank-switch,.act2-rank-figure--best .act2-rank-switch{
+      position:static; margin:-8px 0 26px;
+    }
+    .act2-rank-grid,.act2-city-pair{grid-template-columns:1fr}
+    .act2-rank-column + .act2-rank-column,.act2-city-card + .act2-city-card{margin-top:10px}
+    .act2-city-pair__result{grid-column:auto}
+    .act2-area-grid{grid-template-columns:repeat(2,minmax(0,1fr)); max-width:none; gap:14px}
+    .act2-area-pie-card__title{min-height:2.5em; margin-bottom:10px; display:grid; place-items:end center}
+    .act2-area-pie{width:min(100%,180px)}
+    .act2-area-pie__value{font-size:clamp(.68rem,3vw,.84rem)}
+    .act2-heatmap-scroll{
+      overflow-x:auto; padding-bottom:0; scrollbar-width:none; -ms-overflow-style:none;
+    }
+    .act2-heatmap-scroll::-webkit-scrollbar{display:none}
+    .act2-heatmap-key{
+      display:grid; grid-template-columns:auto minmax(60px,1fr) auto;
+      justify-content:stretch; gap:6px; font-size:.58rem;
+    }
+    .act2-heatmap-key span{white-space:nowrap}
+    .act2-heatmap-key__ramp{width:100%}
+    #act2-heatmap-sub{min-height:2.8em}
+    .act2-heatmap-switch{
+      display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+      width:100%; max-width:none; overflow:visible;
+    }
+    .act2-heatmap-switch button{min-width:0; padding:10px 4px; white-space:normal; font-size:.65rem; line-height:1.12}
+    .act2-period-switch{
+      display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+      width:100%; max-width:none;
+    }
+    .act2-period-switch button{min-width:0; padding:10px 4px; font-size:.68rem; line-height:1.12}
+    #act2-monthly-figure-title{min-height:3.66em}
+    #act2-period-chart-sub{min-height:4.2em}
+    .act2-trend-wrap{overflow:visible}
+    .act2-trend--desktop{display:none}
+    .act2-trend--mobile{display:block; width:100%; height:auto}
+    .act2-trend__axis,.act2-trend__end{font-size:16px}
+    .act2-trend__line{stroke-width:2.5}
+    .act2-trend__point{r:7px; stroke-width:3}
+    .act2-trend-tooltip{display:none}
+    .act2-road-row{
+      grid-template-columns:minmax(128px,1.35fr) minmax(48px,2fr) max-content;
+      gap:5px; min-height:48px; margin:0; padding:4px 0;
+    }
+    .act2-road-row__name{font-size:.7rem; line-height:1.15}
+  }
+  @media (max-width:860px){
+    .act2-monthly__scroll,
+    .act2-monthly__scroll--hours{
+      height:230px; margin-top:18px; overflow:hidden; padding:0;
+    }
+    .act2-monthly__chart{display:none}
+    .act2-period-mobile{
+      display:grid; grid-template-columns:repeat(var(--period-count),minmax(0,1fr));
+      gap:clamp(2px,1vw,5px); width:100%; height:230px;
+    }
+    .act2-period-mobile__item{display:grid; grid-template-rows:minmax(0,1fr) 20px; min-width:0}
+    .act2-period-mobile__plot{position:relative; min-width:0}
+    .act2-period-mobile__bar{
+      position:absolute; left:15%; right:15%; bottom:0; height:var(--period-height);
+      min-width:2px; border-radius:4px 4px 2px 2px; background:var(--period-color);
+    }
+    .act2-period-mobile__value{
+      position:absolute; left:50%; bottom:calc(var(--period-height) + 4px);
+      transform:translateX(-50%); color:#fff; font-size:.62rem; font-weight:600;
+      white-space:nowrap; font-variant-numeric:tabular-nums;
+    }
+    .act2-period-mobile__label{
+      align-self:end; overflow:hidden; color:rgba(244,241,237,.62);
+      font-size:.6rem; line-height:20px; text-align:center; white-space:nowrap;
+    }
+    .act2-period-mobile--hours{gap:2px}
+    .act2-period-mobile--hours .act2-period-mobile__bar{left:8%; right:8%; border-radius:2px 2px 1px 1px}
+  }
+
+  @media (min-width:701px) and (max-width:860px){
+    .act2-heatmap{min-width:0}
+  }
+
+  @media (max-width:430px){
+    .act2-rank-row{grid-template-columns:96px minmax(0,1fr) 4ch; gap:4px}
+    .act2-rank-column__title{grid-template-columns:96px minmax(0,1fr) 4ch; gap:4px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .act-two.is-animated .act2-visual .act2-bar__fill{transform:none}
+    .act-two.is-animated .act2-visual .act2-trend__line{stroke-dashoffset:0}
+  }
+
+
+
+
+
+  .map-section{
+    height:calc(var(--screen) + var(--map-lock));
+    min-height:560px;
+    padding:0; background:var(--map-void);
+    border-block:1px solid var(--rule-3);
+    position:relative; z-index:12;
+  }
+  .map-section.has-story{height:auto}
+
+
+  .map-sticky{
+    position:sticky; top:0;
+    height:var(--screen);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .map-story-steps{
+    position:relative; z-index:600;
+    margin-top:calc(var(--screen) * -1);
+    pointer-events:none;
+  }
+  .map-story-step{
+    min-height:calc(var(--screen) * 1.6);
+    display:flex; align-items:center;
+    padding:calc(var(--screen) * .1) max(22px,6vw);
+  }
+  .map-story-step[data-story="explore"]{
+    display:block;
+    min-height:calc(var(--screen) * 2);
+    margin-top:calc(var(--screen) * .35);
+    padding:0 max(22px,6vw);
+  }
+  .map-story-step:nth-child(even){justify-content:flex-end}
+  .map-story-step[data-story="torun-hotspot"],
+  .map-story-step[data-story="kruszyna"]{justify-content:flex-end}
+  .map-story-step[data-story="explore"]{justify-content:center}
+  .map-story-card{
+    width:min(430px,calc(100vw - 44px));
+    padding:26px 28px;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:8px;
+    background:rgba(24,24,27,.91);
+    box-shadow:0 12px 42px rgba(0,0,0,.48);
+    color:#f2efeb;
+    opacity:.58;
+    transform:translateY(12px);
+    transition:opacity .22s ease,transform .22s ease,background .22s ease;
+    pointer-events:auto;
+  }
+  .map-story-step.is-active .map-story-card{
+    opacity:1; transform:translateY(0); background:rgba(24,24,27,.97);
+  }
+  .map-story-explore-anchor{
+    position:sticky; top:0; z-index:700;
+    height:var(--screen);
+    padding-bottom:var(--bottom-safe);
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  .map-story-card--explore{position:relative}
+  .map-story-step[data-story="explore"].is-active .map-story-card--explore{
+    background:rgba(24,24,27,.76); backdrop-filter:blur(8px);
+  }
+  .map-story-card h2{
+    margin:0 0 12px; color:#fff;
+    font-size:clamp(1.35rem,2.2vw,2rem); line-height:1.08; letter-spacing:-.02em;
+    text-wrap:balance;
+  }
+  .map-story-card p{margin:0;color:#d2cdc7;font-size:.96rem;line-height:1.52}
+  .map-story-card p+p{margin-top:10px}
+  .map-story-card strong{color:#fff}
+  .map-story-note{color:#9f9891!important;font-size:.75rem!important}
+  .map-story-data-sample{
+    --ink:#f2efeb;
+    --ink-2:#a8a19a;
+    --ink-3:#7b7570;
+    --map-void:#111114;
+    --rule:rgba(255,255,255,.10);
+    --sev-all:#7fb2d8;
+    --sev-hard:#f0952f;
+    --sev-fatal:#e2564a;
+    margin-top:18px; padding:14px;
+    border:1px solid rgba(255,255,255,.10); border-radius:8px;
+    background:rgba(255,255,255,.035);
+  }
+  .map-story-data-sample .hero-stat__value{font-size:1.75rem}
+  .map-story-data-sample .hero-stat__delta{margin-top:6px}
+  .map-story-data-sample .gauge-scale{margin-bottom:8px}
+  .map-story-data-sample .rank{margin-bottom:10px}
+  .map-story-data-sample .tiles{margin-bottom:0}
+  .map-story-data-sample .tile{padding:7px 8px}
+  .map-story-data-sample .tile b{font-size:.9rem}
+  .map-story-step[data-story="torun"] .map-story-data-sample + p{margin-top:18px}
+  .map-story-search{
+    --ink:#f2efeb;
+    --ink-2:#a8a19a;
+    --ink-3:#7b7570;
+    --card:rgba(32,32,35,.94);
+    --panel:rgba(20,20,22,.96);
+    --rule:rgba(255,255,255,.10);
+    --rule-2:rgba(255,255,255,.17);
+    --shadow:0 8px 30px rgba(0,0,0,.55);
+    margin-top:18px;
+  }
+  .map-story-search input{box-shadow:none}
+  .map-story-search .suggestions{
+    background:rgba(20,20,22,.96);
+    color:#f2efeb;
+    border-color:rgba(255,255,255,.17);
+  }
+  .map-story-search .suggestion{
+    color:#f2efeb;
+    border-bottom-color:rgba(255,255,255,.10);
+  }
+  .map-story-search .suggestion span{color:#7b7570}
+  .map-story-search + .map-story-note{margin-top:10px}
+  .controls .map-story-search{margin-top:0}
+  .map-story-close{
+    position:absolute; top:12px; right:12px;
+    width:32px; height:32px; padding:0;
+    display:grid; place-items:center;
+    border:0; border-radius:7px;
+    background:transparent; color:#a8a19a;
+    font:inherit; font-size:22px; line-height:1; cursor:pointer;
+  }
+  .map-story-close:hover{background:rgba(255,255,255,.10);color:#fff}
+  .map-story-close:focus-visible{outline:2px solid #f2efeb;outline-offset:2px}
+  .map-section.explore-dismissed .map-story-card--explore{
+    display:none;
+  }
+  .map-section:not(.is-explore) .stage{pointer-events:none}
+  .map-section:not(.is-explore) .controls,
+  .map-section:not(.is-explore) .panel,
+  .map-section:not(.is-explore) .map-legend,
+  .map-section:not(.is-explore) .road-legend,
+  .map-section:not(.is-explore) .map-hint,
+  .map-section:not(.is-explore) .attrib-toggle,
+  .map-section:not(.is-explore) .leaflet-control{
+    opacity:0!important; visibility:hidden!important; pointer-events:none!important;
+  }
+  .map-frame{
+    flex:1 1 auto; min-height:0;
+    width:100%; margin:0; border:0; overflow:hidden; background:var(--map-void);
+  }
+
+
+
+  .stage{
+    --ink:#f2efeb;
+    --ink-2:#a8a19a;
+    --ink-3:#7b7570;
+    --card:rgba(32,32,35,.94);
+    --panel:rgba(20,20,22,.90);
+    --rule:rgba(255,255,255,.10);
+    --rule-2:rgba(255,255,255,.17);
+    --shadow:0 8px 30px rgba(0,0,0,.55);
+    --accent:#e0a03a;
+
+    --sev-all:#7fb2d8;
+    --sev-hard:#f0952f;
+    --sev-fatal:#e2564a;
+
+    position:relative; width:100%; height:100%; min-height:420px; overflow:hidden;
+    background:var(--map-void); -webkit-tap-highlight-color:transparent;
+    color:var(--ink);
+  }
+  #map{position:absolute; inset:0; background:var(--map-void)}
+  .leaflet-container{background:var(--map-void); font:inherit; outline:0}
+  .stage .road-hover-popup{pointer-events:none}
+  .stage .road-hover-popup .leaflet-popup-content-wrapper,
+  .stage .road-hover-popup .leaflet-popup-tip{
+    background:rgba(20,20,22,.94); color:var(--ink);
+  }
+  .stage .road-hover-popup .leaflet-popup-content-wrapper{
+    padding:0; border:1px solid var(--rule-2); border-radius:var(--ui-radius);
+    box-shadow:0 8px 24px rgba(0,0,0,.42); backdrop-filter:blur(8px);
+  }
+  .stage .road-hover-popup .leaflet-popup-content{margin:0; padding:10px 12px; line-height:1}
+  .road-popup__value{
+    color:var(--ink); font-size:1.3rem; line-height:1; font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .road-popup__name{
+    max-width:220px; margin-top:6px; overflow:hidden; text-overflow:ellipsis;
+    color:var(--ink-2); font-size:.74rem; line-height:1.2; font-weight:300;
+    white-space:nowrap;
+  }
+
+  .stage .leaflet-bar a,
+  .stage .leaflet-bar a:hover{
+    background:var(--panel); color:var(--ink);
+    border-bottom-color:var(--rule);
+  }
+  .stage .leaflet-bar a:hover{background:rgba(52,52,56,.95)}
+  .stage .leaflet-bar{border-color:var(--rule-2); box-shadow:var(--shadow)}
+
+  .controls{
+    position:absolute; z-index:500; top:var(--ui-gap); left:var(--ui-gap);
+    width:min(360px,calc(100% - var(--ui-gap) * 2));
+  }
+  .search{position:relative}
+  input{
+    font:inherit; font-size:.94rem; font-weight:550; color:var(--ink);
+    background:var(--card); border:1px solid var(--rule-2); border-radius:var(--ui-radius);
+    height:var(--ui-field-h); padding:0 12px; width:100%; appearance:none; box-shadow:var(--shadow);
+  }
+  input:focus-visible{outline:2px solid #fff; outline-offset:2px}
+	  .metric-picker{position:relative; margin-top:7px}
+	  .metric-picker.off{display:none}
+	  .metric-picker__native{display:none}
+	  .metric-picker__button{
+	    width:100%; min-height:38px; padding:9px 38px 9px 12px;
+	    position:relative; display:flex; align-items:center;
+	    border:1px solid var(--rule-2); border-radius:var(--ui-radius); background:var(--panel);
+	    color:var(--ink); box-shadow:var(--shadow); backdrop-filter:blur(8px);
+	    font:600 .82rem/1.3 var(--sans); text-align:left; cursor:pointer;
+	  }
+	  .metric-picker__button:hover{background:rgba(38,38,42,.96)}
+	  .metric-picker__button:focus-visible{outline:2px solid #fff; outline-offset:2px}
+	  .metric-picker__button-label{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+	  .metric-picker__chevron{
+	    position:absolute; right:14px; top:50%; width:7px; height:7px;
+	    border-right:1px solid currentColor; border-bottom:1px solid currentColor;
+	    color:var(--ink-2); transform:translateY(-70%) rotate(45deg);
+	    transition:transform .16s ease;
+	  }
+	  .metric-picker__button[aria-expanded="true"] .metric-picker__chevron{transform:translateY(-25%) rotate(225deg)}
+	  .metric-picker__menu{
+	    position:absolute; z-index:680; left:0; right:0; top:calc(100% + 6px);
+	    max-height:min(310px,calc(var(--screen) - 150px));
+	    padding:6px; overflow-y:auto;
+	    border:1px solid var(--rule-2); border-radius:var(--ui-radius); background:rgba(20,20,22,.97);
+	    box-shadow:var(--shadow); backdrop-filter:blur(12px);
+	    scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.24) transparent;
+	  }
+	  .metric-picker__menu[hidden]{display:none}
+	  .metric-picker__option{
+	    width:100%; min-height:38px; padding:9px 34px 9px 10px; position:relative;
+	    border:0; border-radius:6px; background:transparent; color:var(--ink-2);
+	    font:500 .8rem/1.3 var(--sans); text-align:left; cursor:pointer;
+	  }
+	  .metric-picker__option:hover,.metric-picker__option:focus-visible{background:rgba(255,255,255,.08); color:var(--ink); outline:0}
+	  .metric-picker__option[aria-selected="true"]{background:rgba(224,160,58,.14); color:var(--ink); font-weight:650}
+	  .metric-picker__option[aria-selected="true"]::after{
+	    content:""; position:absolute; right:13px; top:50%; width:8px; height:4px;
+	    border-left:1.5px solid var(--accent); border-bottom:1.5px solid var(--accent);
+	    transform:translateY(-65%) rotate(-45deg);
+	  }
+  .suggestions{
+    display:none; position:absolute; z-index:650; left:0; right:0; top:calc(100% + 6px);
+    max-height:286px; overflow:auto; background:var(--panel);
+    border:1px solid var(--rule-2); border-radius:var(--ui-radius); box-shadow:var(--shadow);
+    backdrop-filter:blur(8px);
+  }
+  .suggestions.on{display:block}
+
+
+  .suggestions,
+  .stage .stats__scroll{
+    scrollbar-width:thin;
+    scrollbar-color:rgba(255,255,255,.24) transparent;
+  }
+  .suggestions::-webkit-scrollbar,
+  .stage .stats__scroll::-webkit-scrollbar{width:9px}
+  .suggestions::-webkit-scrollbar-track,
+  .stage .stats__scroll::-webkit-scrollbar-track{background:transparent}
+  .suggestions::-webkit-scrollbar-thumb,
+  .stage .stats__scroll::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.20);
+    border-radius:999px;
+    border:2px solid transparent;
+    background-clip:content-box;
+  }
+  .suggestions::-webkit-scrollbar-thumb:hover,
+  .stage .stats__scroll::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.34); background-clip:content-box}
+  .suggestion{
+    padding:9px 12px; cursor:pointer; border-bottom:1px solid var(--rule);
+    font-size:.88rem; line-height:1.22;
+  }
+  .suggestion:last-child{border-bottom:0}
+  .suggestion:hover,.suggestion.active{background:rgba(255,255,255,.08)}
+  .suggestion strong{font-weight:650}
+  .suggestion span{display:block; margin-top:2px; color:var(--ink-3); font-size:.73rem}
+
+  .panel{
+    position:absolute; z-index:500; background:var(--panel);
+    border:1px solid var(--rule-2); border-radius:var(--ui-radius); box-shadow:var(--shadow);
+    backdrop-filter:blur(8px);
+  }
+  .panel.off{display:none}
+  .stats{
+    top:var(--ui-gap); right:var(--ui-gap); width:308px; padding:0;
+    display:flex; flex-direction:column; overflow:hidden;
+    max-height:calc(var(--screen) - var(--ui-gap) * 2);
+    transition:max-height .24s ease;
+  }
+  .stats__bar{
+    flex:0 0 auto; display:flex; align-items:center; gap:6px;
+    height:var(--ui-field-h); padding:0 5px;
+    box-shadow:inset 0 -1px 0 var(--rule);
+    transition:box-shadow .18s ease;
+  }
+  .stats__bar-title{
+    flex:1 1 auto; min-width:0; opacity:0;
+    font-size:.8rem; font-weight:650; color:var(--ink);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    transition:opacity .18s ease;
+  }
+  .stats.is-collapsed .stats__bar{box-shadow:none}
+  .stats.is-collapsed .stats__bar-title{opacity:1}
+  .stats__back,
+  .stats__collapse{
+    flex:0 0 auto; display:flex; align-items:center; gap:5px;
+    height:30px; padding:0 9px; border:0; border-radius:8px;
+    background:transparent; color:var(--ink-2);
+    font:650 .74rem/1 var(--sans); cursor:pointer; white-space:nowrap;
+    transition:background .14s ease, color .14s ease;
+  }
+  .stats__back:hover,
+  .stats__collapse:hover{background:rgba(255,255,255,.10); color:var(--ink)}
+  .stats__back:focus-visible,
+  .stats__collapse:focus-visible{outline:2px solid #fff; outline-offset:-2px}
+  .stats__back-icon,
+  .stats__collapse-icon{
+    flex:0 0 auto; display:block; width:13px; height:13px;
+    position:relative; top:-1px;
+  }
+  .stats__collapse-icon{transform:rotate(180deg); transition:transform .18s ease}
+  .stats.is-collapsed .stats__collapse-icon{transform:rotate(0deg)}
+  .stats__collapse-label::after{content:"Collapse"}
+  .stats.is-collapsed .stats__collapse-label::after{content:"Expand"}
+  .stats.is-collapsed{max-height:var(--ui-field-h)}
+  .stats.is-collapsed .stats__scroll{display:none}
+  .stats__scroll{
+    display:block; min-height:0; padding:14px; overflow-y:auto; overflow-x:hidden;
+  }
+  .stats h2{
+    margin:0 0 2px; font-size:1.08rem; line-height:1.18; font-weight:700;
+    letter-spacing:0;
+  }
+  .sub{font-size:.78rem; color:var(--ink-2); line-height:1.25; margin-bottom:12px}
+
+
+
+  .hero-stat{margin:0 0 10px}
+  .hero-stat__value{
+    font-size:2.05rem; font-weight:700; line-height:1; letter-spacing:-.02em;
+  }
+  .hero-stat__unit{
+    margin-top:3px; font-size:.72rem; color:var(--ink-2); line-height:1.25;
+  }
+  .hero-stat__delta{
+    display:inline-block; margin-top:7px; padding:2px 8px; border-radius:999px;
+    font-size:.73rem; font-weight:650; line-height:1.45;
+  }
+  .hero-stat__delta.is-above{background:rgba(226,86,74,.18); color:#f08379}
+  .hero-stat__delta.is-below{background:rgba(96,176,132,.18); color:#71c79b}
+  .hero-stat__delta.is-nodata{background:rgba(255,255,255,.08); color:var(--ink-3)}
+
+
+
+  .gauge{
+    position:relative; height:8px; border-radius:999px;
+    background:var(--map-void); margin:2px 0 6px;
+  }
+  .gauge__ramp{
+    position:absolute; inset:0; border-radius:999px; opacity:.88;
+    background:linear-gradient(90deg,
+      #fff4c2 0%, #fee391 16.7%, #fec44f 33.3%, #fd8d3c 50%,
+      #ed3941 66.7%, #d01443 83.3%, #9d0f3d 100%);
+  }
+  .gauge__avg{
+    position:absolute; left:47.8%; top:-3px; bottom:-3px; width:2px;
+    margin-left:-1px; background:var(--ink-3); border-radius:1px;
+  }
+  .gauge__me{
+    position:absolute; top:-4px; width:11px; height:16px; margin-left:-5.5px;
+    border:2px solid var(--ink); border-radius:4px; background:transparent;
+  }
+  .gauge-scale{
+    position:relative; height:1.1em; font-size:.66rem; color:var(--ink-3);
+    margin-bottom:11px;
+  }
+  .gauge-scale .lo{position:absolute; left:0}
+  .gauge-scale .hi{position:absolute; right:0}
+  .gauge-scale .mid{position:absolute; left:47.8%; transform:translateX(-50%); white-space:nowrap}
+
+  .rank{
+    font-size:.76rem; color:var(--ink-2); margin-bottom:11px;
+  }
+  .rank b{color:var(--ink); font-weight:650}
+
+
+  .tiles{display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-bottom:12px}
+  .tile{
+    padding:8px 9px; border-radius:8px;
+    background:rgba(255,255,255,.055); border:1px solid var(--rule);
+  }
+  .tile b{display:inline; margin-right:6px; font-size:.98rem; font-weight:700; line-height:1.1}
+  .tile span{
+    display:inline; font-size:.66rem; color:var(--ink-3); line-height:1.2;
+  }
+
+  .tile em{
+    display:block; margin-top:4px; font-style:normal;
+    font-size:.7rem; font-weight:650; line-height:1.15;
+  }
+  .tile--collision em{color:#7aa6a1}
+  .tile--hard em{color:var(--sev-hard)}
+  .tile--fatal em{color:var(--sev-fatal)}
+
+
+  .trend{margin-bottom:12px}
+  .trend svg{display:block; width:100%; height:40px}
+  .trend polygon{fill:var(--sev-all); fill-opacity:.16}
+  .trend polyline{fill:none; stroke:var(--sev-all); stroke-width:1.6; stroke-linejoin:round}
+  .trend__cap{
+    margin-top:5px; font-size:.68rem; color:var(--ink-3); line-height:1.25;
+  }
+  .trend__cap b{color:var(--ink); font-weight:650}
+
+
+  .modes{
+    display:grid; grid-template-columns:1fr 1fr; gap:4px;
+    padding:3px; border-radius:9px; background:rgba(255,255,255,.06);
+    margin-bottom:9px;
+  }
+  .mode{
+    padding:6px 4px; border:0; border-radius:7px; cursor:pointer;
+    background:transparent; color:var(--ink-2);
+    font:inherit; font-size:.73rem; font-weight:600; line-height:1.2;
+    transition:background .14s ease, color .14s ease;
+  }
+  .mode:hover{color:var(--ink)}
+  .mode.is-on{background:rgba(255,255,255,.14); color:var(--ink)}
+  .mode:focus-visible{outline:2px solid #fff; outline-offset:1px}
+
+  .mode-info{
+    font-size:.74rem; color:var(--ink-2); line-height:1.35;
+    padding-top:9px; border-top:1px solid var(--rule);
+  }
+  .mode-info b{color:var(--ink); font-weight:650}
+  .mode-info .big{
+    font-size:1.15rem; font-weight:700; color:var(--ink);
+    line-height:1.2; margin-right:5px;
+  }
+
+
+  .stage .leaflet-tooltip.gmina-tip{
+    padding:7px 10px; border:1px solid var(--rule-2); border-radius:8px;
+    background:var(--panel); color:var(--ink); box-shadow:var(--shadow);
+    backdrop-filter:blur(8px);
+    font-family:var(--sans); font-size:.78rem; line-height:1.3; font-weight:500;
+    white-space:nowrap;
+  }
+  .stage .leaflet-tooltip.gmina-tip::before{display:none}
+  .gmina-tip strong{display:block; font-size:.82rem; font-weight:600; margin-bottom:1px}
+
+
+  .gmina-tip em{
+    display:block; font-style:normal; font-weight:700;
+    font-size:1.35rem; line-height:1.1; letter-spacing:-.01em;
+  }
+	  .gmina-tip small{display:block; margin-top:3px; color:var(--ink-3); font-size:.68rem}
+  .gmina-tip .muted{color:var(--ink-3); font-weight:500}
+
+
+
+  .attrib-toggle{
+    position:absolute; z-index:500; right:16px; bottom:12px;
+    width:22px; height:22px; padding:0; display:grid; place-items:center;
+    border:1px solid var(--rule-2); border-radius:50%;
+    background:var(--panel); color:var(--ink-2); backdrop-filter:blur(6px);
+    font:inherit; font-size:12px; font-weight:700; font-style:italic; line-height:1;
+    cursor:pointer; transition:color .14s ease, border-color .14s ease;
+  }
+  .attrib-toggle:hover{color:var(--ink); border-color:var(--ink-3)}
+  .attrib-toggle:focus-visible{outline:2px solid #fff; outline-offset:2px}
+
+
+  .attrib{
+    position:absolute; z-index:500; right:46px; bottom:12px;
+    width:max-content; max-width:calc(100% - 70px); white-space:nowrap; padding:9px 11px;
+    background:var(--panel); border:1px solid var(--rule-2); border-radius:var(--ui-radius);
+    box-shadow:var(--shadow); backdrop-filter:blur(8px);
+    font-size:.66rem; line-height:1.45; color:var(--ink-3);
+  }
+  .attrib.off{display:none}
+	  .attrib a{color:var(--ink-2)}
+	  .road-legend{
+	    position:absolute; z-index:500; left:var(--ui-gap); bottom:var(--ui-gap); width:236px; padding:10px 11px;
+	    background:var(--panel); border:1px solid var(--rule-2); border-radius:var(--ui-radius); box-shadow:var(--shadow);
+	    backdrop-filter:blur(8px); color:var(--ink-2); font-size:.72rem; line-height:1.2;
+	  }
+	  .road-legend.off{display:none}
+
+
+
+  .map-legend{
+    position:absolute; z-index:500; left:var(--ui-gap); bottom:var(--ui-gap);
+    width:236px; padding:10px 11px;
+    background:var(--panel); border:1px solid var(--rule-2); border-radius:var(--ui-radius);
+    box-shadow:var(--shadow); backdrop-filter:blur(8px);
+    color:var(--ink-2); font-size:.72rem; line-height:1.2;
+  }
+  .map-legend.off{display:none}
+  .map-legend .title{color:var(--ink); font-weight:650; margin-bottom:8px; font-size:.76rem}
+
+
+  .map-legend .bar{
+    position:relative; height:9px; border-radius:999px; background:var(--map-void);
+  }
+  .map-legend .bar .ramp{
+    position:absolute; inset:0; border-radius:999px; opacity:.88;
+    background:linear-gradient(90deg,
+      #fff4c2 0%, #fee391 16.7%, #fec44f 33.3%, #fd8d3c 50%,
+      #ed3941 66.7%, #d01443 83.3%, #9d0f3d 100%);
+  }
+
+
+
+
+  .map-touch-hint{
+    display:none;
+    position:absolute; z-index:450;
+    left:50%; top:0; transform:translateX(-50%);
+    max-width:calc(100% - var(--ui-gap) * 2);
+    width:max-content;
+    align-items:center; gap:8px;
+    color:#fff; font-family:var(--sans); text-align:left;
+    font-size:.7rem; font-weight:600; line-height:1.4;
+    filter:drop-shadow(0 0 18px rgba(0,0,0,1)) drop-shadow(0 0 18px rgba(0,0,0,1));
+    pointer-events:none;
+    opacity:0; transition:opacity .45s ease;
+  }
+  .map-touch-hint svg{width:20px; height:20px; flex:0 0 auto}
+  .map-touch-hint span{min-width:0; text-wrap:balance}
+  @media (max-width:740px){
+    .map-section.is-explore .map-touch-hint,
+    .map-section.explore-dismissed .map-touch-hint{display:flex}
+    .map-section.is-explore .map-hint,
+    .map-section.explore-dismissed .map-hint{display:none}
+  }
+  .map-touch-hint.is-on{opacity:1}
+
+  .map-legend-stack{display:contents}
+  .map-legend__tip{display:none}
+  @media (min-width:741px){
+    .map-section.explore-dismissed .map-legend-stack{
+      position:absolute; z-index:500;
+      left:var(--ui-gap); bottom:var(--ui-gap);
+      display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+    }
+    .map-section.explore-dismissed .map-legend-stack .map-legend,
+    .map-section.explore-dismissed .map-legend-stack .road-legend{
+      position:static; left:auto; bottom:auto;
+      background:#141416; backdrop-filter:none;
+    }
+    .map-section.explore-dismissed .map-legend__tip{
+      display:flex; align-items:center; gap:7px;
+      width:236px; padding:9px 11px;
+      background:#141416; border:1px solid var(--rule-2); border-radius:var(--ui-radius);
+      box-shadow:var(--shadow);
+      font-size:.7rem; line-height:1.4; color:var(--ink-3);
+      text-wrap:balance;
+    }
+  }
+  html.is-touch .map-legend__tip{display:none!important}
+  .map-legend__tip svg{width:14px; height:14px; flex:0 0 auto; opacity:.7}
+  .map-legend__tip,
+  .map-legend__tip svg,
+  .map-legend__tip kbd{transition:color .18s ease,opacity .18s ease,border-color .18s ease,background .18s ease}
+  .map-section.explore-dismissed .map-legend__tip.is-flash{
+    color:#fff; border-color:rgba(255,255,255,.5);
+  }
+  .map-legend__tip.is-flash svg{opacity:1}
+  .map-legend__tip.is-flash kbd{
+    color:#fff; border-color:rgba(255,255,255,.55); background:rgba(255,255,255,.2);
+  }
+  .map-legend__tip kbd{
+    display:inline-block; min-width:1em; padding:0 4px; margin:0 1px;
+    border:1px solid var(--rule-2); border-bottom-width:2px; border-radius:4px;
+    background:rgba(244,241,237,.1);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:.64rem; font-weight:700; color:var(--ink-2); vertical-align:middle;
+  }
+  .map-legend__tip .key-cmd{display:none}
+  html.is-mac .map-legend__tip .key-ctrl{display:none}
+  html.is-mac .map-legend__tip .key-cmd{display:inline-block}
+
+  .map-legend{--avg:47.8%}
+  .map-legend .bar .avg{
+    position:absolute; left:var(--avg); top:-3px; bottom:-3px;
+    width:2px; margin-left:-1px; border-radius:1px; background:var(--ink-3);
+  }
+
+
+  .map-legend .bar .me{
+    position:absolute; top:-5px; bottom:-5px;
+    width:3px; margin-left:-1.5px; border-radius:2px;
+    background:#fff; box-shadow:0 0 0 1px rgba(0,0,0,.5);
+    opacity:0; transition:left .1s linear, opacity .12s ease;
+  }
+  .map-legend .bar .me.is-on{opacity:1}
+  .map-legend .marks{
+    position:relative; height:1.15em; margin-top:6px;
+    font-size:.66rem; color:var(--ink-3);
+  }
+  .map-legend .marks .lo{position:absolute; left:0}
+  .map-legend .marks .hi{position:absolute; right:0}
+  .map-legend .marks .mid{
+    position:absolute; left:var(--avg); transform:translateX(-50%);
+    white-space:nowrap;
+  }
+	  .road-legend .title{color:var(--ink); font-weight:650; margin-bottom:7px; font-size:.76rem}
+	  .road-legend .bar{
+	    flex:1 1 auto; min-width:0; height:8px; margin:0; border-radius:999px;
+	    background:linear-gradient(90deg,#2f8f60 0%,#2f8f60 10%,#fee8a6 14%,#f0952f 30%,#e2564a 55%,#c22038 72%,#c22038 90%,#762a83 100%);
+	  }
+    .road-legend .scale{display:flex; align-items:center; gap:8px}
+    .road-legend .scale span{flex:0 0 auto; font-variant-numeric:tabular-nums}
+	  .spin{
+	    position:absolute; inset:0; z-index:400; display:flex;
+	    align-items:center; justify-content:center;
+	    font-size:.85rem; color:var(--ink-2); background:rgba(12,12,12,.86);
+	  }
+	  .spin.off{display:none}
+	  .spin__content{display:flex; flex-direction:column; align-items:center; gap:12px; max-width:calc(100% - 32px); text-align:center}
+	  .spin__progress{position:relative; width:74px; height:74px; display:grid; place-items:center}
+	  .spin__svg{position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg); transform-origin:center}
+	  .spin__track,.spin__value{fill:none; stroke-width:3.5}
+	  .spin__track{stroke:rgba(244,241,237,.14)}
+	  .spin__value{
+	    stroke:var(--accent); stroke-linecap:round; stroke-dasharray:100;
+	    stroke-dashoffset:calc(100 - var(--progress,0));
+	    transition:stroke-dashoffset .16s ease;
+	  }
+	  .spin__percent{position:relative; color:var(--ink); font-size:.86rem; font-weight:700; font-variant-numeric:tabular-nums}
+	  .spin__label{font-size:.78rem}
+	  .spin.is-indeterminate .spin__value{stroke-dasharray:24 76; stroke-dashoffset:0; transition:none}
+	  .spin.is-indeterminate .spin__svg{animation:spin-ring 1s linear infinite}
+	  .spin.is-error .spin__progress{display:none}
+	  .spin.is-error .spin__svg{animation:none}
+	  .spin.is-error .spin__label{color:#f08379}
+	  @keyframes spin-ring{from{transform:rotate(-90deg)}to{transform:rotate(270deg)}}
+	  @media (prefers-reduced-motion:reduce){.spin.is-indeterminate .spin__svg{animation-duration:2s}}
+  .leaflet-bottom.leaflet-right .leaflet-control-zoom{margin:0 12px 44px 0}
+
+
+
+
+
+  .map-story-card .map-story-tip{
+    display:flex; align-items:center; gap:9px;
+    margin:18px 2px 0; color:rgba(244,241,237,.58);
+    font-size:.76rem; line-height:1.45;
+  }
+  .map-story-tip__mouse,
+  .map-story-tip__touch{display:block; min-width:0; text-wrap:balance}
+  .map-story-tip__icon{width:14px; height:14px; flex:0 0 auto; opacity:.7}
+  .map-story-tip kbd{
+    display:inline-block; min-width:1em; padding:1px 5px; margin:0 1px;
+    border:1px solid rgba(244,241,237,.3); border-bottom-width:2px; border-radius:5px;
+    background:rgba(244,241,237,.12);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:.68rem; font-weight:700; color:#f4f1ed; vertical-align:middle;
+  }
+  .map-story-tip .key-cmd{display:none}
+  html.is-mac .map-story-tip .key-ctrl{display:none}
+  html.is-mac .map-story-tip .key-cmd{display:inline-block}
+  .map-story-tip__touch,
+  .map-story-tip__icon--touch{display:none}
+  html.is-touch .map-story-tip__mouse,
+  html.is-touch .map-story-tip__icon--mouse{display:none}
+  html.is-touch .map-story-tip__touch{display:block}
+  html.is-touch .map-story-tip__icon--touch{display:block}
+
+  .map-hint{
+    position:absolute; z-index:300; left:50%; top:50%;
+    transform:translate(-50%,-50%) scale(.97);
+    display:flex; align-items:center; gap:9px;
+    max-width:min(420px,calc(100% - 32px));
+    padding:13px 20px; border-radius:999px;
+    background:rgba(18,16,14,.84); color:#f4f1ed;
+    font-family:var(--sans); font-size:.9rem; line-height:1.35; text-align:center;
+    backdrop-filter:blur(6px); box-shadow:0 8px 28px rgba(0,0,0,.28);
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
+  }
+  .map-hint.is-on{
+    opacity:1; visibility:visible; transform:translate(-50%,-50%) scale(1);
+    transition:opacity .18s ease, transform .18s ease, visibility 0s;
+  }
+  .map-hint kbd{
+    display:inline-block; min-width:1.1em; padding:2px 7px; margin:0 2px;
+    border:1px solid rgba(244,241,237,.34); border-bottom-width:2px; border-radius:6px;
+    background:rgba(244,241,237,.14);
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:.78rem; font-weight:700; color:#f4f1ed; vertical-align:middle;
+  }
+
+  .map-hint .key-cmd{display:none}
+  html.is-mac .map-hint .key-ctrl{display:none}
+  html.is-mac .map-hint .key-cmd{display:inline-block}
+  .map-hint__touch{display:none}
+  html.is-touch .map-hint__mouse{display:none}
+  html.is-touch .map-hint__touch{display:inline}
+
+
+
+  .meta{
+    padding:80px 0 100px;
+    border-top:1px solid var(--rule-3); font-family:var(--sans);
+    position:relative; z-index:12; background:var(--paper);
+  }
+  .meta__title{
+    margin:0 0 26px; padding-bottom:16px;
+    font-family:var(--sans); font-weight:600;
+    font-size:clamp(26px,3.7vw,42px); line-height:1.1; letter-spacing:-.018em;
+    max-width:20ch; text-wrap:balance; border-bottom:1px solid var(--rule-3);
+  }
+  .meta p{
+    margin:0 0 22px; font-family:var(--sans); font-weight:400;
+    font-size:clamp(17px,1.6vw,19.5px); line-height:1.68; letter-spacing:.002em;
+    color:var(--ink); text-wrap:pretty;
+  }
+  .meta p:last-child{margin-bottom:0}
+
+
+
+
+
+  .stopka {
+    position: relative;
+    z-index: 10;
+    padding: 20px 16px 64px;
+    background: #f8f7f2;
+    font-family: "Fira Sans", system-ui, sans-serif;
+  }
+
+
+  .stopka p { font-family: inherit; }
+
+  .stopka .authors-title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    color: #000000;
+  }
+
+  .stopka .stopka-profiles {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+  }
+
+  .stopka .profile {
+    text-align: center;
+    max-width: 160px;
+    flex: 1;
+  }
+
+  .stopka .profile a {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+  }
+
+  .stopka .profile img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 5px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    border: 5px solid #ffffff;
+  }
+
+  .stopka .profile img:hover { transform: scale(1.05); }
+  .stopka .profile img:active { transform: scale(1.1); }
+
+  .stopka .profile .name {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #000000;
+    line-height: 1.3;
+  }
+
+  .stopka .profile .name span {
+    display: block;
+  }
+
+  .stopka .credits {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    font-size: 14px;
+    color: #000000;
+    line-height: 1.5;
+  }
+
+  .stopka .credits p {
+    margin: 0 0 14px;
+  }
+
+  .stopka .credits p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (min-width: 761px) {
+    .stopka .credits {
+      max-width: 620px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  @media (max-width: 440px) {
+    .stopka .stopka-profiles {
+      gap: 16px;
+      flex-wrap: nowrap;
+    }
+
+    .stopka .profile { max-width: 130px; }
+
+    .stopka .profile img {
+      width: 96px;
+      height: 96px;
+    }
+
+    .stopka .profile .name {
+      font-size: 16px;
+    }
+  }
+
+
+
+  @media (max-width:740px){
+    :root{--bottom-safe:calc(60px + env(safe-area-inset-bottom, 0px))}
+    .spin__content{position:absolute; left:50%; top:25%; transform:translate(-50%,-50%); width:calc(100% - 32px)}
+    .map-story-step + .map-story-step:not([data-story="explore"]){
+      margin-top:max(180px,calc(var(--screen) * .3));
+    }
+    .map-story-step[data-story="accidents"] + .map-story-step[data-story="torun"]{
+      margin-top:max(240px,calc(var(--screen) * .5));
+    }
+    .map-story-step,.map-story-step:nth-child(even),
+    .map-story-step[data-story="torun-hotspot"],
+    .map-story-step[data-story="kruszyna"]{
+      align-items:flex-end; justify-content:center;
+      padding:calc(var(--screen) * .08) 16px calc(var(--screen) * .12);
+    }
+    .map-story-step[data-story="explore"]{padding:0 16px}
+    .map-story-card{width:min(520px,calc(100vw - 32px));padding:20px 21px}
+    .map-story-card h2{font-size:1.35rem}
+    .map-story-card p{font-size:.88rem;line-height:1.42}
+    .stage{
+      --stats-sheet-max:min(calc(var(--screen) * .46),420px);
+    }
+    .stage{--ui-gap:12px}
+    .controls{width:calc(100% - var(--ui-gap) * 2)}
+    .controls input{height:38px; font-size:.82rem; font-weight:600}
+    .stats{
+      top:auto; left:var(--ui-gap); right:var(--ui-gap); bottom:calc(var(--ui-gap) + var(--bottom-safe)); width:auto;
+      max-height:var(--stats-sheet-max); border-radius:var(--ui-radius);
+      z-index:900;
+      transition:max-height .24s ease,transform .24s ease;
+    }
+    .stats__bar{height:48px; padding:0 6px}
+    .stats__collapse-icon{transform:rotate(0deg)}
+    .stats.is-collapsed .stats__collapse-icon{transform:rotate(180deg)}
+    .stats__back,
+    .stats__collapse{height:36px; padding:0 10px; font-size:.76rem}
+    .stats__scroll{
+      padding:12px 14px 14px;
+      overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+    }
+    .stats.is-collapsed{max-height:48px}
+    .stage:has(.stats:not(.off):not(.is-collapsed)) .road-legend,
+    .stage:has(.stats:not(.off):not(.is-collapsed)) .map-legend{bottom:calc(var(--stats-sheet-max) + 24px + var(--bottom-safe))}
+    .stage:has(.stats.is-collapsed:not(.off)) .road-legend,
+    .stage:has(.stats.is-collapsed:not(.off)) .map-legend{bottom:calc(72px + var(--bottom-safe))}
+    .stage:has(.stats:not(.off):not(.is-collapsed)) .leaflet-bottom.leaflet-right .leaflet-control-zoom{margin-bottom:calc(var(--stats-sheet-max) + 24px + var(--bottom-safe))}
+    .stage:has(.stats.is-collapsed:not(.off)) .leaflet-bottom.leaflet-right .leaflet-control-zoom{margin-bottom:calc(72px + var(--bottom-safe))}
+    .road-legend,
+    .map-legend{left:12px; bottom:calc(12px + var(--bottom-safe)); width:min(236px,calc(100% - 24px))}
+    .leaflet-bottom.leaflet-right .leaflet-control-zoom{margin:0 12px calc(12px + var(--bottom-safe)) 0}
+
+    .attrib-toggle{right:16px; bottom:calc(82px + var(--bottom-safe))}
+    .attrib{
+      right:12px; bottom:calc(112px + var(--bottom-safe)); left:auto;
+      width:min(280px,calc(100% - 24px)); max-width:none; white-space:normal;
+    }
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+
+  .portfolio-link{
+    position:fixed; top:14px; left:14px; z-index:10050;
+    display:inline-flex; align-items:center; gap:8px;
+    min-height:44px; padding:0 14px;
+    background:#fff; color:#111;
+    font:500 14px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;
+    text-decoration:none;
+    box-shadow:0 2px 6px rgba(0,0,0,.18);
+  }
+  .portfolio-link span{font-size:16px; line-height:.7}
+  .portfolio-link b{font-weight:400; color:rgba(17,17,17,.7)}
+  .portfolio-link:hover{opacity:.65}
+  .portfolio-link:focus-visible{outline:2px solid #e2231a; outline-offset:4px}
+  @media(max-width:520px){.portfolio-link{top:10px;left:10px;padding:0 11px}.portfolio-link b{display:none}}
+  @media print{.portfolio-link{display:none}}
+
+  .hero__title span{color:#ffd200}
+  .profile-monogram{display:grid;place-items:center;width:104px;height:104px;margin:0 auto 8px;border-radius:50%;background:#e7e2da;color:#2e333d;font:700 26px/1 var(--sans)}
+</style>
+</head>
+<body>
+  <a class="portfolio-link" href="../#/data-viz" aria-label="Back to Anastasiia Morozova’s portfolio: data &amp; viz"><span aria-hidden="true">←</span> Anastasiia Morozova <b>/ data &amp; viz</b></a>
+
+
+
+
+
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+<main class="story">
+
+
+  <section class="hero" id="hero">
+
+    <div class="hero__bg" id="heroBg" aria-hidden="true">
+      <video class="hero__video" autoplay muted loop playsinline preload="auto">
+        <source src="assets_sklad/tlo_vid_1.mp4" type="video/mp4">
+      </video>
+
+      <video class="hero__video" muted playsinline preload="auto">
+        <source src="assets_sklad/tlo_vid_1.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="hero__scrim" aria-hidden="true"></div>
+
+    <div class="wrap">
+
+      <h1 class="hero__title">RISK<br><span>MAP</span></h1>
+      <div class="hero__lead">
+        <p>Poland’s roads are among the most dangerous in Europe. But the risk is not evenly distributed, and crashes do not happen at random. Every municipality has streets where another collision no longer surprises anyone.</p>
+        <p><p>I analysed nearly 3.4 million police records of collisions and crashes from 2018–2025, mapped them onto almost 600,000 kilometres of road and compared all 2,479 municipalities in Poland.</p> Readers can use the interactive map to see the pattern in their own area.</p>
+      </div>
+    </div>
+
+    <div class="hero__scroll" aria-hidden="true">
+      Scroll
+      <span></span>
+    </div>
+  </section>
+
+
+  <section class="map-section has-story" id="mapa">
+    <div class="map-sticky">
+    <div class="map-frame">
+<div class="stage">
+  <div id="map"></div>
+  <div class="spin is-indeterminate" id="spin" role="status" aria-live="polite" aria-label="Loading Map">
+    <div class="spin__content">
+      <div class="spin__progress" aria-hidden="true">
+        <svg class="spin__svg" viewBox="0 0 40 40">
+          <circle class="spin__track" cx="20" cy="20" r="16" pathLength="100"></circle>
+          <circle class="spin__value" id="spinCircle" cx="20" cy="20" r="16" pathLength="100"></circle>
+        </svg>
+        <strong class="spin__percent" id="spinPercent">…</strong>
+      </div>
+      <span class="spin__label" id="spinLabel">Loading map…</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div id="defaultSearchSlot"></div>
+	    <div class="metric-picker" id="metricPicker">
+	      <select class="metric-picker__native" id="overviewMetric" aria-hidden="true" tabindex="-1">
+	        <option value="incidents">Incidents per 10,000 residents</option>
+	        <option value="collisions">Collisions per 10,000 residents</option>
+	        <option value="accidents">Crashes per 10,000 residents</option>
+	        <option value="severe">Serious and fatal incidents per 10,000</option>
+	        <option value="fatalShare">Fatal incidents as a share of all incidents</option>
+	        <option value="change">Change in the number of incidents, 2018–2025</option>
+	      </select>
+	      <button class="metric-picker__button" id="overviewMetricButton" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="overviewMetricMenu">
+	        <span class="metric-picker__button-label" id="overviewMetricButtonLabel">Incidents per 10,000 residents</span>
+	        <span class="metric-picker__chevron" aria-hidden="true"></span>
+	      </button>
+	      <div class="metric-picker__menu" id="overviewMetricMenu" role="listbox" aria-label="Map Color Indicator" hidden></div>
+	    </div>
+  </div>
+
+
+	  <div class="map-touch-hint" id="mapTouchHint" aria-hidden="true">
+	    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+	      <path d="M12 3v18M3 12h18M12 3 9 6M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>
+	    </svg>
+	    <span>Use two fingers to pan or zoom the map</span>
+	  </div>
+
+	  <aside class="panel stats off" id="stats" aria-live="polite"></aside>
+	  <div class="map-legend-stack">
+	  <div class="map-legend__tip">
+	    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+	      <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/>
+	    </svg>
+	    <span>Hold      <kbd class="key-ctrl">Ctrl</kbd><kbd class="key-cmd">⌘ Cmd</kbd>      and scroll to zoom the map</span>
+	  </div>
+	  <div class="map-legend off" id="map-legend">
+	    <div class="title" id="mapLegendTitle">Incidents per 10,000 residents</div>
+	    <div class="bar"><span class="ramp"></span><i class="avg"></i><i class="me" id="legendMe"></i></div>
+	    <div class="marks">
+	      <span class="lo" id="mapLegendLo">280</span>
+	      <span class="mid" id="mapLegendMid">average 910</span>
+	      <span class="hi" id="mapLegendHi">1600+</span>
+	    </div>
+	  </div>
+	  <div class="road-legend off" id="road-legend" aria-hidden="true">
+	    <div class="title" id="roadLegendTitle">Number of incidents</div>
+	    <div class="scale"><span>0</span><div class="bar"></div><span id="road-legend-max">max</span></div>
+	  </div>
+	  </div>
+
+  <div class="map-hint" id="mapHint" role="status" aria-live="polite">
+    <span class="map-hint__mouse">
+      
+      
+      
+      
+      
+      Hold      <kbd class="key-ctrl">Ctrl</kbd><kbd class="key-cmd">⌘ Cmd</kbd>      and scroll to zoom the map.
+    
+    
+    
+    
+    
+    </span>
+    <span class="map-hint__touch">
+      
+      
+      
+      
+      
+      Use two fingers to pan and zoom the map.
+    
+    
+    
+    
+    
+    </span>
+  </div>
+
+  <button class="attrib-toggle" id="attribToggle" type="button"
+          aria-label="Data sources" aria-expanded="false" aria-controls="attrib">i</button>
+  <div class="attrib off" id="attrib">
+    
+    
+    
+    
+    
+    Data: Polish Road Safety Observatory, GUGiK, Statistics Poland/BDL, Geofabrik/OSM · Map: <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> · OpenStreetMap contributors
+  </div>
+</div>
+    </div>
+    </div>
+    <div class="map-story-steps" id="mapStorySteps">
+      <section class="map-story-step is-active" id="map-story-start" data-story="overview">
+        <article class="map-story-card">
+          <p>First, I assign every incident to a municipality and divide by its population. This shows where a collision is more likely. You can see a clear pattern: municipalities form distinct lines across the country.</p>
+        </article>
+      </section>
+      <section class="map-story-step" data-story="motorways">
+        <article class="map-story-card">
+          <p>The reason becomes obvious when motorways and expressways are overlaid on the map. Chains of red municipalities cross successive regions along the exact paths of the A1, A4 and S7.</p>
+          <p>A small resident population combined with a major national route produces the highest per-capita rates. A motorway or expressway crosses every municipality in the top ten. The rural municipality surrounding the border city of Zgorzelec, crossed by the A4, leads the first five, followed by Krotoszyce (A4 and S3), Kobierzyce (A4 and S8), Kostomłoty (A4) and Kamieńsk (A1).</p>
+        </article>
+      </section>
+      <section class="map-story-step" data-story="accidents">
+        <article class="map-story-card">
+          <p>Now leave only crashes that caused injury or death. They account for just 5.7% of the police records—fewer than 193,000 of 3.4 million.</p>
+          <p>There is no single pattern here. Major transit routes and many large urban centres fade, particularly in Kuyavian-Pomeranian Voivodeship and the Warsaw metropolitan area.</p>
+          <p>Southern Lesser Poland, Kashubia, the area around Kutno and a belt from southern Mazovia towards Łódź stand out in the opposite direction. Although casualty crashes occur most often outside built-up areas, Łódź has one of the country’s worst crash rates—and the worst among all large cities.</p>
+        </article>
+      </section>
+      <section class="map-story-step" data-story="torun">
+        <article class="map-story-card">
+          <p>Toruń is a good example. The database contains 25,072 incidents there, including 354 crashes that caused injury or death. As in many large cities, its per-capita incident rate is above average. Yet the city performs very well on the share of the most serious incidents: just 1.4% of all reports, the lowest among Poland’s large cities.</p>
+          <div class="map-story-data-sample">
+            <div class="hero-stat">
+              <div class="hero-stat__value" style="color:#db2042">1,300.5</div>
+              <div class="hero-stat__unit">incidents per 10,000 residents, 2018–2025</div>
+              <div class="hero-stat__delta is-above">+42.8% above the national average</div>
+            </div>
+            <div class="gauge">
+              <span class="gauge__ramp"></span>
+              <i class="gauge__avg"></i>
+              <i class="gauge__me" style="left:77.3%"></i>
+            </div>
+            <div class="gauge-scale">
+              <span class="lo">280</span><span class="mid">average 910</span><span class="hi">1600+</span>
+            </div>
+            <div class="rank"><b>138.</b>      worst municipality in Poland out of 2,479</div>
+            <div class="tiles">
+              <div class="tile tile--all"><b>25 072</b><span>incidents</span></div>
+              <div class="tile tile--collision"><b>24 718</b><span>collisions</span><em>98.6% of incidents</em></div>
+              <div class="tile tile--hard"><b>314</b><span>injury crashes</span><em>1.3% of incidents</em></div>
+              <div class="tile tile--fatal"><b>40</b><span>fatal</span><em>0.2% of incidents</em></div>
+            </div>
+          </div>
+          <p>The map also reveals several places to which police returned unusually often: the junction of Podgórska and Poznańska streets beneath the railway overpass, familiar to residents on the left bank; the old bridge; and Szosa Lubicka. One location stands out far more than the rest.</p>
+        </article>
+      </section>
+      <section class="map-story-step" data-story="torun-hotspot">
+        <article class="map-story-card">
+          <p>Toruń’s densest cluster is beside the Plaza shopping centre. Police recorded more than 600 incidents within a 200-metre radius over seven years. A large, busy junction with trams, a shopping centre and retail park surrounded by huge car parks creates the city’s perfect recipe for collisions.</p>
+        </article>
+      </section>
+      <section class="map-story-step" data-story="klodzko">
+        <article class="map-story-card">
+          <p>The same mechanism appears at the other end of Poland. The Twierdza Kłodzko shopping centre accounts for 434 incidents—one in every seven police reports in Kłodzko. The map contains dozens of similar places, including Manufaktura in Łódź, Dąbrówka in Katowice and Hetmańska in Białystok. Car parks make it very easy to dent a bumper.</p>
+        </article>
+      </section>
+      <section class="map-story-step" data-story="kruszyna">
+        <article class="map-story-card">
+          <p>Kruszyna confirms the motorway pattern. This rural municipality of 4,600 residents near Częstochowa is crossed by the A1, which accounts for more than two thirds of all collisions recorded there. With the motorway included, Kruszyna is near the top nationally. Without A1 incidents, it would fall to 1,809th place, close to the national average.</p>
+          <div class="map-story-data-sample">
+            <div class="hero-stat">
+              <div class="hero-stat__value" style="color:#db2042">1,667.7</div>
+              <div class="hero-stat__unit">incidents per 10,000 residents, 2018–2025</div>
+              <div class="hero-stat__delta is-above">+83.2% above the national average</div>
+            </div>
+            <div class="gauge">
+              <span class="gauge__ramp"></span>
+              <i class="gauge__avg"></i>
+              <i class="gauge__me" style="left:96%"></i>
+            </div>
+            <div class="gauge-scale">
+              <span class="lo">280</span><span class="mid">average 910</span><span class="hi">1600+</span>
+            </div>
+            <div class="rank"><b>44.</b>      worst municipality in Poland out of 2,479</div>
+          </div>
+        </article>
+      </section>
+      <section class="map-story-step" data-story="explore">
+        <div class="map-story-explore-anchor">
+        <article class="map-story-card map-story-card--explore">
+          <button class="map-story-close" id="exploreDismiss" type="button" aria-label="Close and go to the map">×</button>
+          <h2>Now check your municipality</h2>
+          <p>In one municipality the motorway drives the result; elsewhere it may be a shopping-centre car park, a market square or a single busy junction. Search for a place or select it on the map to inspect the data and its most dangerous locations.</p>
+          <div class="search map-story-search">
+            <input id="story-gmina-search" type="text" autocomplete="off" inputmode="search" spellcheck="false" placeholder="Search for your town" role="combobox" aria-autocomplete="list" aria-label="Place" aria-controls="suggestions" aria-expanded="false" />
+            <div id="suggestions" class="suggestions" role="listbox"></div>
+          </div>
+          <p class="map-story-tip">
+            <svg class="map-story-tip__icon map-story-tip__icon--mouse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/>
+            </svg>
+            <svg class="map-story-tip__icon map-story-tip__icon--touch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v18M3 12h18M12 3 9 6M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>
+            </svg>
+            <span class="map-story-tip__mouse">Hold      <kbd class="key-ctrl">Ctrl</kbd><kbd class="key-cmd">⌘ Cmd</kbd>      and scroll to zoom the map</span>
+            <span class="map-story-tip__touch">Use two fingers to pan or zoom the map</span>
+          </p>
+        </article>
+        </div>
+      </section>
+    </div>
+  </section>
+
+
+</main>
+
+
+
+
+<script>
+
+
+(function () {
+  function preventPolishOrphans(root) {
+    if (!root) return;
+    Array.prototype.forEach.call(root.querySelectorAll('p'), function (paragraph) {
+      var walker = document.createTreeWalker(paragraph, NodeFilter.SHOW_TEXT);
+      var nodes = [];
+      var node;
+      while ((node = walker.nextNode())) nodes.push(node);
+      nodes.forEach(function (textNode) {
+        textNode.nodeValue = textNode.nodeValue.replace(/(^|[\s\u00a0])([AaIiOoUuWwZz])[\t ]+(?=\S)/g, '$1$2\u00a0');
+      });
+    });
+  }
+
+  function boot() {
+    preventPolishOrphans(document.querySelector('.story'));
+    var deferred = document.querySelectorAll('img[data-src]');
+    Array.prototype.forEach.call(deferred, function (img) {
+      img.src = img.getAttribute('data-src');
+      img.removeAttribute('data-src');
+    });
+    window.appReady = true;
+    window.dispatchEvent(new Event('app:ready'));
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
+})();
+</script>
+
+<script>
+
+
+(function () {
+  var bg = document.getElementById('heroBg');
+  if (!bg) return;
+
+  var vids = bg.querySelectorAll('video');
+  if (vids.length < 2) return;
+
+  var a = vids[0], b = vids[1];
+
+  var raw = getComputedStyle(document.documentElement)
+    .getPropertyValue('--hero-xfade').trim();
+  var FADE = parseFloat(raw) || 1.1;
+  if (/ms$/.test(raw)) FADE = FADE / 1000;
+
+
+  a.removeAttribute('loop');
+  b.removeAttribute('loop');
+
+  var active = a;
+  var busy = false;
+
+  function play(v) {
+    var p = v.play();
+    if (p && p.catch) p.catch(function () {});
+  }
+
+  function swap() {
+    var next = (active === a) ? b : a;
+    var prev = active;
+
+    next.currentTime = 0;
+    play(next);
+
+
+    next.style.zIndex = '2';
+    next.style.transition = 'none';
+    next.style.opacity = '0';
+    void next.offsetWidth;
+    next.style.transition = 'opacity ' + FADE + 's linear';
+    next.style.opacity = '1';
+
+    active = next;
+    busy = true;
+
+    window.setTimeout(function () {
+      prev.pause();
+      prev.style.transition = 'none';
+      prev.style.opacity = '0';
+      prev.style.zIndex = '1';
+      busy = false;
+    }, FADE * 1000 + 80);
+  }
+
+  function tick() {
+    var d = active.duration;
+
+    if (!busy && d && isFinite(d)) {
+      if (d <= FADE * 2) {
+        if (active.currentTime >= d - 0.05) { active.currentTime = 0; play(active); }
+      } else if (active.currentTime >= d - FADE) {
+        swap();
+      }
+    }
+    window.requestAnimationFrame(tick);
+  }
+
+  a.style.zIndex = '2';
+  a.style.opacity = '1';
+  b.style.zIndex = '1';
+  play(a);
+  window.requestAnimationFrame(tick);
+})();
+
+(function () {
+  var videos = document.querySelectorAll('.section-bg video');
+  if (!videos.length || !('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      var video = entry.target;
+      if (entry.isIntersecting) {
+        var p = video.play();
+        if (p && p.catch) p.catch(function () {});
+      } else {
+        video.pause();
+      }
+    });
+  }, { rootMargin: '200px 0px' });
+  Array.prototype.forEach.call(videos, function (v) { io.observe(v); });
+})();
+</script>
+
+<script>
+(function () {
+  var act = document.querySelector('.act-two');
+  if (!act) return;
+  var rankData = {
+    events:{
+      unit:'Incidents per 10,000 residents, 2018–2025',
+      worst:{
+        all:[['Zgorzelec',4202.7],['Krotoszyce',3297.0],['Kobierzyce',2986.0],['Kostomłoty',2938.5],['Kamieńsk',2815.7]],
+        large:[['Katowice',1751.7],['Kielce',1534.8],['Opole',1524.4],['Częstochowa',1511.4],['Rzeszów',1477.9]]
+      },
+      best:{
+        all:[['Wietrzychowice',163.7],['Rokietnica',186.5],['Bolesław',187.5],['Szerzyny',189.1],['Mędrzechów',193.8]],
+        large:[['Rybnik',789.5],['Ruda Śląska',847.1],['Zabrze',889.6],['Bytom',900.4],['Gdynia',934.3]]
+      }
+    },
+    accidents:{
+      unit:'Crashes per 10,000 residents, 2018–2025',
+      worst:{
+        all:[['Strzelce',305.4],['Krzyżanów',278.6],['Krotoszyce',193.6],['Inowłódz',183.0],['Dmosin',181.2]],
+        large:[['Łódź',129.3],['Rzeszów',101.7],['Radom',96.9],['Poznań',96.8],['Częstochowa',83.3]]
+      },
+      best:{
+        all:[['Rybczewice',3.2],['Przelewice',4.6],['Horyniec-Zdrój',4.9],['Lubaczów',6.8],['Przemyśl',7.5]],
+        large:[['Toruń',18.4],['Koszalin',20.0],['Białystok',24.6],['Gorzów Wlkp.',24.9],['Bielsko-Biała',25.4]]
+      }
+    }
+  };
+  var rankButtons = act.querySelectorAll('[data-rank-metric]');
+  var rankLists = act.querySelectorAll('[data-rank-list]');
+  function renderRankings(side, metric) {
+    var selected = rankData[metric] || rankData.events;
+    Array.prototype.forEach.call(act.querySelectorAll('[data-rank-unit="' + side + '"]'), function (node) {
+      node.textContent = selected.unit;
+    });
+    Array.prototype.forEach.call(rankLists, function (list) {
+      var parts = list.dataset.rankList.split('-');
+      if (parts[0] !== side) return;
+      var scope = parts[1];
+      var rows = selected[side][scope];
+      var scaleRows = selected[side].all.concat(selected[side].large);
+      var max = Math.max.apply(null, scaleRows.map(function (row) { return row[1]; }));
+      list.textContent = '';
+      rows.forEach(function (row) {
+        var item = document.createElement('div');
+        item.className = 'act2-rank-row';
+        var name = document.createElement('span');
+        name.className = 'act2-rank-row__name';
+        name.textContent = row[0];
+        var track = document.createElement('div');
+        track.className = 'act2-bar__track';
+        var fill = document.createElement('span');
+        fill.className = 'act2-bar__fill';
+        fill.style.setProperty('--act2-w', (row[1] / max * 100).toFixed(2) + '%');
+        track.appendChild(fill);
+        var value = document.createElement('span');
+        value.className = 'act2-rank-row__value';
+        value.textContent = row[1].toLocaleString('en-GB', { maximumFractionDigits:0 });
+        item.appendChild(name); item.appendChild(track); item.appendChild(value);
+        list.appendChild(item);
+      });
+    });
+    Array.prototype.forEach.call(rankButtons, function (button) {
+      if (button.dataset.rankSide !== side) return;
+      var active = button.dataset.rankMetric === metric;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+  Array.prototype.forEach.call(rankButtons, function (button) {
+    button.addEventListener('click', function () { renderRankings(button.dataset.rankSide, button.dataset.rankMetric); });
+  });
+  if (rankLists.length) {
+    renderRankings('worst', 'events');
+    renderRankings('best', 'events');
+  }
+  var heatmap = document.getElementById('act2-heatmap');
+  var fatalHeatmap = document.getElementById('act2-fatal-heatmap');
+  if (heatmap && fatalHeatmap) {
+    var heatmapPalette = ['#fff4c2','#fee391','#fec44f','#fd8d3c','#ed3941','#d01443','#9d0f3d'];
+    function heatmapColor(value) {
+      var scaled = Math.max(0, Math.min(1, value)) * (heatmapPalette.length - 1);
+      var fromIndex = Math.floor(scaled);
+      var toIndex = Math.min(heatmapPalette.length - 1, fromIndex + 1);
+      var mix = scaled - fromIndex;
+      function channel(hex, offset) { return parseInt(hex.slice(offset, offset + 2), 16); }
+      var from = heatmapPalette[fromIndex];
+      var to = heatmapPalette[toIndex];
+      var red = Math.round(channel(from, 1) + (channel(to, 1) - channel(from, 1)) * mix);
+      var green = Math.round(channel(from, 3) + (channel(to, 3) - channel(from, 3)) * mix);
+      var blue = Math.round(channel(from, 5) + (channel(to, 5) - channel(from, 5)) * mix);
+      return 'rgb(' + red + ',' + green + ',' + blue + ')';
+    }
+    var days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    var heatmapData = {
+      events:[
+        [3993,2543,2008,2110,3047,8862,17817,28548,31113,29287,32152,34019,34872,36239,42049,44921,44440,35988,29187,22134,16703,12753,9574,5225],
+        [3448,2213,1752,1749,2578,8014,17033,28795,30863,29011,31606,33173,34087,35044,41083,44619,44149,35746,28763,21983,16341,12939,9589,5364],
+        [3482,2380,1863,1774,2541,7933,16894,28468,30240,28196,30875,32387,33316,34568,40861,44494,44166,36431,29567,22595,17057,13201,9956,5773],
+        [3574,2435,2030,1841,2569,7899,16510,27314,29344,28177,31011,33103,34010,35417,41501,44243,43697,35879,29821,22980,17754,13990,10297,6265],
+        [4066,2751,2180,1993,2767,7866,16206,26243,29207,30162,34249,36873,39085,41157,48067,49394,47617,39545,33805,26789,21229,17140,13756,9371],
+        [6915,5147,3987,3458,3729,5216,7288,9743,15147,22384,30176,34307,35194,33082,31726,27139,26523,25000,24250,21315,17944,15316,12705,9858],
+        [7436,6017,4813,4107,3936,3833,4620,5095,6480,8720,12913,16564,19171,20135,21336,21655,22509,23638,23020,20555,16414,12792,9214,5936]
+      ],
+      accidents:[
+        [208,161,139,107,217,827,1373,1748,1540,1452,1586,1646,1679,1924,2155,2331,2398,2166,1799,1436,921,639,493,283],
+        [177,123,107,110,157,676,1273,1754,1499,1385,1415,1445,1537,1746,2060,2243,2385,2108,1743,1351,944,659,475,250],
+        [179,123,129,109,181,645,1211,1747,1518,1355,1410,1572,1552,1764,2057,2269,2453,2229,1805,1333,888,730,558,282],
+        [180,133,120,90,159,676,1301,1672,1463,1395,1488,1632,1577,1727,2030,2296,2333,2123,1831,1359,992,778,521,344],
+        [208,132,121,137,211,670,1291,1579,1408,1462,1689,1714,1870,2076,2383,2558,2607,2447,2209,1669,1234,988,793,554],
+        [429,312,294,274,281,439,530,636,852,1219,1582,1870,1827,1840,1863,1665,1755,1774,1766,1561,1205,1000,845,645],
+        [531,431,379,328,347,351,385,327,444,575,873,1160,1313,1426,1516,1627,1784,1851,1741,1424,1041,747,470,306]
+      ],
+      fatal:[
+        [30,41,32,24,50,98,137,116,92,102,117,106,121,131,132,138,170,189,153,129,85,72,68,49],
+        [37,21,25,31,34,85,114,80,84,94,78,104,114,118,123,130,156,164,141,128,100,68,52,46],
+        [29,31,32,28,36,67,102,96,83,89,99,109,103,117,136,145,159,179,135,129,86,103,75,63],
+        [32,26,29,29,30,81,128,105,91,90,100,111,109,135,133,143,159,144,139,116,109,97,59,50],
+        [36,25,24,25,45,90,111,111,90,85,112,122,108,133,133,140,189,207,200,158,125,143,112,96],
+        [67,39,48,52,59,76,77,77,73,90,99,101,117,134,148,96,187,181,156,187,166,143,124,97],
+        [73,56,72,64,69,66,58,41,49,66,78,85,98,115,124,125,168,170,146,145,116,128,80,45]
+      ],
+      fatalShare:[
+        [.751,1.612,1.594,1.137,1.641,1.106,.769,.406,.296,.348,.364,.312,.347,.361,.314,.307,.383,.525,.524,.583,.509,.565,.710,.938],
+        [1.073,.949,1.427,1.772,1.319,1.061,.669,.278,.272,.324,.247,.314,.334,.337,.299,.291,.353,.459,.490,.582,.612,.526,.542,.858],
+        [.833,1.303,1.718,1.578,1.417,.845,.604,.337,.274,.316,.321,.337,.309,.338,.333,.326,.360,.491,.457,.571,.504,.780,.753,1.091],
+        [.895,1.068,1.429,1.575,1.168,1.025,.775,.384,.310,.319,.322,.335,.320,.381,.320,.323,.364,.401,.466,.505,.614,.693,.573,.798],
+        [.885,.909,1.101,1.254,1.626,1.144,.685,.423,.308,.282,.327,.331,.276,.323,.277,.283,.397,.523,.592,.590,.589,.834,.814,1.024],
+        [.969,.758,1.204,1.504,1.582,1.457,1.057,.790,.482,.402,.328,.294,.332,.405,.466,.354,.705,.724,.643,.877,.925,.934,.976,.984],
+        [.982,.931,1.496,1.558,1.753,1.722,1.255,.805,.756,.757,.604,.513,.511,.571,.581,.577,.746,.719,.634,.705,.707,1.001,.868,.758]
+      ]
+    };
+    var heatmapButtons = act.querySelectorAll('[data-heatmap-metric]');
+    var heatmapSub = document.getElementById('act2-heatmap-sub');
+    var heatmapKeyLow = document.getElementById('act2-heatmap-key-low');
+    var heatmapKeyHigh = document.getElementById('act2-heatmap-key-high');
+    var heatmapLabels = {
+      events:{value:'incidents', aria:'all incidents', low:'fewer incidents', high:'more incidents', sub:'Number of all incidents by weekday and hour'},
+      accidents:{value:'crashes', aria:'crashes', low:'fewer crashes', high:'more crashes', sub:'Number of crashes by weekday and hour'},
+      fatal:{value:'fatal incidents', aria:'fatal incidents', low:'fewer fatal incidents', high:'more fatal incidents', sub:'Number of fatal incidents by weekday and hour'}
+    };
+    function renderHeatmap(target, values, metric, colorMax) {
+      var shareMode = metric === 'fatalShare';
+      var flatValues = [].concat.apply([], values);
+      var maxValue = Math.max.apply(null, flatValues);
+      var scaleMax = colorMax || maxValue;
+      var maxIndex = flatValues.indexOf(maxValue);
+      var focusDay = Math.floor(maxIndex / 24);
+      var focusHour = maxIndex % 24;
+      target.innerHTML = '';
+      var corner = document.createElement('span');
+      corner.className = 'act2-heatmap__corner';
+      target.appendChild(corner);
+      values[0].forEach(function (_, hour) {
+        var label = document.createElement('span');
+        label.className = 'act2-heatmap__hour';
+        label.textContent = hour % 3 === 0 ? hour : '';
+        target.appendChild(label);
+      });
+      days.forEach(function (day, dayIndex) {
+        var dayLabel = document.createElement('span');
+        dayLabel.className = 'act2-heatmap__day';
+        dayLabel.textContent = day;
+        target.appendChild(dayLabel);
+        values[dayIndex].forEach(function (value, hour) {
+          var displayValue = shareMode
+            ? value.toLocaleString('en-GB', {minimumFractionDigits:3, maximumFractionDigits:3}) + '%'
+            : value.toLocaleString('en-GB') + ' ' + heatmapLabels[metric].value;
+          var cell = document.createElement('span');
+          cell.className = 'act2-heatmap__cell';
+          cell.style.setProperty('--heat-color', heatmapColor(value / scaleMax));
+          cell.setAttribute('aria-label', day + ', hour ' + hour + ': ' + displayValue);
+          if (!shareMode && dayIndex === focusDay && hour === focusHour) {
+            cell.classList.add('is-focus');
+            cell.setAttribute('data-hour', hour);
+          }
+          target.appendChild(cell);
+        });
+      });
+      target.setAttribute('aria-label', shareMode
+        ? 'Heat map of fatal incidents as a share of all incidents by weekday and hour'
+        : 'Heat map showing the number of ' + heatmapLabels[metric].aria + ' by weekday and hour');
+      return { day:focusDay, hour:focusHour, value:maxValue };
+    }
+    function setWeeklyHeatmap(metric) {
+      renderHeatmap(heatmap, heatmapData[metric], metric);
+      heatmapSub.textContent = heatmapLabels[metric].sub;
+      heatmapKeyLow.textContent = heatmapLabels[metric].low;
+      heatmapKeyHigh.textContent = heatmapLabels[metric].high;
+      Array.prototype.forEach.call(heatmapButtons, function (button) {
+        var active = button.dataset.heatmapMetric === metric;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+    Array.prototype.forEach.call(heatmapButtons, function (button) {
+      button.addEventListener('click', function () { setWeeklyHeatmap(button.dataset.heatmapMetric); });
+    });
+    var fatalHeatmapSub = document.getElementById('act2-fatal-heatmap-sub');
+    setWeeklyHeatmap('events');
+    renderHeatmap(fatalHeatmap, heatmapData.fatalShare, 'fatalShare');
+    fatalHeatmapSub.textContent = 'Fatal incidents as a share of all incidents by weekday and hour';
+  }
+  Array.prototype.forEach.call(act.querySelectorAll('.act2-heatmap-scroll'), function (scroller) {
+    var pointerId = null;
+    var startX = 0;
+    var startY = 0;
+    var startScroll = 0;
+    var directionDecided = false;
+    var horizontalDrag = false;
+    scroller.addEventListener('pointerdown', function (event) {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      pointerId = event.pointerId;
+      startX = event.clientX;
+      startY = event.clientY;
+      startScroll = scroller.scrollLeft;
+      directionDecided = false;
+      horizontalDrag = false;
+      try { scroller.setPointerCapture(pointerId); } catch (_) {}
+    });
+    scroller.addEventListener('pointermove', function (event) {
+      if (event.pointerId !== pointerId) return;
+      var deltaX = event.clientX - startX;
+      var deltaY = event.clientY - startY;
+      if (!directionDecided && Math.max(Math.abs(deltaX), Math.abs(deltaY)) > 5) {
+        directionDecided = true;
+        horizontalDrag = Math.abs(deltaX) > Math.abs(deltaY);
+      }
+      if (!horizontalDrag) return;
+      event.preventDefault();
+      scroller.classList.add('is-dragging');
+      scroller.scrollLeft = startScroll - deltaX;
+    });
+    function finishHeatmapDrag(event) {
+      if (pointerId === null || (event.pointerId !== undefined && event.pointerId !== pointerId)) return;
+      var finishedPointerId = pointerId;
+      pointerId = null;
+      directionDecided = false;
+      horizontalDrag = false;
+      scroller.classList.remove('is-dragging');
+      try { scroller.releasePointerCapture(finishedPointerId); } catch (_) {}
+    }
+    scroller.addEventListener('pointerup', finishHeatmapDrag);
+    scroller.addEventListener('pointercancel', finishHeatmapDrag);
+    scroller.addEventListener('lostpointercapture', finishHeatmapDrag);
+  });
+  var periodChartButtons = act.querySelectorAll('[data-period-chart-button]');
+  var periodCharts = act.querySelectorAll('[data-period-chart]');
+  var periodChartTitle = document.getElementById('act2-monthly-figure-title');
+  var periodChartSub = document.getElementById('act2-period-chart-sub');
+  function buildMobilePeriodCharts() {
+    Array.prototype.forEach.call(periodCharts, function (chart) {
+      var svg = chart.querySelector('.act2-monthly__chart');
+      if (!svg || chart.querySelector('.act2-period-mobile')) return;
+      var bars = svg.querySelectorAll('.act2-monthly__bar');
+      var values = svg.querySelectorAll('.act2-monthly__value');
+      var labels = svg.querySelectorAll('.act2-monthly__axis text');
+      if (!bars.length) return;
+      var period = chart.dataset.periodChart;
+      var maxHeight = Math.max.apply(null, Array.prototype.map.call(bars, function (bar) {
+        return Number(bar.getAttribute('height')) || 0;
+      }));
+      var mobile = document.createElement('div');
+      mobile.className = 'act2-period-mobile act2-period-mobile--' + period;
+      mobile.style.setProperty('--period-count', bars.length);
+      mobile.setAttribute('role', 'img');
+      var title = svg.querySelector('title');
+      var desc = svg.querySelector('desc');
+      mobile.setAttribute('aria-label', ((title ? title.textContent + '. ' : '') + (desc ? desc.textContent : '')).trim());
+      Array.prototype.forEach.call(bars, function (bar, index) {
+        var item = document.createElement('span');
+        item.className = 'act2-period-mobile__item';
+        item.setAttribute('aria-hidden', 'true');
+        var plot = document.createElement('span');
+        plot.className = 'act2-period-mobile__plot';
+        var heightLimit = period === 'days' ? 88 : 96;
+        var height = maxHeight ? (Number(bar.getAttribute('height')) / maxHeight * heightLimit) : 0;
+        plot.style.setProperty('--period-height', height.toFixed(2) + '%');
+        var fill = document.createElement('span');
+        fill.className = 'act2-period-mobile__bar';
+        fill.style.setProperty('--period-color', bar.getAttribute('fill') || 'var(--act2-orange)');
+        plot.appendChild(fill);
+        if (period === 'days' && values[index]) {
+          var value = document.createElement('span');
+          value.className = 'act2-period-mobile__value';
+          var numericValue = Number(values[index].textContent.replace('%', '').replace(',', '.'));
+          value.textContent = Number.isFinite(numericValue)
+            ? numericValue.toLocaleString('en-GB', { minimumFractionDigits:2, maximumFractionDigits:2 }) + '%'
+            : values[index].textContent;
+          plot.appendChild(value);
+        }
+        var label = document.createElement('span');
+        label.className = 'act2-period-mobile__label';
+        label.textContent = labels[index] && (period !== 'hours' || index % 3 === 0) ? labels[index].textContent : '';
+        item.appendChild(plot);
+        item.appendChild(label);
+        mobile.appendChild(item);
+      });
+      svg.insertAdjacentElement('afterend', mobile);
+    });
+  }
+  buildMobilePeriodCharts();
+  function setPeriodChart(period) {
+    Array.prototype.forEach.call(periodChartButtons, function (button) {
+      var active = button.dataset.periodChartButton === period;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call(periodCharts, function (chart) {
+      chart.hidden = chart.dataset.periodChart !== period;
+    });
+    if (periodChartTitle) periodChartTitle.textContent = period === 'days'
+      ? 'How the fatality rate changes through the week'
+      : period === 'hours'
+        ? 'How the fatality rate changes through the day'
+        : 'How the fatality rate changes through the year';
+    if (periodChartSub) periodChartSub.textContent = period === 'days'
+      ? 'Fatal incidents as a share of all incidents by weekday, 2018–2025'
+      : period === 'hours'
+        ? 'Fatal incidents as a share of all incidents by hour, 2018–2025'
+        : 'Fatal incidents as a share of all incidents by month, 2018–2025';
+  }
+  Array.prototype.forEach.call(periodChartButtons, function (button) {
+    button.addEventListener('click', function () { setPeriodChart(button.dataset.periodChartButton); });
+  });
+  var trendSvg = act.querySelector('.act2-trend');
+  var trendTooltip = act.querySelector('.act2-trend-tooltip');
+  if (trendSvg && trendTooltip) {
+    var trendYears = [2018,2019,2020,2021,2022,2023,2024,2025];
+    var trendX = [52,147.4,242.9,338.3,433.7,529.1,624.6,720];
+    var trendValues = {
+      collision:[436403,455454,382046,422619,362266,365983,390580,391810],
+      accident:[31674,30288,23540,22816,21322,20936,21519,20925],
+      fatal:[2638,2672,2286,2074,1760,1732,1729,1545]
+    };
+    var trendY = {
+      collision:[53,32.9,110.3,67.5,131.1,127.2,101.3,100],
+      accident:[53,73.1,171.1,181.6,203.3,208.9,200.5,209.1],
+      fatal:[53,47.1,114.4,151.3,206.1,211,211.5,243.6]
+    };
+    var trendGuide = trendSvg.querySelector('.act2-trend__guide');
+    var trendPoints = {
+      collision:trendSvg.querySelector('.act2-trend__point--collision'),
+      accident:trendSvg.querySelector('.act2-trend__point--accident'),
+      fatal:trendSvg.querySelector('.act2-trend__point--fatal')
+    };
+    var trendIndex = trendYears.length - 1;
+    function trendFormat(value) {
+      return value.toLocaleString('en-GB');
+    }
+    function showTrendPoint(index) {
+      trendIndex = Math.max(0, Math.min(trendYears.length - 1, index));
+      var x = trendX[trendIndex];
+      trendGuide.setAttribute('x1', x);
+      trendGuide.setAttribute('x2', x);
+      Object.keys(trendPoints).forEach(function (key) {
+        var y = trendY[key][trendIndex];
+        if (y === null) {
+          trendPoints[key].setAttribute('visibility', 'hidden');
+          return;
+        }
+        trendPoints[key].removeAttribute('visibility');
+        trendPoints[key].setAttribute('cx', x);
+        trendPoints[key].setAttribute('cy', y);
+      });
+      trendTooltip.innerHTML =
+        '<strong>' + trendYears[trendIndex] + '</strong>' +
+        '<span><i style="--tooltip-color:var(--act2-gold)"></i>collisions<b>' + trendFormat(trendValues.collision[trendIndex]) + '</b></span>' +
+        '<span><i style="--tooltip-color:var(--act2-red)"></i>crashes<b>' + trendFormat(trendValues.accident[trendIndex]) + '</b></span>' +
+        '<span><i style="--tooltip-color:var(--ink)"></i>fatal incidents<b>' + trendFormat(trendValues.fatal[trendIndex]) + '</b></span>';
+      trendSvg.classList.add('is-interacting');
+      trendTooltip.classList.add('is-visible');
+      trendTooltip.setAttribute('aria-hidden', 'false');
+      var chartWidth = trendSvg.getBoundingClientRect().width;
+      var desiredLeft = x / 820 * chartWidth;
+      var halfTooltip = trendTooltip.offsetWidth / 2 + 4;
+      trendTooltip.style.left = Math.max(halfTooltip, Math.min(chartWidth - halfTooltip, desiredLeft)) + 'px';
+    }
+    function hideTrendPoint() {
+      trendSvg.classList.remove('is-interacting');
+      trendTooltip.classList.remove('is-visible');
+      trendTooltip.setAttribute('aria-hidden', 'true');
+    }
+    function trendIndexFromPointer(event) {
+      var matrix = trendSvg.getScreenCTM();
+      if (!matrix) return trendIndex;
+      var point = trendSvg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      var localX = point.matrixTransform(matrix.inverse()).x;
+      var nearest = 0;
+      var distance = Infinity;
+      trendX.forEach(function (x, index) {
+        var nextDistance = Math.abs(localX - x);
+        if (nextDistance < distance) {
+          distance = nextDistance;
+          nearest = index;
+        }
+      });
+      return nearest;
+    }
+    trendSvg.addEventListener('pointermove', function (event) {
+      showTrendPoint(trendIndexFromPointer(event));
+    });
+    trendSvg.addEventListener('pointerleave', hideTrendPoint);
+    trendSvg.addEventListener('focus', function () { showTrendPoint(trendIndex); });
+    trendSvg.addEventListener('blur', hideTrendPoint);
+    trendSvg.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowLeft') trendIndex--;
+      else if (event.key === 'ArrowRight') trendIndex++;
+      else if (event.key === 'Home') trendIndex = 0;
+      else if (event.key === 'End') trendIndex = trendYears.length - 1;
+      else if (event.key === 'Escape') {
+        hideTrendPoint();
+        trendSvg.blur();
+        return;
+      } else return;
+      event.preventDefault();
+      showTrendPoint(trendIndex);
+    });
+    window.addEventListener('resize', function () {
+      if (trendTooltip.classList.contains('is-visible')) showTrendPoint(trendIndex);
+    });
+  }
+  var visuals = act.querySelectorAll('.act2-visual');
+  if (!visuals.length) return;
+
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    Array.prototype.forEach.call(visuals, function (visual) { visual.classList.add('is-visible'); });
+    return;
+  }
+
+  act.classList.add('is-animated');
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold:.14, rootMargin:'0px 0px -8% 0px' });
+
+  Array.prototype.forEach.call(visuals, function (visual) { observer.observe(visual); });
+})();
+</script>
+
+<script>
+(function () {
+  var bar = document.getElementById('scrollProgress');
+  if (!bar) return;
+  var ticking = false;
+
+  function update(){
+    ticking = false;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+    bar.style.width = Math.max(0, Math.min(100, pct)) + '%';
+  }
+  function request(){
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(update);
+  }
+
+  window.addEventListener('scroll', request, { passive:true });
+  window.addEventListener('resize', request);
+  window.addEventListener('app:ready', update);
+  update();
+})();
+</script>
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+	  var BUILD_VER = '20260821-hotspoty-w-granicach-gmin';
+	  var selectedId = '';
+	  var hovered = '';
+	  var detailMode = 'roads';
+	  var currentDetail = null;
+	  var overviewLayer = null, boundaryLayer = null, hotspotLayer = null, roadLayer = null, pointsLayer = null;
+  var index = [];
+  var indexById = {};
+
+
+  var overviewById = {};
+  var rankedCount = 0;
+	  var activeSuggestion = -1;
+	  var requestSeq = 0;
+	  var storyGminaIds = ['0463011', '0208021', '2404082'];
+	  var gminaDataCache = {};
+	  var gminaDataRequests = {};
+	  var storyPointAnimationFrame = null;
+	  var storyPointMoveEndHandler = null;
+	  var storyPointSettleTimer = null;
+	  var storyPaneFadeSequence = 0;
+	  var currentRoadMax = 0;
+	  var currentRoadRef = 0;
+	  var currentRoadExtreme = 0;
+	  var allRoadsMode = false;
+
+
+  var HEAT_STOPS = ['#fff4c2', '#fee391', '#fec44f', '#fd8d3c', '#ed3941', '#d01443', '#9d0f3d'];
+
+
+  var HEAT_MIN = 280;
+  var HEAT_MAX = 1600;
+	  var CHANGE_STOPS = ['#2166ac', '#67a9cf', '#d1e5f0', '#f7f7f7', '#fddbc7', '#ef8a62', '#b2182b'];
+	  var OVERVIEW_METRICS = {
+	    incidents:{
+	      field:'zdarzenia_na_10k_mieszkancow', title:'Incidents per 10,000 residents',
+	      min:280, max:1600, avg:910.45, lo:'280', hi:'1600+', avgLabel:'average 910', type:'sequential'
+	    },
+	    collisions:{
+	      field:'kolizje_na_10k_mieszkancow', title:'Collisions per 10,000 residents',
+	      min:247, max:1520, avg:858.76, lo:'247', hi:'1520+', avgLabel:'average 859', type:'sequential'
+	    },
+	    accidents:{
+	      field:'wypadki_na_10k_mieszkancow', title:'Crashes per 10,000 residents',
+	      min:15, max:130, avg:51.69, lo:'15', hi:'130+', avgLabel:'average 52', type:'sequential'
+	    },
+	    severe:{
+	      field:'smiertelne_ciezkie_na_10k_mieszkancow', title:'Serious and fatal incidents per 10,000',
+	      min:4, max:65, avg:20.41, lo:'4', hi:'65+', avgLabel:'average 20', type:'sequential'
+	    },
+	    fatalShare:{
+	      derived:'fatalShare', title:'Fatal incidents as a share of all incidents',
+	      min:0, max:3, avg:0.4836, lo:'0%', hi:'3%+', avgLabel:'Poland 0.48%', type:'sequential', unit:'%'
+	    },
+	    change:{
+	      field:'zmiana_zdarzen_2018_2025_proc', title:'Change in the number of incidents, 2018–2025',
+	      min:-55, max:85, avg:-11.8, lo:'−55%', hi:'+85%', avgLabel:'Poland −11.8%', type:'diverging'
+	    }
+	  };
+	  var activeOverviewMetric = 'incidents';
+
+
+  var NO_DATA_COLOR = '#4c4c50';
+
+
+  var OVERVIEW_MAX_ZOOM = 9;
+  var DETAIL_MAX_ZOOM = 17;
+
+  var map = L.map('map', {
+    zoomControl:false, attributionControl:false, preferCanvas:true,
+
+    zoomSnap:.25, zoomDelta:1, minZoom:5, maxZoom:OVERVIEW_MAX_ZOOM,
+
+    scrollWheelZoom:false
+  }).setView([52.05, 19.2], 6);
+  L.control.zoom({ position:'bottomright' }).addTo(map);
+
+
+
+
+  (function () {
+    var stage = document.querySelector('.stage');
+    var hint = document.getElementById('mapHint');
+    if (!stage) return;
+
+    var root = document.documentElement;
+    var isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
+    var isTouch = window.matchMedia('(pointer:coarse)').matches;
+    if (isMac) root.classList.add('is-mac');
+    if (isTouch) root.classList.add('is-touch');
+
+
+    if (isTouch) {
+      map.dragging.disable();
+      stage.style.touchAction = 'pan-y';
+
+      var mapEl = document.getElementById('map');
+      if (mapEl) mapEl.style.touchAction = 'pan-y';
+    }
+
+    var hintTimer = 0;
+    var legendTip = document.querySelector('.map-legend__tip');
+    var touchHint = document.getElementById('mapTouchHint');
+    var controlsEl = stage.querySelector('.controls');
+    function placeTouchHint() {
+      if (!touchHint || !controlsEl) return;
+      touchHint.style.top = (controlsEl.offsetTop + controlsEl.offsetHeight + 22) + 'px';
+    }
+    placeTouchHint();
+    window.addEventListener('resize', placeTouchHint);
+    window.addEventListener('screen:resize', placeTouchHint);
+    var touchHintTimer = 0;
+    var exploreCard = document.querySelector('.map-story-card--explore');
+    function exploreCardOnScreen() {
+      if (!exploreCard) return false;
+      var section = document.getElementById('mapa');
+      if (section && section.classList.contains('explore-dismissed')) return false;
+      var r = exploreCard.getBoundingClientRect();
+      return r.height > 0 && r.bottom > 0 && r.top < window.innerHeight;
+    }
+    function showTouchHint() {
+      if (!touchHint || exploreCardOnScreen()) return;
+      placeTouchHint();
+      touchHint.classList.add('is-on');
+      window.clearTimeout(touchHintTimer);
+      touchHintTimer = window.setTimeout(function () {
+        touchHint.classList.remove('is-on');
+      }, 3200);
+    }
+    function showHint() {
+      if (legendTip) legendTip.classList.add('is-flash');
+      showTouchHint();
+      window.clearTimeout(hintTimer);
+      hintTimer = window.setTimeout(function () {
+        if (hint) hint.classList.remove('is-on');
+        if (legendTip) legendTip.classList.remove('is-flash');
+      }, 1500);
+      if (hint) hint.classList.add('is-on');
+    }
+    function hideTouchHint() {
+      if (!touchHint) return;
+      window.clearTimeout(touchHintTimer);
+      touchHint.classList.remove('is-on');
+    }
+    window.hideMapTouchHint = hideTouchHint;
+    function hideHint() {
+      if (legendTip) legendTip.classList.remove('is-flash');
+      window.clearTimeout(hintTimer);
+      if (hint) hint.classList.remove('is-on');
+    }
+
+
+    function inChrome(target) {
+      return !!(target && target.closest &&
+        target.closest('.controls, .panel, .road-legend, .map-legend, .attrib, .attrib-toggle, .leaflet-control'));
+    }
+
+    var accum = 0, raf = 0, lastPoint = null;
+    function applyZoom() {
+      raf = 0;
+      var dz = Math.max(-1.5, Math.min(1.5, -accum / 130));
+      accum = 0;
+      if (!dz || !lastPoint) return;
+      var z = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), map.getZoom() + dz));
+      map.setZoomAround(lastPoint, z, { animate:false });
+    }
+
+    stage.addEventListener('wheel', function (e) {
+      if (inChrome(e.target)) return;
+      if (!e.ctrlKey && !e.metaKey) { showHint(); return; }
+
+
+      e.preventDefault();
+      hideHint();
+      accum += e.deltaY;
+      lastPoint = map.mouseEventToContainerPoint(e);
+      if (!raf) raf = window.requestAnimationFrame(applyZoom);
+    }, { passive:false });
+
+
+    if (isTouch) {
+      stage.addEventListener('touchmove', function (e) {
+        if (inChrome(e.target)) return;
+        if (e.touches.length > 1) { hideHint(); hideTouchHint(); return; }
+        showHint();
+      }, { passive:true });
+      stage.addEventListener('touchend', function (e) {
+        if (!e.touches.length) hideHint();
+      }, { passive:true });
+    }
+
+    stage.addEventListener('mouseleave', hideHint);
+  })();
+
+
+  function refreshMapSize(){ window.setTimeout(function(){ map.invalidateSize(); }, 80); }
+  if (window.appReady) refreshMapSize();
+  else window.addEventListener('app:ready', refreshMapSize, { once:true });
+
+  window.addEventListener('screen:resize', refreshMapSize);
+
+  var PL_NAME = ['coalesce', ['get', 'name:pl'], ['get', 'name:en'], ['get', 'name:latin'], ['get', 'name']];
+  function polishLabels(glMap) {
+    if (!glMap) return;
+    var done = false;
+    glMap.on('styledata', function () {
+      if (done) return;
+      var st = glMap.getStyle();
+      if (!st || !st.layers || !st.layers.length) return;
+      done = true;
+      st.layers.forEach(function (l) {
+        if (l.type !== 'symbol' || !l.layout) return;
+        var tf = JSON.stringify(l.layout['text-field'] || '');
+        if (tf.indexOf('name') === -1) return;
+        try { glMap.setLayoutProperty(l.id, 'text-field', PL_NAME); } catch (e) {}
+      });
+    });
+  }
+  if (L.maplibreGL) {
+    var gl = L.maplibreGL({ style:'assets_sklad/map-style-dark.json' }).addTo(map);
+    polishLabels(gl.getMaplibreMap());
+  }
+
+  map.createPane('storyMotorwayPane');
+  var storyMotorwayPane = map.getPane('storyMotorwayPane');
+  storyMotorwayPane.style.zIndex = 405;
+  storyMotorwayPane.style.pointerEvents = 'none';
+  storyMotorwayPane.style.opacity = '0';
+  storyMotorwayPane.style.transition = 'opacity 650ms ease';
+
+  var storyMotorwayLayer = null;
+  var storyMotorwayRequest = null;
+  var storyMotorwaysWanted = false;
+  var storyMotorwayFadeTimer = null;
+  function showStoryMotorwayLayer() {
+    if (!storyMotorwayLayer || !storyMotorwaysWanted) return;
+    if (storyMotorwayFadeTimer) {
+      window.clearTimeout(storyMotorwayFadeTimer);
+      storyMotorwayFadeTimer = null;
+    }
+    if (!map.hasLayer(storyMotorwayLayer)) storyMotorwayLayer.addTo(map);
+    window.requestAnimationFrame(function () {
+      window.requestAnimationFrame(function () {
+        if (storyMotorwaysWanted) storyMotorwayPane.style.opacity = '1';
+      });
+    });
+  }
+  function hideStoryMotorwayLayer() {
+    storyMotorwayPane.style.opacity = '0';
+    if (storyMotorwayFadeTimer) window.clearTimeout(storyMotorwayFadeTimer);
+    storyMotorwayFadeTimer = window.setTimeout(function () {
+      storyMotorwayFadeTimer = null;
+      if (!storyMotorwaysWanted && storyMotorwayLayer && map.hasLayer(storyMotorwayLayer)) {
+        map.removeLayer(storyMotorwayLayer);
+      }
+    }, 680);
+  }
+  function requestStoryMotorways() {
+    if (storyMotorwayLayer) return Promise.resolve(storyMotorwayLayer);
+    if (storyMotorwayRequest) return storyMotorwayRequest;
+    storyMotorwayRequest = fetch('assets/wypadki/drogi_a_s.geojson')
+      .then(function (response) {
+        if (!response.ok) throw new Error('Could not load motorway and expressway data: ' + response.status);
+        return response.json();
+      })
+      .then(function (data) {
+        storyMotorwayLayer = L.geoJSON(data, {
+          pane:'storyMotorwayPane',
+          renderer:L.canvas({ pane:'storyMotorwayPane', padding:.5 }),
+          interactive:false,
+          style:function (feature) {
+            var isMotorway = feature && feature.properties && feature.properties.class === 'A';
+            return {
+              color:isMotorway ? '#8ec5ff' : '#63e6d7',
+              weight:isMotorway ? 2.5 : 2,
+              opacity:.95,
+              lineCap:'round',
+              lineJoin:'round'
+            };
+          }
+        });
+        if (storyMotorwaysWanted) showStoryMotorwayLayer();
+        return storyMotorwayLayer;
+      })
+      .catch(function (error) {
+        storyMotorwayRequest = null;
+        console.error(error);
+      });
+    return storyMotorwayRequest;
+  }
+  function setStoryMotorways(visible) {
+    storyMotorwaysWanted = !!visible;
+    if (storyMotorwayLayer) {
+      if (storyMotorwaysWanted) showStoryMotorwayLayer();
+      else hideStoryMotorwayLayer();
+      return;
+    }
+    if (storyMotorwaysWanted) requestStoryMotorways();
+  }
+
+  map.createPane('overviewPane');
+  var overviewPane = map.getPane('overviewPane');
+  overviewPane.style.zIndex = 350;
+  map.createPane('selectedPane'); map.getPane('selectedPane').style.zIndex = 410;
+  map.createPane('hotspotPane'); map.getPane('hotspotPane').style.zIndex = 430;
+  map.createPane('roadPane'); map.getPane('roadPane').style.zIndex = 440;
+  map.createPane('pointPane'); map.getPane('pointPane').style.zIndex = 455;
+  ['selectedPane', 'hotspotPane', 'pointPane'].forEach(function (name) {
+    map.getPane(name).style.pointerEvents = 'none';
+  });
+  map.getPane('roadPane').style.pointerEvents = 'auto';
+
+  var canvas = L.canvas({ padding:.35 });
+  var spin = document.getElementById('spin');
+	  var spinPercent = document.getElementById('spinPercent');
+	  var spinLabel = document.getElementById('spinLabel');
+	  var search = document.getElementById('story-gmina-search');
+	  var suggestions = document.getElementById('suggestions');
+	  var stats = document.getElementById('stats');
+	  var roadLegend = document.getElementById('road-legend');
+	  var roadLegendBar = roadLegend.querySelector('.bar');
+	  var roadLegendMax = document.getElementById('road-legend-max');
+	  var roadLegendTitle = document.getElementById('roadLegendTitle');
+	  var mapLegend = document.getElementById('map-legend');
+	  var legendMe = document.getElementById('legendMe');
+	  var metricPicker = document.getElementById('metricPicker');
+	  var overviewMetric = document.getElementById('overviewMetric');
+	  var overviewMetricButton = document.getElementById('overviewMetricButton');
+	  var overviewMetricButtonLabel = document.getElementById('overviewMetricButtonLabel');
+	  var overviewMetricMenu = document.getElementById('overviewMetricMenu');
+	  var mapLegendTitle = document.getElementById('mapLegendTitle');
+	  var mapLegendLo = document.getElementById('mapLegendLo');
+	  var mapLegendMid = document.getElementById('mapLegendMid');
+	  var mapLegendHi = document.getElementById('mapLegendHi');
+	  var mapLegendRamp = mapLegend.querySelector('.ramp');
+	  var overviewMetricOptions = [];
+
+	  function setOverviewMetricMenuOpen(open, focusSelected) {
+	    if (!overviewMetricButton || !overviewMetricMenu) return;
+	    overviewMetricButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+	    overviewMetricMenu.hidden = !open;
+	    if (open && focusSelected) {
+	      var selected = overviewMetricMenu.querySelector('[aria-selected="true"]') || overviewMetricOptions[0];
+	      if (selected) selected.focus();
+	    }
+	  }
+	  function syncOverviewMetricPicker() {
+	    if (!overviewMetric || !overviewMetricButtonLabel) return;
+	    var selectedOption = overviewMetric.options[overviewMetric.selectedIndex];
+	    overviewMetricButtonLabel.textContent = selectedOption ? selectedOption.textContent : '';
+	    overviewMetricOptions.forEach(function (option) {
+	      option.setAttribute('aria-selected', option.dataset.metricValue === overviewMetric.value ? 'true' : 'false');
+	    });
+	  }
+	  function focusOverviewMetricOption(offset) {
+	    if (!overviewMetricOptions.length) return;
+	    var current = overviewMetricOptions.indexOf(document.activeElement);
+	    if (current < 0) current = overviewMetricOptions.findIndex(function (option) {
+	      return option.getAttribute('aria-selected') === 'true';
+	    });
+	    current = Math.max(0, Math.min(overviewMetricOptions.length - 1, current + offset));
+	    overviewMetricOptions[current].focus();
+	  }
+	  if (overviewMetric && overviewMetricButton && overviewMetricMenu) {
+	    Array.prototype.forEach.call(overviewMetric.options, function (nativeOption, index) {
+	      var option = document.createElement('button');
+	      option.type = 'button';
+	      option.tabIndex = -1;
+	      option.className = 'metric-picker__option';
+	      option.id = 'overviewMetricOption' + index;
+	      option.setAttribute('role', 'option');
+	      option.setAttribute('aria-selected', nativeOption.selected ? 'true' : 'false');
+	      option.dataset.metricValue = nativeOption.value;
+	      option.textContent = nativeOption.textContent;
+	      overviewMetricMenu.appendChild(option);
+	      overviewMetricOptions.push(option);
+	    });
+	    overviewMetricButton.addEventListener('click', function () {
+	      var opening = overviewMetricMenu.hidden;
+	      setOverviewMetricMenuOpen(opening, opening);
+	    });
+	    overviewMetricButton.addEventListener('keydown', function (event) {
+	      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+	      event.preventDefault();
+	      setOverviewMetricMenuOpen(true, true);
+	    });
+	    overviewMetricMenu.addEventListener('click', function (event) {
+	      var option = event.target.closest('.metric-picker__option');
+	      if (!option) return;
+	      overviewMetric.value = option.dataset.metricValue;
+	      overviewMetric.dispatchEvent(new Event('change', { bubbles:true }));
+	      setOverviewMetricMenuOpen(false, false);
+	      overviewMetricButton.focus();
+	    });
+	    overviewMetricMenu.addEventListener('keydown', function (event) {
+	      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+	        event.preventDefault();
+	        focusOverviewMetricOption(event.key === 'ArrowDown' ? 1 : -1);
+	      } else if (event.key === 'Home' || event.key === 'End') {
+	        event.preventDefault();
+	        overviewMetricOptions[event.key === 'Home' ? 0 : overviewMetricOptions.length - 1].focus();
+	      } else if (event.key === 'Escape') {
+	        event.preventDefault();
+	        setOverviewMetricMenuOpen(false, false);
+	        overviewMetricButton.focus();
+	      } else if (event.key === 'Tab') {
+	        setOverviewMetricMenuOpen(false, false);
+	      }
+	    });
+	    document.addEventListener('click', function (event) {
+	      if (!event.target.closest('#metricPicker')) setOverviewMetricMenuOpen(false, false);
+	    });
+	    syncOverviewMetricPicker();
+	  }
+
+	  function setLoadingProgress(loaded, total, label) {
+	    spin.classList.remove('off', 'is-error');
+	    if (label) spinLabel.textContent = label;
+	    if (total > 0) {
+	      var percent = Math.max(0, Math.min(100, Math.round(loaded / total * 100)));
+	      spin.classList.remove('is-indeterminate');
+	      spin.style.setProperty('--progress', percent);
+	      spinPercent.textContent = percent + '%';
+	      spin.setAttribute('aria-label', spinLabel.textContent + ' ' + percent + '%');
+	    } else {
+	      spin.classList.add('is-indeterminate');
+	      spinPercent.textContent = '…';
+	      spin.setAttribute('aria-label', spinLabel.textContent);
+	    }
+	  }
+	  function setLoadingError(message) {
+	    spin.classList.remove('off', 'is-indeterminate');
+	    spin.classList.add('is-error');
+	    spinLabel.textContent = message;
+	    spin.setAttribute('aria-label', message);
+	  }
+
+	  function requestJson(url, onProgress) {
+	    return new Promise(function (resolve, reject) {
+	      var xhr = new XMLHttpRequest();
+	      var lastTotal = 0;
+	      var isCompressed = /\.gz(?:\?|$)/.test(url);
+	      xhr.open('GET', url, true);
+	      if (isCompressed) xhr.responseType = 'arraybuffer';
+	      xhr.onprogress = function (event) {
+	        lastTotal = event.lengthComputable ? event.total : 0;
+	        if (onProgress) onProgress(event.loaded, lastTotal);
+	      };
+	      function parseAndResolve(text) {
+	        try {
+	          if (onProgress) onProgress(lastTotal || 1, lastTotal || 1);
+	          resolve(JSON.parse(text));
+	        } catch (error) {
+	          reject(error);
+	        }
+	      }
+	      xhr.onload = function () {
+	        if (xhr.status < 200 || xhr.status >= 300) {
+	          reject(new Error('HTTP ' + xhr.status));
+	          return;
+	        }
+	        if (!isCompressed) {
+	          parseAndResolve(xhr.responseText);
+	          return;
+	        }
+	        if ('DecompressionStream' in window) {
+	          var stream = new Blob([xhr.response]).stream().pipeThrough(new DecompressionStream('gzip'));
+	          new Response(stream).text().then(parseAndResolve).catch(reject);
+	        } else if (window.pako) {
+	          parseAndResolve(window.pako.ungzip(new Uint8Array(xhr.response), { to:'string' }));
+	        } else {
+	          reject(new Error('This browser cannot decompress the map data.'));
+	        }
+	      };
+	      xhr.onerror = function () { reject(new Error('Network error')); };
+	      xhr.send();
+	    });
+	  }
+
+  function hasNumber(n) { return n !== null && n !== undefined && n !== '' && !Number.isNaN(Number(n)); }
+  function fmt(n) { return hasNumber(n) ? Number(n).toLocaleString('en-GB') : 'no data'; }
+  function fmt1(n) { return hasNumber(n) ? Number(n).toLocaleString('en-GB', { maximumFractionDigits:1 }) : 'no data'; }
+  function hexToRgb(h) {
+    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  }
+
+
+  function heatColor(v) {
+    if (!hasNumber(v)) return NO_DATA_COLOR;
+    var t = (Number(v) - HEAT_MIN) / (HEAT_MAX - HEAT_MIN);
+    t = Math.max(0, Math.min(1, t));
+    var pos = t * (HEAT_STOPS.length - 1);
+    var i = Math.min(HEAT_STOPS.length - 2, Math.floor(pos));
+    return mixColor(hexToRgb(HEAT_STOPS[i]), hexToRgb(HEAT_STOPS[i + 1]), pos - i);
+  }
+	  function metricDef() { return OVERVIEW_METRICS[activeOverviewMetric]; }
+	  function metricValueFor(def, p) {
+	    if (def.derived === 'fatalShare') {
+	      return hasNumber(p.zdarzenia) && Number(p.zdarzenia) > 0 && hasNumber(p.smiertelne)
+	        ? Number(p.smiertelne) / Number(p.zdarzenia) * 100
+	        : null;
+	    }
+	    return p[def.field];
+	  }
+	  function metricValue(p) { return metricValueFor(metricDef(), p); }
+	  function metricPositionFor(def, v) {
+	    if (!hasNumber(v)) return 0;
+	    var n = Number(v), t;
+	    if (def.type === 'diverging') {
+	      t = n < 0 ? .5 + .5 * n / Math.abs(def.min) : .5 + .5 * n / def.max;
+	    } else {
+	      t = (n - def.min) / (def.max - def.min);
+	    }
+	    return Math.max(0, Math.min(1, t)) * 100;
+	  }
+	  function metricPosition(v) { return metricPositionFor(metricDef(), v); }
+	  function metricColorFor(def, v) {
+	    if (!hasNumber(v)) return NO_DATA_COLOR;
+	    var stops = def.type === 'diverging' ? CHANGE_STOPS : HEAT_STOPS;
+	    var pos = metricPositionFor(def, v) / 100 * (stops.length - 1);
+	    var i = Math.min(stops.length - 2, Math.floor(pos));
+	    return mixColor(hexToRgb(stops[i]), hexToRgb(stops[i + 1]), pos - i);
+	  }
+	  function metricColor(v) {
+	    return metricColorFor(metricDef(), v);
+	  }
+	  function formatMetricValue(v) {
+	    if (!hasNumber(v)) return 'no data';
+	    if (metricDef().type !== 'diverging') return fmt1(v) + (metricDef().unit || '');
+	    var n = Number(v);
+	    return (n > 0 ? '+' : (n < 0 ? '−' : '')) + fmt1(Math.abs(n)) + '%';
+	  }
+	  function updateOverviewMetricUi() {
+	    var def = metricDef();
+	    syncOverviewMetricPicker();
+	    mapLegendTitle.textContent = def.title;
+	    mapLegendLo.textContent = def.lo;
+	    mapLegendMid.textContent = def.avgLabel;
+	    mapLegendHi.textContent = def.hi;
+	    mapLegend.style.setProperty('--avg', metricPosition(def.avg).toFixed(1) + '%');
+	    mapLegendRamp.style.background = def.type === 'diverging'
+	      ? 'linear-gradient(90deg,' + CHANGE_STOPS.join(',') + ')'
+	      : 'linear-gradient(90deg,' + HEAT_STOPS.join(',') + ')';
+	    markLegend(null);
+	  }
+
+
+	  var tip = L.tooltip({ direction:'top', offset:[0, -10], className:'gmina-tip', opacity:1 });
+
+
+	  var TIP_BG = [20, 20, 22];
+	  function relLum(rgb) {
+	    var c = rgb.map(function (v) {
+	      v /= 255;
+	      return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+	    });
+	    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+	  }
+	  function contrastRatio(a, b) {
+	    var l1 = relLum(a), l2 = relLum(b);
+	    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+	  }
+	  function readableColor(hex) {
+	    var rgb = hexToRgb(hex);
+	    for (var t = 0; t <= 1.0001; t += 0.05) {
+	      var mix = rgb.map(function (v) { return Math.round(v + (255 - v) * t); });
+	      if (contrastRatio(mix, TIP_BG) >= 3.5) return mixColor(rgb, [255, 255, 255], t);
+	    }
+	    return '#ffffff';
+	  }
+
+
+
+	  function showTip(p, latlng) {
+	    var v = metricValue(p);
+	    var years = activeOverviewMetric === 'change' && hasNumber(p.zdarzenia_2018) && hasNumber(p.zdarzenia_2025)
+	      ? '<small>2018: ' + fmt(p.zdarzenia_2018) + ' → 2025: ' + fmt(p.zdarzenia_2025) + '</small>'
+	      : '';
+	    tip.setContent(
+	      '<strong>' + p.admin_nazwa + '</strong>' +
+	      (hasNumber(v)
+	        ? '<em style="color:' + readableColor(metricColor(v)) + '">' + formatMetricValue(v) + '</em>' + years
+	        : '<span class="muted">no data</span>')
+	    );
+	    tip.setLatLng(latlng);
+	    map.openTooltip(tip);
+	    markLegend(v);
+	  }
+	  function moveTip(latlng) { if (map.hasLayer(tip)) tip.setLatLng(latlng); }
+	  function hideTip() { map.closeTooltip(tip); markLegend(null); }
+
+
+	  function markLegend(v) {
+	    if (!legendMe) return;
+	    if (!hasNumber(v)) { legendMe.classList.remove('is-on'); return; }
+	    legendMe.style.left = metricPosition(v).toFixed(1) + '%';
+	    legendMe.classList.add('is-on');
+	  }
+
+	  var storyMetricBlend = null;
+	  function overviewFillColor(p) {
+	    if (!storyMetricBlend) return metricColor(metricValue(p));
+	    var fromColor = metricColorFor(storyMetricBlend.from, metricValueFor(storyMetricBlend.from, p));
+	    var toColor = metricColorFor(storyMetricBlend.to, metricValueFor(storyMetricBlend.to, p));
+	    return mixColor(hexToRgb(fromColor), hexToRgb(toColor), storyMetricBlend.amount);
+	  }
+  function overviewStyle(f) {
+    var p = f.properties;
+    var mobileOverview = mobileQuery && mobileQuery.matches;
+    if (selectedId) {
+	      return {
+	        pane:'overviewPane', renderer:canvas,
+	        color:'#000', weight:.1, fillColor:'#000', fillOpacity:0, opacity:0
+	      };
+	    }
+
+
+    return {
+      pane:'overviewPane', renderer:canvas,
+      color:hovered === p.admin_kod ? '#ffffff' : '#0c0c0c',
+      weight:hovered === p.admin_kod ? (mobileOverview ? .9 : 1.3) : (mobileOverview ? .25 : .5),
+      fillColor:overviewFillColor(p),
+      fillOpacity:hovered === p.admin_kod ? .96 : .86,
+      opacity:hovered === p.admin_kod ? .95 : .45
+    };
+  }
+  function norm(s) {
+    return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+	  function resetStoryPaneFades() {
+	    storyPaneFadeSequence++;
+	    var selectedPane = map.getPane('selectedPane');
+	    if (selectedPane) {
+	      selectedPane.style.transition = 'none';
+	      selectedPane.style.opacity = '1';
+	    }
+	    if (canvas && canvas._container) {
+	      canvas._container.style.transition = 'none';
+	      canvas._container.style.opacity = '1';
+	    }
+	  }
+	  function fadeInStoryElement(element, duration) {
+	    if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+	    var sequence = storyPaneFadeSequence;
+	    element.style.transition = 'none';
+	    element.style.opacity = '0';
+	    window.requestAnimationFrame(function () {
+	      window.requestAnimationFrame(function () {
+	        if (sequence !== storyPaneFadeSequence) return;
+	        element.style.transition = 'opacity ' + duration + 'ms ease';
+	        element.style.opacity = '1';
+	      });
+	    });
+	  }
+	  function fadeInStoryPane(name, duration) {
+	    fadeInStoryElement(map.getPane(name), duration);
+	  }
+	  function clearDetail() {
+	    resetStoryPaneFades();
+	    if (storyPointMoveEndHandler) {
+	      map.off('moveend', storyPointMoveEndHandler);
+	      storyPointMoveEndHandler = null;
+	    }
+	    if (storyPointAnimationFrame) {
+	      window.cancelAnimationFrame(storyPointAnimationFrame);
+	      storyPointAnimationFrame = null;
+	    }
+	    if (storyPointSettleTimer) {
+	      window.clearTimeout(storyPointSettleTimer);
+	      storyPointSettleTimer = null;
+	    }
+	    [boundaryLayer, hotspotLayer, roadLayer, pointsLayer].forEach(function (l) { if (l) map.removeLayer(l); });
+	    boundaryLayer = hotspotLayer = roadLayer = pointsLayer = null;
+	    currentRoadMax = 0;
+	    currentRoadRef = 0;
+	    currentRoadExtreme = 0;
+	    roadLegend.classList.add('off');
+	    roadLegend.setAttribute('aria-hidden', 'true');
+	  }
+
+
+  function deltaFromAverage(p) {
+    if (!hasNumber(p.procent_sredniej_krajowej_na_10k)) {
+      return { text:'no population data', cls:'is-nodata' };
+    }
+    var diff = Number(p.procent_sredniej_krajowej_na_10k) - 100;
+    var znak = diff > 0 ? '+' : (diff < 0 ? '−' : '');
+    return {
+      text:znak + fmt1(Math.abs(diff)) + '% from the national average',
+      cls:diff > 0 ? 'is-above' : 'is-below'
+    };
+  }
+  function radiusLabel(radius) {
+    var r = Number(radius || 0);
+    if (!r) return 'area';
+    return r < 1000 ? r + ' m area' : (r / 1000) + ' km area';
+  }
+  function closeSuggestions() {
+    suggestions.classList.remove('on');
+    suggestions.innerHTML = '';
+    search.setAttribute('aria-expanded', 'false');
+    activeSuggestion = -1;
+  }
+  function renderSuggestions(value) {
+    var q = norm(value).trim();
+    if (!q) {
+      closeSuggestions();
+      return;
+    }
+
+
+    var matches = index.map(function (g) {
+      var score;
+      if (g.nameNorm === q) score = 0;
+      else if (g.nameNorm.indexOf(q) === 0) score = 1;
+      else if (g.nameNorm.indexOf(' ' + q) !== -1) score = 2;
+      else if (g.nameNorm.indexOf(q) !== -1) score = 3;
+      else if (g.searchText.indexOf(q) !== -1) score = 4;
+      else return null;
+      return { g:g, score:score };
+    }).filter(Boolean).sort(function (a, b) {
+      if (a.score !== b.score) return a.score - b.score;
+      return a.g.nameNorm.localeCompare(b.g.nameNorm, 'pl');
+    }).slice(0, 12).map(function (x) { return x.g; });
+    if (!matches.length) {
+      suggestions.innerHTML = '<div class="suggestion">No results</div>';
+      suggestions.classList.add('on');
+      search.setAttribute('aria-expanded', 'true');
+      return;
+    }
+    suggestions.innerHTML = matches.map(function (g, i) {
+
+
+      var meta = [g.ambiguous ? g.type : '', g.powiat, g.woj].filter(Boolean).join(' · ');
+      return '<div class="suggestion' + (i === activeSuggestion ? ' active' : '') + '" role="option" data-id="' + g.id + '">' +
+        '<strong>' + g.name + '</strong>' + (meta ? '<span>' + meta + '</span>' : '') +
+        '</div>';
+    }).join('');
+    suggestions.classList.add('on');
+    search.setAttribute('aria-expanded', 'true');
+  }
+  function moveSuggestion(step) {
+    var items = suggestions.querySelectorAll('.suggestion[data-id]');
+    if (!items.length) return;
+    activeSuggestion = (activeSuggestion + step + items.length) % items.length;
+    items.forEach(function (item, i) { item.classList.toggle('active', i === activeSuggestion); });
+    items[activeSuggestion].scrollIntoView({ block:'nearest' });
+  }
+	  function mixColor(a, b, t) {
+	    return '#' + a.map(function (v, i) {
+	      var x = Math.round(v + (b[i] - v) * t);
+	      return x.toString(16).padStart(2, '0');
+	    }).join('');
+	  }
+
+	  var ROAD_STOPS = [
+	    [0,    [254, 232, 166]],
+	    [0.25, [240, 149,  47]],
+	    [0.55, [226,  86,  74]],
+	    [1,    [194,  32,  56]]
+	  ];
+	  var ROAD_PURPLE = [118, 42, 131];
+	  var ALL_ROAD_STOPS = [
+	    [0,    [254, 232, 166]],
+	    [0.42, [240, 149,  47]],
+	    [0.72, [226,  86,  74]],
+	    [0.90, [194,  32,  56]],
+	    [1,    [194,  32,  56]]
+	  ];
+
+	  function roadColor(value) {
+	    value = Number(value || 0);
+	    if (value <= 0) return '#2f8f60';
+	    if (!(currentRoadRef > 0)) return '#fee8a6';
+	    if (value > currentRoadExtreme) {
+	      if (!(currentRoadMax > currentRoadExtreme)) return '#762a83';
+	      var extremeT = Math.min(1, (value - currentRoadExtreme) / (currentRoadMax - currentRoadExtreme));
+	      return mixColor(ROAD_STOPS[ROAD_STOPS.length - 1][1], ROAD_PURPLE, extremeT);
+	    }
+	    if (value > currentRoadRef) return '#c22038';
+	    var t = Math.min(1, value / currentRoadRef);
+	    for (var i = 1; i < ROAD_STOPS.length; i++) {
+	      if (t <= ROAD_STOPS[i][0] || i === ROAD_STOPS.length - 1) {
+	        var a = ROAD_STOPS[i - 1], b = ROAD_STOPS[i];
+	        var span = b[0] - a[0];
+	        return mixColor(a[1], b[1], span > 0 ? (t - a[0]) / span : 0);
+	      }
+	    }
+	    return '#762a83';
+	  }
+	  function allRoadsColor(value, purpleAt) {
+	    value = Number(value || 0);
+	    if (value <= 0) return '#2f8f60';
+	    if (!(currentRoadRef > 0)) return '#fee8a6';
+	    if (value > currentRoadRef) {
+	      var purpleT = purpleAt > currentRoadRef
+	        ? Math.min(1, (value - currentRoadRef) / (purpleAt - currentRoadRef))
+	        : 1;
+	      return mixColor(ALL_ROAD_STOPS[ALL_ROAD_STOPS.length - 1][1], ROAD_PURPLE, purpleT);
+	    }
+	    var t = Math.min(1, value / currentRoadRef);
+	    for (var i = 1; i < ALL_ROAD_STOPS.length; i++) {
+	      if (t <= ALL_ROAD_STOPS[i][0] || i === ALL_ROAD_STOPS.length - 1) {
+	        var a = ALL_ROAD_STOPS[i - 1], b = ALL_ROAD_STOPS[i];
+	        var span = b[0] - a[0];
+	        return mixColor(a[1], b[1], span > 0 ? (t - a[0]) / span : 0);
+	      }
+	    }
+	    return '#a81b48';
+	  }
+	  function roadImportance(highway) {
+	    highway = String(highway || '');
+	    if (highway === 'motorway' || highway === 'trunk') return 5;
+	    if (highway === 'primary' || highway === 'motorway_link' || highway === 'trunk_link') return 4;
+	    if (highway === 'secondary' || highway === 'primary_link') return 3;
+	    if (highway === 'tertiary' || highway === 'unclassified' || highway === 'secondary_link' || highway === 'tertiary_link') return 2;
+	    return 1;
+	  }
+	  function roadWeight(highway) {
+	    var base = [0, 1.5, 2, 2.6, 3.3, 4.1][roadImportance(highway)] || 1.5;
+	    return base;
+	  }
+	  function roadStyle(f) {
+	    var p = f.properties || {};
+	    var z = Number(p.zdarzenia || 0);
+	    return {
+	      pane:'roadPane',
+	      color:roadColor(z),
+	      weight:roadWeight(p.highway),
+	      opacity:z > 0 ? .94 : .72,
+	      interactive:z > 0,
+	      lineCap:'round',
+	      lineJoin:'round'
+	    };
+	  }
+	  function escapePopupText(value) {
+	    return String(value).replace(/[&<>"']/g, function (character) {
+	      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character];
+	    });
+	  }
+	  function bindRoadPopup(feature, layer) {
+	    var p = feature.properties || {};
+	    var z = Number(p.zdarzenia || 0);
+	    if (z <= 0) return;
+	    var roadName = String(p.road_name || '').trim();
+	    var content = '<div class="road-popup__value">' + fmt(z) + '</div>';
+	    if (roadName) content += '<div class="road-popup__name">' + escapePopupText(roadName) + '</div>';
+	    layer.bindPopup(
+	      content,
+	      { className:'road-hover-popup', closeButton:false, autoPan:false, closeOnClick:false, maxWidth:260, minWidth:0 }
+	    );
+	    layer.on('mouseover', function () { layer.openPopup(); });
+	    layer.on('mouseout', function () { layer.closePopup(); });
+	  }
+	  function prepareRoads(roads) {
+	    var fc = roads || { type:'FeatureCollection', features:[] };
+	    fc.features = (fc.features || []).sort(function (a, b) {
+	      return Number((a.properties || {}).zdarzenia || 0) - Number((b.properties || {}).zdarzenia || 0);
+	    });
+	    currentRoadMax = fc.features.reduce(function (m, f) {
+	      return Math.max(m, Number((f.properties || {}).zdarzenia || 0));
+	    }, 0);
+
+	    var zZdarzeniami = [];
+	    fc.features.forEach(function (f) {
+	      var z = Number((f.properties || {}).zdarzenia || 0);
+	      if (z > 0) zZdarzeniami.push(z);
+	    });
+	    zZdarzeniami.sort(function (a, b) { return a - b; });
+	    currentRoadRef = zZdarzeniami.length
+	      ? Math.max(2, zZdarzeniami[Math.floor(.95 * (zZdarzeniami.length - 1))])
+	      : 0;
+	    currentRoadExtreme = zZdarzeniami.length
+	      ? Math.max(currentRoadRef, zZdarzeniami[Math.floor(.95 * (zZdarzeniami.length - 1))])
+	      : 0;
+
+	    roadLegendMax.textContent = currentRoadMax ? fmt(currentRoadMax) : 'more';
+	    roadLegendBar.style.background = 'linear-gradient(90deg,' +
+	      '#2f8f60 0%,#2f8f60 10%,#fee8a6 14%,#f0952f 30%,' +
+	      '#e2564a 55%,#c22038 72%,#c22038 90%,#762a83 100%)';
+
+	    return fc;
+	  }
+  function topRoadProps(roads) {
+    var features = roads && roads.features ? roads.features : [];
+    var best = null;
+    features.forEach(function (f) {
+      var p = f.properties || {};
+      if (!best || Number(p.zdarzenia || 0) > Number(best.zdarzenia || 0) ||
+        (Number(p.zdarzenia || 0) === Number(best.zdarzenia || 0) && Number(p.ciezkie || 0) > Number(best.ciezkie || 0)) ||
+        (Number(p.zdarzenia || 0) === Number(best.zdarzenia || 0) && Number(p.ciezkie || 0) === Number(best.ciezkie || 0) && Number(p.smiertelne || 0) > Number(best.smiertelne || 0))) {
+        best = p;
+      }
+    });
+    return best;
+  }
+
+
+  function gaugePos(v) {
+    var t = (Number(v) - HEAT_MIN) / (HEAT_MAX - HEAT_MIN);
+    return (Math.max(0, Math.min(1, t)) * 100).toFixed(1);
+  }
+
+
+  function share(part, total) {
+    if (!hasNumber(part) || !hasNumber(total) || Number(total) <= 0) return '';
+    return '<em>' + fmt1(100 * Number(part) / Number(total)) + '%</em>';
+  }
+
+
+  function trendSpark(p) {
+    var vals = [];
+    for (var y = 2018; y <= 2025; y++) {
+      var v = p['zdarzenia_' + y];
+      if (!hasNumber(v)) return '';
+      vals.push(Number(v));
+    }
+    if (!vals.length) return '';
+    var max = Math.max.apply(null, vals);
+    if (!max) return '';
+    var W = 280, H = 40, n = vals.length;
+    var pts = vals.map(function (v, i) {
+      var x = (i / (n - 1)) * W;
+      var y = H - (v / max) * (H - 3) - 1.5;
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    });
+    var first = vals[0], last = vals[n - 1];
+    var change = first > 0 ? Math.round((last - first) / first * 100) : null;
+
+    var cap = change === null ? ''
+      : '<div class="trend__cap">Change, 2018–2025: <b>' +
+        (change > 0 ? '+' : '−') + Math.abs(change) + '%</b></div>';
+    return '<div class="trend">' +
+      '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
+        '<polygon points="0,' + H + ' ' + pts.join(' ') + ' ' + W + ',' + H + '"></polygon>' +
+        '<polyline points="' + pts.join(' ') + '" vector-effect="non-scaling-stroke"></polyline>' +
+      '</svg>' + cap +
+    '</div>';
+  }
+
+
+  function plural(n, one, few, many) {
+    n = Math.abs(Number(n) || 0);
+    if (n === 1) return one;
+    var ost = n % 10, dwie = n % 100;
+    if (ost >= 2 && ost <= 4 && (dwie < 12 || dwie > 14)) return few;
+    return many;
+  }
+  function zdarzenia(n) { return n === 1 ? 'incident' : 'incidents'; }
+
+  function modeInfoHtml() {
+    if (!currentDetail) return '';
+    var road = currentDetail.road || {};
+    var h = currentDetail.hotspot || {};
+    if (detailMode === 'roads') {
+      if (!road.zdarzenia) return 'No road section with recorded incidents in this municipality.';
+      return '<span class="big">' + fmt(road.zdarzenia) + '</span>' +
+        zdarzenia(road.zdarzenia) + ' on the highest-rate road section';
+    }
+    var count = h.hotspot_count || currentDetail.pointCount || 0;
+    if (!count) return 'No hotspot area is available for this municipality.';
+    return '<span class="big">' + fmt(count) + '</span>' +
+      zdarzenia(count) + ' in the highest-rate ' + radiusLabel(h.radius_m);
+  }
+  function renderModeInfo() {
+    var box = stats.querySelector('.mode-info');
+    if (box) box.innerHTML = modeInfoHtml();
+    var btns = stats.querySelectorAll('.mode');
+    Array.prototype.forEach.call(btns, function (b) {
+      b.classList.toggle('is-on', b.getAttribute('data-mode') === detailMode);
+      b.setAttribute('aria-pressed', b.getAttribute('data-mode') === detailMode ? 'true' : 'false');
+    });
+  }
+  function ICON_CHEVRON(cls, d) {
+    return '<svg class="' + cls + '" viewBox="0 0 16 16" aria-hidden="true" focusable="false">' +
+      '<path d="' + d + '" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  function renderStats(boundaryProps, hotspotProps, pointCount, meta, roadProps) {
+    var p = boundaryProps;
+    var injured = (Number(p.lekkie) || 0) + (Number(p.ciezkie) || 0);
+    var place = [meta && meta.powiat ? 'county: ' + meta.powiat : '', meta && meta.woj ? 'voivodeship: ' + meta.woj : ''].filter(Boolean).join(' · ');
+    var v = p.zdarzenia_na_10k_mieszkancow;
+    var delta = deltaFromAverage(p);
+    var rank = hasNumber(p.ranking_krajowy_zdarzenia_na_10k)
+      ? '<div class="rank"><b>' + fmt(p.ranking_krajowy_zdarzenia_na_10k) + '.</b> highest-rate municipality in Poland out of ' + fmt(rankedCount) + '</div>'
+      : '';
+    var gauge = hasNumber(v)
+      ? '<div class="gauge">' +
+          '<span class="gauge__ramp"></span>' +
+          '<i class="gauge__avg"></i>' +
+          '<i class="gauge__me" style="left:' + gaugePos(v) + '%"></i>' +
+        '</div>' +
+        '<div class="gauge-scale">' +
+          '<span class="lo">280</span><span class="mid">average 910</span><span class="hi">1600+</span>' +
+        '</div>'
+      : '';
+
+    stats.innerHTML =
+      '<div class="stats__bar">' +
+        '<button class="stats__back" type="button" id="statsClose" aria-label="Back to general view of Poland">' +
+          ICON_CHEVRON('stats__back-icon', 'M10 3.5 5.5 8 10 12.5') + '<span>Back</span>' +
+        '</button>' +
+        '<span class="stats__bar-title" aria-hidden="true">' + p.admin_nazwa + '</span>' +
+        '<button class="stats__collapse" type="button" data-stats-sheet-toggle aria-expanded="true" aria-label="Collapse Data Panel">' +
+          '<span class="stats__collapse-label" aria-hidden="true"></span>' + ICON_CHEVRON('stats__collapse-icon', 'M3.5 5.75 8 10.25 12.5 5.75') +
+        '</button>' +
+      '</div>' +
+      '<div class="stats__scroll">' +
+      '<h2>' + p.admin_nazwa + '</h2>' +
+      '<div class="sub">' + place + '</div>' +
+
+      '<div class="hero-stat">' +
+        '<div class="hero-stat__value" style="color:' + heatColor(v) + '">' + fmt1(v) + '</div>' +
+        '<div class="hero-stat__unit">incidents per 10,000 residents, 2018–2025</div>' +
+        '<div class="hero-stat__delta ' + delta.cls + '">' + delta.text + '</div>' +
+      '</div>' +
+      gauge +
+      rank +
+
+      '<div class="tiles">' +
+        '<div class="tile tile--all"><b>' + fmt(p.zdarzenia) + '</b><span>incidents</span></div>' +
+        '<div class="tile tile--collision"><b>' + fmt(p.kolizje) + '</b><span>collisions</span>' + share(p.kolizje, p.zdarzenia) + '</div>' +
+        '<div class="tile tile--hard"><b>' + fmt(injured) + '</b><span>injury crashes</span>' + share(injured, p.zdarzenia) + '</div>' +
+        '<div class="tile tile--fatal"><b>' + fmt(p.smiertelne) + '</b><span>fatal</span>' + share(p.smiertelne, p.zdarzenia) + '</div>' +
+      '</div>' +
+      trendSpark(p) +
+
+      '<div class="modes" role="group" aria-label="Map layer">' +
+        '<button class="mode" type="button" data-mode="roads">Road sections</button>' +
+        '<button class="mode" type="button" data-mode="hotspot">Highest-rate area</button>' +
+      '</div>' +
+      '<div class="mode-info"></div>' +
+      '</div>';
+
+    stats.classList.remove('is-collapsed');
+    stats.classList.remove('off');
+    renderModeInfo();
+  }
+
+
+  var mobileQuery = window.matchMedia('(max-width:740px)');
+  function mobileUpperHalfPadding() {
+    var top = 64;
+    var bottom = Math.min(window.innerHeight - 80, Math.round(window.innerHeight * .5) + top);
+    return { paddingTopLeft:[16, top], paddingBottomRight:[16, bottom] };
+  }
+  function flyPadding() {
+    if (mobileQuery.matches) {
+      return mobileUpperHalfPadding();
+    }
+    return { paddingTopLeft:[28, 78], paddingBottomRight:[330, 42] };
+  }
+  function overviewFitOptions(duration) {
+    var mapSection = document.getElementById('mapa');
+    var centerInViewport = !!(mapSection && mapSection.classList.contains('explore-dismissed'));
+    var padding;
+    if (mobileQuery.matches && !centerInViewport) {
+      padding = mobileUpperHalfPadding();
+      padding.paddingTopLeft[0] = 12;
+      padding.paddingBottomRight = [12, Math.max(12, padding.paddingBottomRight[1] - 16)];
+    } else if (mobileQuery.matches) {
+      padding = { paddingTopLeft:[12, 12], paddingBottomRight:[12, 132] };
+    } else {
+      padding = { paddingTopLeft:[18, 18], paddingBottomRight:[18, 18] };
+    }
+    if (duration !== undefined) padding.duration = duration;
+    return padding;
+  }
+  var OVERVIEW_TIGHTEN = .06;
+  var OVERVIEW_TIGHTEN_MOBILE = .06;
+  function overviewBounds() {
+    return overviewLayer.getBounds()
+      .pad(-(mobileQuery.matches ? OVERVIEW_TIGHTEN_MOBILE : OVERVIEW_TIGHTEN));
+  }
+
+
+
+
+
+  function applyMode(fly) {
+    var roads = detailMode === 'roads';
+    var revealPointsAfterMove = false;
+    if (roadLayer) { if (roads) roadLayer.addTo(map); else map.removeLayer(roadLayer); }
+    if (hotspotLayer) { if (roads) map.removeLayer(hotspotLayer); else hotspotLayer.addTo(map); }
+    if (pointsLayer) {
+      if (roads) {
+        cancelPendingStoryPointReveal();
+        resetStoryPointLayer(pointsLayer);
+        map.removeLayer(pointsLayer);
+      }
+      else {
+        revealPointsAfterMove = fly && shouldAnimateStoryPoints();
+        if (revealPointsAfterMove) map.removeLayer(pointsLayer);
+        else {
+          pointsLayer.addTo(map);
+          animateStoryPoints();
+        }
+      }
+    }
+    var showRoadLegend = roads && currentRoadMax > 0 && !!currentDetail;
+    roadLegend.classList.toggle('off', !showRoadLegend);
+    roadLegend.setAttribute('aria-hidden', showRoadLegend ? 'false' : 'true');
+    renderModeInfo();
+
+    if (!fly) return;
+
+
+    var pad = flyPadding();
+    if (roads) {
+      if (boundaryLayer) {
+        map.flyToBounds(boundaryLayer.getBounds(), {
+          paddingTopLeft:pad.paddingTopLeft,
+          paddingBottomRight:pad.paddingBottomRight,
+          maxZoom:12, duration:.8
+        });
+      }
+    } else if (hotspotLayer && hotspotLayer.getBounds().isValid()) {
+      map.flyToBounds(hotspotLayer.getBounds(), {
+        paddingTopLeft:pad.paddingTopLeft,
+        paddingBottomRight:pad.paddingBottomRight,
+        maxZoom:16, duration:.9
+      });
+      if (revealPointsAfterMove) scheduleStoryPointsAfterMove();
+    }
+  }
+
+
+  function resetToOverview() {
+    if (window.hideMapTouchHint) window.hideMapTouchHint();
+    requestSeq++;
+    selectedId = '';
+    hovered = '';
+    currentDetail = null;
+    detailMode = 'roads';
+	    allRoadsMode = false;
+	    roadLegendTitle.textContent = 'Number of incidents';
+    clearDetail();
+    hideTip();
+    search.value = '';
+    closeSuggestions();
+    stats.classList.add('off');
+    stats.innerHTML = '';
+	    metricPicker.classList.remove('off');
+    if (overviewLayer) overviewLayer.setStyle(overviewStyle);
+    if (mapLegend) mapLegend.classList.remove('off');
+    spin.classList.add('off');
+    map.setMaxZoom(OVERVIEW_MAX_ZOOM);
+    if (overviewLayer) {
+      map.flyToBounds(overviewBounds(), overviewFitOptions(.8));
+    }
+  }
+  stats.addEventListener('click', function (ev) {
+    if (ev.target.closest('#statsClose')) { resetToOverview(); return; }
+    var sheetToggle = ev.target.closest('[data-stats-sheet-toggle]');
+    if (sheetToggle) {
+      var collapsed = stats.classList.toggle('is-collapsed');
+      sheetToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      sheetToggle.setAttribute('aria-label', collapsed ? 'Expand data panel' : 'Collapse data panel');
+      return;
+    }
+    var btn = ev.target.closest('.mode');
+    if (!btn) return;
+    var next = btn.getAttribute('data-mode');
+    if (next === detailMode) return;
+    detailMode = next;
+    applyMode(true);
+  });
+
+
+
+  (function () {
+    var toggle = document.getElementById('attribToggle');
+    var box = document.getElementById('attrib');
+    if (!toggle || !box) return;
+
+    function setOpen(open) {
+      box.classList.toggle('off', !open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    toggle.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      setOpen(box.classList.contains('off'));
+    });
+    document.addEventListener('click', function (ev) {
+      if (!ev.target.closest('#attrib, #attribToggle')) setOpen(false);
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') setOpen(false);
+    });
+  })();
+
+  function pointMarker(f, latlng) {
+    return L.circleMarker(latlng, {
+
+      pane:'pointPane', radius:4, interactive:false,
+      color:'rgba(12,12,12,.85)', weight:1.2, fillColor:'#ffd85e', fillOpacity:.95
+    });
+  }
+
+  function shouldAnimateStoryPoints() {
+    return !!(pointsLayer && pointsLayer._storyPointFeatures && (
+      (selectedId === '0463011' && activeMapStory === 'torun-hotspot') ||
+      (selectedId === '0208021' && activeMapStory === 'klodzko')
+    ));
+  }
+
+  function cancelPendingStoryPointReveal() {
+    if (storyPointMoveEndHandler) {
+      map.off('moveend', storyPointMoveEndHandler);
+      storyPointMoveEndHandler = null;
+    }
+    if (storyPointSettleTimer) {
+      window.clearTimeout(storyPointSettleTimer);
+      storyPointSettleTimer = null;
+    }
+  }
+
+  function resetStoryPointLayer(layer) {
+    if (!layer || !layer._storyPointFeatures) return;
+    if (storyPointAnimationFrame) {
+      window.cancelAnimationFrame(storyPointAnimationFrame);
+      storyPointAnimationFrame = null;
+    }
+    layer.clearLayers();
+    layer._storyPointsAnimated = false;
+    layer._storyPointsComplete = false;
+  }
+
+  function scheduleStoryPointsAfterMove() {
+    cancelPendingStoryPointReveal();
+    var scheduledLayer = pointsLayer;
+    var reveal = function () {
+      cancelPendingStoryPointReveal();
+      if (pointsLayer !== scheduledLayer || detailMode !== 'hotspot' || !shouldAnimateStoryPoints()) return;
+      animateStoryPoints();
+    };
+    storyPointMoveEndHandler = function () {
+      map.off('moveend', storyPointMoveEndHandler);
+      storyPointMoveEndHandler = null;
+      storyPointSettleTimer = window.setTimeout(reveal, 100);
+    };
+    map.once('moveend', storyPointMoveEndHandler);
+  }
+
+  function animateStoryPoints() {
+    if (!pointsLayer || pointsLayer._storyPointsAnimated || pointsLayer._storyPointsComplete || !pointsLayer._storyPointFeatures) return;
+    if (!shouldAnimateStoryPoints()) return;
+
+    var animatedLayer = pointsLayer;
+    animatedLayer._storyPointsAnimated = true;
+    var ordered = animatedLayer._storyPointFeatures.slice();
+    for (var i = ordered.length - 1; i > 0; i--) {
+      var swapIndex = (i * 9301 + 49297) % (i + 1);
+      var temporary = ordered[i];
+      ordered[i] = ordered[swapIndex];
+      ordered[swapIndex] = temporary;
+    }
+
+    animatedLayer.clearLayers();
+    if (!map.hasLayer(animatedLayer)) animatedLayer.addTo(map);
+
+    var startedAt = performance.now();
+    var added = 0;
+    var lastPaint = 0;
+    function reveal(now) {
+      if (pointsLayer !== animatedLayer || !map.hasLayer(animatedLayer)) {
+        animatedLayer.clearLayers();
+        animatedLayer._storyPointsAnimated = false;
+        animatedLayer._storyPointsComplete = false;
+        storyPointAnimationFrame = null;
+        return;
+      }
+      var progress = Math.min(1, (now - startedAt) / 1500);
+      if (progress === 1 || now - lastPaint >= 45) {
+        lastPaint = now;
+        var eased = 1 - Math.pow(1 - progress, 3);
+        var target = Math.min(ordered.length, Math.floor(ordered.length * eased));
+        if (target > added) {
+          animatedLayer.addData(ordered.slice(added, target));
+          added = target;
+        }
+      }
+      if (progress < 1) storyPointAnimationFrame = window.requestAnimationFrame(reveal);
+      else {
+        animatedLayer._storyPointsComplete = true;
+        storyPointAnimationFrame = null;
+      }
+    }
+    storyPointAnimationFrame = window.requestAnimationFrame(reveal);
+  }
+
+  function selectGmina(id, requestedMode, transitionFromOverview) {
+    if (!id || !indexById[id]) return;
+    if (window.hideMapTouchHint) window.hideMapTouchHint();
+    if (id !== selectedId) {
+      cancelPendingStoryPointReveal();
+      if (storyPointAnimationFrame) {
+        window.cancelAnimationFrame(storyPointAnimationFrame);
+        storyPointAnimationFrame = null;
+      }
+      if (pointsLayer) map.removeLayer(pointsLayer);
+    }
+    var targetMode = requestedMode === 'hotspot' ? 'hotspot' : 'roads';
+    var storyFly = !!transitionFromOverview;
+    if (storyFly) spin.classList.add('off');
+    if (id === selectedId && currentDetail) {
+      detailMode = targetMode;
+      applyMode(true);
+      return;
+    }
+    map.stop();
+    selectedId = id;
+    hovered = '';
+    detailMode = targetMode;
+	    allRoadsMode = false;
+	    roadLegendTitle.textContent = 'Number of incidents';
+    hideTip();
+
+    if (mapLegend) mapLegend.classList.add('off');
+	    metricPicker.classList.add('off');
+
+    map.setMaxZoom(DETAIL_MAX_ZOOM);
+    var seq = ++requestSeq;
+    search.value = indexById[id].name;
+    closeSuggestions();
+    if (overviewLayer && !storyFly) overviewLayer.setStyle(overviewStyle);
+    if (!storyFly) setLoadingProgress(0, 0, 'Loading municipality…');
+    requestGminaData(id, storyFly ? null : function (loaded, total) {
+      if (seq === requestSeq) setLoadingProgress(loaded, total, 'Loading municipality…');
+    })
+	      .then(function (data) {
+        if (seq !== requestSeq) return;
+        clearDetail();
+
+        boundaryLayer = L.geoJSON(data.boundary, {
+          pane:'selectedPane',
+          interactive:false,
+          style:{ color:'#f2efeb', weight:1.8, opacity:.85, fill:false }
+        });
+        if (!storyFly) boundaryLayer.addTo(map);
+        if (storyFly && overviewLayer) overviewLayer.setStyle(overviewStyle);
+        var roads = prepareRoads(data.roads);
+        var h = data.hotspot.features.length ? data.hotspot.features[0].properties : null;
+        var directStoryHotspot = storyFly && targetMode === 'hotspot' && data.hotspot.features.length;
+        var initialStoryBounds = boundaryLayer.getBounds();
+        if (directStoryHotspot) initialStoryBounds = L.geoJSON(data.hotspot).getBounds();
+
+
+
+        var p = Object.assign({}, data.boundary.features[0].properties, overviewById[id] || {});
+        var road = topRoadProps(roads);
+        currentDetail = {
+          hotspot:h || {},
+          road:road || {},
+          pointCount:data.points.features.length
+        };
+        renderStats(p, h, data.points.features.length, indexById[id], road);
+
+
+
+        var pad = flyPadding();
+        var mounted = false;
+        var storyBoundaryShown = !storyFly;
+        function showStoryBoundary() {
+          if (storyBoundaryShown || seq !== requestSeq || !boundaryLayer) return;
+          storyBoundaryShown = true;
+          boundaryLayer.addTo(map);
+        }
+        function mountDetailLayers() {
+          if (mounted || seq !== requestSeq) return;
+          mounted = true;
+          hotspotLayer = L.geoJSON(data.hotspot, {
+            pane:'hotspotPane',
+            interactive:false,
+            style:{ color:'#ff6a5a', weight:1.6, opacity:.95, fillColor:'#e2564a', fillOpacity:.28 }
+          });
+          roadLayer = L.geoJSON(roads, {
+            renderer:canvas,
+	            interactive:true,
+	            style:roadStyle,
+	            onEachFeature:bindRoadPopup
+          });
+          var animatePointsInStory = storyFly && (id === '0463011' || id === '0208021');
+          pointsLayer = L.geoJSON(animatePointsInStory ? [] : data.points, {
+            interactive:false,
+            pointToLayer:pointMarker
+          });
+          if (animatePointsInStory) pointsLayer._storyPointFeatures = data.points.features;
+
+          if (directStoryHotspot) {
+            window.setTimeout(function () {
+              if (seq === requestSeq && detailMode === 'hotspot') applyMode(false);
+            }, 100);
+          } else {
+            applyMode(storyFly ? detailMode === 'hotspot' : targetMode === 'hotspot');
+          }
+	          if (storyFly && id === '0463011' && detailMode === 'roads' &&
+	              map.hasLayer(boundaryLayer) && map.hasLayer(roadLayer)) {
+	            fadeInStoryPane('selectedPane', 900);
+	            fadeInStoryElement(canvas._container, 900);
+	          }
+          spin.classList.add('off');
+        }
+        if (storyFly) {
+          map.once('moveend', showStoryBoundary);
+        }
+        map.once('moveend', mountDetailLayers);
+        window.setTimeout(mountDetailLayers, storyFly ? 3200 : 1400);
+        if (storyFly) spin.classList.add('off');
+        map.flyToBounds(initialStoryBounds, {
+          paddingTopLeft:pad.paddingTopLeft,
+          paddingBottomRight:pad.paddingBottomRight,
+          maxZoom:directStoryHotspot ? 16 : 12,
+          duration:storyFly ? 2.4 : 1.1,
+          easeLinearity:storyFly ? .12 : .18
+        });
+      })
+      .catch(function () {
+        if (seq !== requestSeq) return;
+	      if (storyFly) {
+	        spin.classList.add('off');
+	        console.error('Could not load the municipality used in the story: ' + id);
+	        return;
+	      }
+
+
+	        setLoadingError('Could not load this municipality.');
+	        window.setTimeout(function () {
+	          if (seq !== requestSeq) return;
+	          resetToOverview();
+	        }, 1800);
+	      });
+  }
+
+	  function makeAllRoadsCanvasLayer(buckets) {
+	    return new (L.Layer.extend({
+	      onAdd:function (targetMap) {
+	        this._map = targetMap;
+	        this._canvas = L.DomUtil.create(
+	          'canvas',
+	          'all-roads-canvas ' + (targetMap.options.zoomAnimation ? 'leaflet-zoom-animated' : 'leaflet-zoom-hide')
+	        );
+	        this._canvas.style.position = 'absolute';
+	        this._canvas.style.pointerEvents = 'none';
+	        targetMap.getPane('roadPane').appendChild(this._canvas);
+	        targetMap.on('moveend zoomend viewreset resize', this._schedule, this);
+	        if (targetMap.options.zoomAnimation) targetMap.on('zoomanim', this._animateZoom, this);
+	        this._reset();
+	      },
+	      onRemove:function (targetMap) {
+	        targetMap.off('moveend zoomend viewreset resize', this._schedule, this);
+	        if (targetMap.options.zoomAnimation) targetMap.off('zoomanim', this._animateZoom, this);
+	        if (this._frame) window.cancelAnimationFrame(this._frame);
+	        L.DomUtil.remove(this._canvas);
+	        this._canvas = null;
+	        this._map = null;
+	      },
+	      _schedule:function () {
+	        if (this._frame) return;
+	        this._frame = window.requestAnimationFrame(function () {
+	          this._frame = 0;
+	          this._reset();
+	        }.bind(this));
+	      },
+	      _animateZoom:function (event) {
+	        if (!this._map || !this._canvas) return;
+	        var scale = this._map.getZoomScale(event.zoom, this._map.getZoom());
+	        var currentNorthWest = this._map.containerPointToLatLng([0, 0]);
+	        var offset = this._map._latLngToNewLayerPoint(currentNorthWest, event.zoom, event.center);
+	        L.DomUtil.setTransform(this._canvas, offset, scale);
+	      },
+	      _reset:function () {
+	        if (!this._map || !this._canvas) return;
+	        var size = this._map.getSize();
+	        var topLeft = this._map.containerPointToLayerPoint([0, 0]);
+	        L.DomUtil.setPosition(this._canvas, topLeft);
+	        this._canvas.width = size.x;
+	        this._canvas.height = size.y;
+	        this._canvas.style.width = size.x + 'px';
+	        this._canvas.style.height = size.y + 'px';
+
+	        var ctx = this._canvas.getContext('2d');
+	        var zoom = this._map.getZoom();
+	        var world = 256 * Math.pow(2, zoom);
+	        var origin = this._map.getPixelOrigin();
+	        ctx.lineCap = 'round';
+	        ctx.lineJoin = 'round';
+	        ctx.globalAlpha = .94;
+
+	        function point(coord) {
+	          var lon = Number(coord[0]);
+	          var lat = Math.max(-85.05112878, Math.min(85.05112878, Number(coord[1])));
+	          var sin = Math.sin(lat * Math.PI / 180);
+	          return [
+	            (lon + 180) / 360 * world - origin.x - topLeft.x,
+	            (.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * world - origin.y - topLeft.y
+	          ];
+	        }
+
+	        buckets.forEach(function (bucket) {
+	          ctx.beginPath();
+	          bucket.paths.forEach(function (coords, pathIndex) {
+	            if (!coords || coords.length < 2) return;
+	            var p = point(coords[0]);
+	            ctx.moveTo(p[0], p[1]);
+	            for (var i = 1; i < coords.length; i++) {
+	              p = point(coords[i]);
+	              ctx.lineTo(p[0], p[1]);
+	            }
+	            if (pathIndex > 0 && pathIndex % 5000 === 0) {
+	              ctx.strokeStyle = bucket.color;
+	              ctx.lineWidth = bucket.weight;
+	              ctx.stroke();
+	              ctx.beginPath();
+	            }
+	          });
+	          ctx.strokeStyle = bucket.color;
+	          ctx.lineWidth = bucket.weight;
+	          ctx.stroke();
+	        });
+	      }
+	    }))();
+	  }
+
+	  function loadAllRoads() {
+	    map.stop();
+	    clearDetail();
+	    hideTip();
+	    closeSuggestions();
+	    selectedId = '__all_roads__';
+	    hovered = '';
+	    currentDetail = null;
+	    detailMode = 'roads';
+	    allRoadsMode = true;
+	    roadLegendTitle.textContent = 'Number of incidents — common scale for Poland';
+	    stats.classList.add('off');
+	    stats.innerHTML = '';
+	    metricPicker.classList.add('off');
+	    if (mapLegend) mapLegend.classList.add('off');
+	    if (overviewLayer) overviewLayer.setStyle(overviewStyle);
+	    map.setMaxZoom(DETAIL_MAX_ZOOM);
+
+	    var seq = ++requestSeq;
+	    var nextIndex = 0;
+	    var completed = 0;
+	    var failed = 0;
+	    var paths = [];
+	    var values = [];
+	    var importance = [];
+	    var histogram = {};
+	    var positiveCount = 0;
+	    var workerCount = Math.min(4, index.length);
+	    setLoadingProgress(0, index.length, 'Loading road sections from all municipalities…');
+
+	    function worker() {
+	      if (seq !== requestSeq || nextIndex >= index.length) return Promise.resolve();
+	      var gmina = index[nextIndex++];
+	      return requestJson('assets/wypadki/gminy/' + gmina.id + '.geojson.gz?v=' + BUILD_VER)
+	        .then(function (data) {
+	          if (seq !== requestSeq) return;
+	          var roads = data && data.roads && data.roads.features ? data.roads.features : [];
+	          for (var i = 0; i < roads.length; i++) {
+	            var feature = roads[i];
+	            var properties = feature.properties || {};
+	            var value = Number(properties.zdarzenia || 0);
+	            if (value <= 0 || !feature.geometry) continue;
+	            var lines = feature.geometry.type === 'MultiLineString'
+	              ? feature.geometry.coordinates
+	              : [feature.geometry.coordinates];
+	            for (var j = 0; j < lines.length; j++) {
+	              paths.push(lines[j]);
+	              values.push(value);
+	              importance.push(roadImportance(properties.highway));
+	            }
+	            histogram[value] = (histogram[value] || 0) + 1;
+	            positiveCount++;
+	            currentRoadMax = Math.max(currentRoadMax, value);
+	          }
+	        })
+	        .catch(function () { failed++; })
+	        .then(function () {
+	          if (seq !== requestSeq) return;
+	          completed++;
+	          setLoadingProgress(completed, index.length,
+	            'Loading all municipalities (' + completed + '/' + index.length + ')…');
+	          return worker();
+	        });
+	    }
+
+	    var workers = [];
+	    for (var i = 0; i < workerCount; i++) workers.push(worker());
+	    Promise.all(workers).then(function () {
+	      if (seq !== requestSeq) return;
+	      var distribution = Object.keys(histogram).map(Number).sort(function (a, b) { return a - b; });
+	      function percentile(q) {
+	        var target = Math.ceil(positiveCount * q);
+	        var seen = 0;
+	        for (var i = 0; i < distribution.length; i++) {
+	          seen += histogram[distribution[i]];
+	          if (seen >= target) return distribution[i];
+	        }
+	        return currentRoadMax;
+	      }
+	      currentRoadRef = currentRoadExtreme = Math.max(2, percentile(.94));
+	      var purpleAt = currentRoadMax;
+	      roadLegendMax.textContent = currentRoadMax ? fmt(currentRoadMax) : 'more';
+	      roadLegendBar.style.background = 'linear-gradient(90deg,' +
+	        '#fee8a6 0%,#f0952f 42%,#e2564a 72%,' +
+	        '#c22038 90%,#c22038 95%,#762a83 100%)';
+	      setLoadingProgress(1, 1, 'Drawing ' + fmt(paths.length) + ' coloured road sections…');
+	      window.setTimeout(function () {
+	        if (seq !== requestSeq) return;
+	        var byStyle = {};
+	        for (var i = 0; i < paths.length; i++) {
+	          var key = values[i] + ':' + importance[i];
+	          if (!byStyle[key]) {
+	            byStyle[key] = {
+	              value:values[i],
+	              color:allRoadsColor(values[i], purpleAt),
+	              weight:[0, 1.5, 2, 2.6, 3.3, 4.1][importance[i]],
+	              paths:[]
+	            };
+	          }
+	          byStyle[key].paths.push(paths[i]);
+	        }
+	        var buckets = Object.keys(byStyle).map(function (key) { return byStyle[key]; })
+	          .sort(function (a, b) { return a.value - b.value; });
+	        paths = values = importance = null;
+	        roadLayer = makeAllRoadsCanvasLayer(buckets).addTo(map);
+	        roadLegend.classList.toggle('off', currentRoadMax <= 0);
+	        roadLegend.setAttribute('aria-hidden', currentRoadMax > 0 ? 'false' : 'true');
+        if (overviewLayer) map.fitBounds(overviewBounds(), overviewFitOptions());
+	        spin.classList.add('off');
+	        if (failed) console.warn('Municipality files could not be loaded:', failed);
+	      }, 50);
+	    });
+	  }
+
+	  function requestGminaData(id, onProgress) {
+	    if (gminaDataCache[id]) return Promise.resolve(gminaDataCache[id]);
+	    if (gminaDataRequests[id]) return gminaDataRequests[id];
+
+	    var request = requestJson('assets/wypadki/gminy/' + id + '.geojson.gz?v=' + BUILD_VER, onProgress)
+	      .then(function (data) {
+	        gminaDataCache[id] = data;
+	        return data;
+	      })
+	      .catch(function (error) {
+	        delete gminaDataRequests[id];
+	        throw error;
+	      });
+	    gminaDataRequests[id] = request;
+	    return request;
+	  }
+
+	  function preloadStoryGminas() {
+	    storyGminaIds.reduce(function (previous, id) {
+	      return previous.then(function () {
+	        return requestGminaData(id).catch(function (error) {
+	          console.warn('Could not preload municipality ' + id, error);
+	        });
+	      });
+	    }, Promise.resolve());
+	  }
+
+  var mapStorySection = document.getElementById('mapa');
+  var mapStorySteps = Array.prototype.slice.call(document.querySelectorAll('.map-story-step'));
+  var defaultSearchSlot = document.getElementById('defaultSearchSlot');
+  var exploreDismissButton = document.getElementById('exploreDismiss');
+  var activeMapStory = '';
+  var mapStoryTicking = false;
+  var storyMetricAnimationFrame = null;
+
+  function setStoryOverviewMetric(metric) {
+    if (!OVERVIEW_METRICS[metric]) return;
+    if (storyMetricAnimationFrame) {
+      window.cancelAnimationFrame(storyMetricAnimationFrame);
+      storyMetricAnimationFrame = null;
+    }
+    storyMetricBlend = null;
+    if (metric === activeOverviewMetric || !overviewLayer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      activeOverviewMetric = metric;
+      if (overviewMetric) overviewMetric.value = metric;
+      updateOverviewMetricUi();
+      if (overviewLayer) overviewLayer.setStyle(overviewStyle);
+      return;
+    }
+    var fromDef = metricDef();
+    var toDef = OVERVIEW_METRICS[metric];
+    activeOverviewMetric = metric;
+    if (overviewMetric) overviewMetric.value = metric;
+    updateOverviewMetricUi();
+    var startedAt = performance.now();
+    var lastPaint = 0;
+    function animateMetric(now) {
+      var progress = Math.min(1, (now - startedAt) / 850);
+      var eased = progress * progress * (3 - 2 * progress);
+      storyMetricBlend = { from:fromDef, to:toDef, amount:eased };
+      if (progress === 1 || now - lastPaint >= 32) {
+        lastPaint = now;
+        overviewLayer.setStyle(overviewStyle);
+      }
+      if (progress < 1) {
+        storyMetricAnimationFrame = window.requestAnimationFrame(animateMetric);
+      } else {
+        storyMetricAnimationFrame = null;
+        storyMetricBlend = null;
+        overviewLayer.setStyle(overviewStyle);
+      }
+    }
+    storyMetricAnimationFrame = window.requestAnimationFrame(animateMetric);
+  }
+
+  function showStoryOverview(metric, motorways, keepCamera) {
+    spin.classList.add('off');
+    if (selectedId || allRoadsMode) resetToOverview();
+    setStoryOverviewMetric(metric);
+    setStoryMotorways(motorways);
+    if (!keepCamera && overviewLayer && !selectedId) {
+      map.flyToBounds(overviewBounds(), overviewFitOptions(.8));
+    }
+  }
+
+  function dismissExploreCard(resetView) {
+    if (!mapStorySection) return;
+    if (!mapStorySection.classList.contains('explore-dismissed')) {
+      mapStorySection.classList.add('explore-dismissed');
+      var searchBox = search && search.closest('.search');
+      if (defaultSearchSlot && searchBox) defaultSearchSlot.appendChild(searchBox);
+      closeSuggestions();
+    }
+    if (resetView) showStoryOverview('incidents', false, false);
+  }
+
+  if (exploreDismissButton) {
+    exploreDismissButton.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      dismissExploreCard(true);
+    });
+  }
+
+  var OVERVIEW_FLY_MS = 800;
+  var overviewFadeTimer = null;
+  var overviewFadeStartedAt = 0;
+  function revealOverviewPane() {
+    if (overviewFadeTimer) { window.clearTimeout(overviewFadeTimer); overviewFadeTimer = null; }
+    map.off('moveend', onOverviewFlightEnd);
+    var pane = overviewFadeTarget();
+    if (!pane) return;
+    pane.style.pointerEvents = '';
+    if (pane.style.opacity === '' || pane.style.opacity === '1') return;
+    pane.style.transition = 'opacity .5s ease';
+    window.requestAnimationFrame(function () {
+      window.requestAnimationFrame(function () { pane.style.opacity = '1'; });
+    });
+  }
+  function onOverviewFlightEnd() {
+    if (Date.now() - overviewFadeStartedAt < OVERVIEW_FLY_MS - 60) {
+      map.once('moveend', onOverviewFlightEnd);
+      return;
+    }
+    revealOverviewPane();
+  }
+  function overviewFadeTarget() {
+    return map.getPane('overlayPane');
+  }
+  function flyToOverviewWithFade() {
+    var pane = overviewFadeTarget();
+    if (!pane || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      showStoryOverview('incidents', false, false);
+      revealOverviewPane();
+      return;
+    }
+    if (overviewFadeTimer) { window.clearTimeout(overviewFadeTimer); overviewFadeTimer = null; }
+    map.off('moveend', onOverviewFlightEnd);
+    pane.style.transition = 'none';
+    pane.style.opacity = '0';
+    pane.style.pointerEvents = 'none';
+    overviewFadeStartedAt = Date.now();
+    showStoryOverview('incidents', false, false);
+    map.once('moveend', onOverviewFlightEnd);
+    overviewFadeTimer = window.setTimeout(revealOverviewPane, OVERVIEW_FLY_MS + 1000);
+  }
+
+  function activateMapStory(step) {
+    if (!step) return;
+    var scene = step.getAttribute('data-story') || '';
+    if (!scene || scene === activeMapStory) return;
+    if (window.hideMapTouchHint) window.hideMapTouchHint();
+    activeMapStory = scene;
+    mapStorySteps.forEach(function (item) { item.classList.toggle('is-active', item === step); });
+    if (mapStorySection) {
+      mapStorySection.classList.toggle('is-explore', scene === 'explore');
+    }
+
+    if (scene !== 'explore') revealOverviewPane();
+
+    if (scene === 'overview') {
+      showStoryOverview('incidents', false, false);
+    } else if (scene === 'motorways') {
+      showStoryOverview('incidents', true, true);
+    } else if (scene === 'accidents') {
+      showStoryOverview('accidents', false, true);
+    } else if (scene === 'torun') {
+      setStoryMotorways(false);
+      selectGmina('0463011', 'roads', true);
+    } else if (scene === 'torun-hotspot') {
+      setStoryMotorways(false);
+      selectGmina('0463011', 'hotspot', true);
+    } else if (scene === 'klodzko') {
+      setStoryMotorways(false);
+      selectGmina('0208021', 'hotspot', true);
+    } else if (scene === 'kruszyna') {
+      setStoryMotorways(false);
+      selectGmina('2404082', 'roads', true);
+    } else if (scene === 'explore') {
+      flyToOverviewWithFade();
+      refreshMapSize();
+    }
+  }
+
+  function storyStepAtActivationLine() {
+    if (!mapStorySteps.length) return null;
+    var activationY = window.innerHeight * .56;
+    var nearest = mapStorySteps[0], nearestDistance = Infinity;
+    for (var i = 0; i < mapStorySteps.length; i++) {
+      var rect = mapStorySteps[i].getBoundingClientRect();
+      if (rect.top <= activationY && rect.bottom >= activationY) return mapStorySteps[i];
+      var distance = Math.min(Math.abs(rect.top - activationY), Math.abs(rect.bottom - activationY));
+      if (distance < nearestDistance) { nearestDistance = distance; nearest = mapStorySteps[i]; }
+    }
+    return nearest;
+  }
+
+  function updateMapStory() {
+    mapStoryTicking = false;
+    activateMapStory(storyStepAtActivationLine());
+  }
+  function requestMapStoryUpdate() {
+    if (mapStoryTicking) return;
+    mapStoryTicking = true;
+    window.requestAnimationFrame(updateMapStory);
+  }
+
+	  var initialLoads = [{ loaded:0, total:0 }, { loaded:0, total:0 }, { loaded:0, total:0 }];
+	  function updateInitialProgress(which, loaded, total) {
+	    initialLoads[which] = { loaded:loaded, total:total };
+	    var allKnown = initialLoads.every(function (item) { return item.total > 0; });
+	    if (allKnown) {
+	      var loadedSum = initialLoads.reduce(function (sum, item) { return sum + item.loaded; }, 0);
+	      var totalSum = initialLoads.reduce(function (sum, item) { return sum + item.total; }, 0);
+	      setLoadingProgress(
+	        loadedSum,
+	        totalSum,
+	        'Loading map…'
+	      );
+	    } else {
+	      setLoadingProgress(0, 0, 'Loading map…');
+	    }
+	  }
+	  setLoadingProgress(0, 0, 'Loading map…');
+  Promise.all([
+	    requestJson('assets/wypadki/gminy_index.json?v=' + BUILD_VER, function (loaded, total) {
+	      updateInitialProgress(0, loaded, total);
+	    }),
+	    requestJson('assets/wypadki/gminy_overview.topojson?v=' + BUILD_VER, function (loaded, total) {
+	      updateInitialProgress(1, loaded, total);
+	    }),
+	    requestJson('assets/wypadki/gminy_metrics.json?v=' + BUILD_VER, function (loaded, total) {
+	      updateInitialProgress(2, loaded, total);
+	    })
+  ]).then(function (res) {
+    index = res[0];
+
+    var topo = res[1];
+    var overview = topojson.feature(topo, topo.objects.gminy);
+	    var annualById = {};
+	    res[2].forEach(function (row) {
+	      annualById[row[0]] = {
+	        zdarzenia_2018:row[1],
+	        zdarzenia_2025:row[2],
+	        zmiana_zdarzen_2018_2025_proc:row[3]
+	      };
+	    });
+    var labelCount = {};
+    index.forEach(function (g) {
+      g.nameNorm = norm(g.name);
+      g.searchText = norm([g.name, g.powiat, g.woj, g.label].join(' '));
+      labelCount[g.label] = (labelCount[g.label] || 0) + 1;
+      indexById[g.id] = g;
+    });
+
+    index.forEach(function (g) { g.ambiguous = labelCount[g.label] > 1; });
+
+    overview.features.forEach(function (f) {
+      var pr = f.properties;
+	      if (annualById[pr.admin_kod]) Object.assign(pr, annualById[pr.admin_kod]);
+      overviewById[pr.admin_kod] = pr;
+      if (pr.ranking_krajowy_zdarzenia_na_10k != null) rankedCount++;
+    });
+    search.addEventListener('input', function () {
+      activeSuggestion = -1;
+      renderSuggestions(search.value);
+    });
+    search.addEventListener('focus', function () {
+      var selected = selectedId && indexById[selectedId];
+      if (mobileQuery.matches) {
+        if (selected && search.value === selected.name) search.value = '';
+      } else {
+        search.select();
+      }
+      renderSuggestions(search.value);
+    });
+    search.addEventListener('keydown', function (ev) {
+      if (ev.key === 'ArrowDown') {
+        ev.preventDefault();
+        if (!suggestions.classList.contains('on')) renderSuggestions(search.value);
+        moveSuggestion(1);
+      } else if (ev.key === 'ArrowUp') {
+        ev.preventDefault();
+        moveSuggestion(-1);
+      } else if (ev.key === 'Enter') {
+        var active = suggestions.querySelector('.suggestion.active[data-id]') || suggestions.querySelector('.suggestion[data-id]');
+        if (active) {
+          ev.preventDefault();
+          selectGmina(active.getAttribute('data-id'));
+          dismissExploreCard(false);
+          search.blur();
+        }
+      } else if (ev.key === 'Escape') {
+        closeSuggestions();
+      }
+    });
+    suggestions.addEventListener('mousedown', function (ev) {
+      var item = ev.target.closest('.suggestion[data-id]');
+      if (item) {
+        ev.preventDefault();
+        selectGmina(item.getAttribute('data-id'));
+        dismissExploreCard(false);
+        search.blur();
+      }
+    });
+    document.addEventListener('click', function (ev) {
+      if (!ev.target.closest('.search')) closeSuggestions();
+    });
+
+    overviewLayer = L.geoJSON(overview, {
+      pane:'overviewPane',
+
+      smoothFactor:0,
+      style:overviewStyle,
+      onEachFeature:function (feature, layer) {
+	        layer.on('click', function () {
+	          var id = feature.properties.admin_kod;
+	          if (id !== selectedId) {
+	            selectGmina(id);
+	            dismissExploreCard(false);
+	          }
+	        });
+        layer.on('mouseover', function (ev) {
+          if (selectedId) return;
+          hovered = feature.properties.admin_kod;
+          layer.setStyle(overviewStyle(feature));
+          layer.bringToFront();
+          showTip(feature.properties, ev.latlng);
+        });
+        layer.on('mousemove', function (ev) {
+          if (!selectedId) moveTip(ev.latlng);
+        });
+        layer.on('mouseout', function () {
+          hovered = '';
+          overviewLayer.resetStyle(layer);
+          hideTip();
+        });
+      }
+    }).addTo(map);
+	    overviewMetric.addEventListener('change', function () {
+	      var tipLatLng = map.hasLayer(tip) ? tip.getLatLng() : null;
+	      if (storyMetricAnimationFrame) {
+	        window.cancelAnimationFrame(storyMetricAnimationFrame);
+	        storyMetricAnimationFrame = null;
+	      }
+	      storyMetricBlend = null;
+	      activeOverviewMetric = overviewMetric.value;
+	      updateOverviewMetricUi();
+	      if (overviewLayer) overviewLayer.setStyle(overviewStyle);
+	      if (tipLatLng && hovered && overviewById[hovered]) {
+	        showTip(overviewById[hovered], tipLatLng);
+	      }
+	    });
+	    updateOverviewMetricUi();
+    map.fitBounds(overviewBounds(), overviewFitOptions());
+    if (mapLegend && !selectedId) mapLegend.classList.remove('off');
+    spin.classList.add('off');
+    requestStoryMotorways().then(preloadStoryGminas);
+    window.addEventListener('scroll', requestMapStoryUpdate, { passive:true });
+    window.addEventListener('resize', requestMapStoryUpdate);
+    requestMapStoryUpdate();
+  }).catch(function () {
+
+	    setLoadingError('Could not load the map. Refresh the page.');
+  });
+});
+</script>
+</body>
+</html>

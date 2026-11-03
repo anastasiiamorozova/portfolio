@@ -81,7 +81,8 @@ function tagsHTML(tags) {
 }
 
 // A card links to the published story when it has a `url`, otherwise to its project page
-// (the behind-the-story post). Stories with a post get a "Behind the story" button too.
+// (the behind-the-story post). A card with a `zoomImage` opens that picture in a pop-up instead.
+// Stories with a post get a "Behind the story" button too.
 function cardHTML(p) {
   const img = p.coverImage
     ? `<img src="${esc(p.coverImage)}" alt="${esc(p.coverAlt || '')}" loading="lazy">`
@@ -91,18 +92,40 @@ function cardHTML(p) {
   const read = /^https?:\/\//.test(p.url ?? '') ? `<a class="card__more"${linkAttrs(p.url)}>Read the story</a>` : '';
   const behind = p.behind ? `<a class="card__more" href="${page}">Behind the story</a>` : '';
   const more = read || behind ? `<div class="card__links">${read}${behind}</div>` : '';
-  return `
-    <article class="card">
-      <a class="card__link"${linkAttrs(href)}>
+  const inner = `
         <span class="card__img">${img}</span>
         <span class="card__text">
           <span class="card__title">${esc(p.title)}</span>
           ${tagsHTML(p.tags)}
           <span class="card__desc">${esc(p.summary)}</span>
-        </span>
-      </a>
+        </span>`;
+  const main = p.zoomImage
+    ? `<button class="card__link card__link--zoom" type="button" aria-haspopup="dialog"
+         data-zoom="${esc(p.zoomImage)}" data-alt="${esc(p.coverAlt || p.title)}">${inner}</button>`
+    : `<a class="card__link"${linkAttrs(href)}>${inner}</a>`;
+  return `
+    <article class="card">
+      ${main}
       ${more}
     </article>`;
+}
+
+// One pop-up for enlarged pictures; clicking anywhere outside the picture (or Esc) closes it.
+let lightbox = null;
+function openLightbox(src, alt) {
+  if (!lightbox) {
+    lightbox = document.createElement('dialog');
+    lightbox.className = 'lightbox';
+    lightbox.innerHTML = '<img class="lightbox__img" alt="">';
+    lightbox.addEventListener('click', (e) => {
+      if (e.target !== lightbox.firstChild) lightbox.close();
+    });
+    document.body.append(lightbox);
+  }
+  const pic = lightbox.firstChild;
+  pic.src = src;
+  pic.alt = alt;
+  lightbox.showModal();
 }
 
 function gridHTML(category, projects) {
@@ -128,6 +151,10 @@ async function renderHome(categorySlug) {
     heroHTML(site) +
     fieldsHTML(categories, category?.slug) +
     (category ? gridHTML(category, projects) : '');
+
+  app.querySelectorAll('[data-zoom]').forEach((btn) => {
+    btn.addEventListener('click', () => openLightbox(btn.dataset.zoom, btn.dataset.alt));
+  });
 
   app.querySelectorAll('.field').forEach((btn) => {
     btn.addEventListener('click', () => {

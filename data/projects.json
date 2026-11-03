@@ -25,7 +25,7 @@
       "category": "osint",
       "order": 1,
       "title": "Crossing NATO Lines: Tracing Russia's GRU Explosive Parcel Bombs",
-      "summary": "An interactive scrollytelling piece built with custom JavaScript injected into a CMS that didn't support it. I added a moving-camera effect to guide readers through a dense network of names and connections across several countries. The Lithuanian prosecutor's office went public two days early, so I finished it in twenty minutes instead of two days. Named Innovation of the Year in media by Wirtualne Media in 2026.",
+      "summary": "An interactive visual investigation built with custom JavaScript injected into a CMS that didn't want to support it. I added a moving-camera effect to guide readers through a network of names and connections across several countries. The piece was named an Innovation of the Year in Polish media in 2026.",
       "tags": ["Visual investigation"],
       "url": "https://vsquare.org/crossing-nato-lines-tracing-the-arson-sabotage-russia-gru-explosive-parcel-bombs/",
       "behind": {
@@ -48,9 +48,10 @@
       "url": "https://vsquare.org/russia-military-bases-threat-europe-nato/",
       "behind": null,
       "coverImage": "assets/covers/nato-bases.jpg",
-      "coverAlt": null,
+      "coverAlt": "Satellite image of the Asipovichy-2 military base with its buildings marked",
       "body": null,
-      "published": true
+      "published": true,
+      "zoomImage": "assets/zoom/nato-bases.jpg"
     },
     {
       "slug": "red-cross",
@@ -75,7 +76,7 @@
       "category": "osint",
       "order": 4,
       "title": "ANDROMEDA: Ukrainian puzzle",
-      "summary": "We tracked the yacht Andromeda, suspected in the Nord Stream pipeline explosions, by cross-referencing satellite imagery and AIS vessel tracking data. On-ground OSINT reporting led us to a Kyiv businessman whose company had rented the boat.",
+      "summary": "We tracked the yacht Andromeda, suspected in the Nord Stream pipeline explosions, by cross-referencing satellite imagery and AIS vessel tracking data. On-ground OSINT reporting led me to Kyiv, where I talked to a bad guy who wanted to run me over with his car.",
       "tags": ["Satellite images", "AIS tracking", "On-ground"],
       "url": "https://frontstory.pl/andromeda-rurociag-nord-stream-wybuch-ukraina-trasa-rosja-niemcy/",
       "behind": {
@@ -163,8 +164,8 @@
       "category": "data-viz",
       "order": 2,
       "title": "Brain at Full Throttle",
-      "summary": "A 3D brain that turns and lights up as you scroll through 24 hours, showing which areas work hardest at each time of day. Built from the Neurotorium atlas models.",
-      "tags": ["3D image generation"],
+      "summary": "A 3D brain that turns and lights up as you scroll through 24 hours, showing which areas work hardest at each time of day.",
+      "tags": ["3D model generation"],
       "url": "https://anastasiiamorozova.github.io/portfolio/brain/",
       "behind": null,
       "coverImage": "assets/previews/brain.jpg",
@@ -191,11 +192,11 @@
       "category": "data-viz",
       "order": 3,
       "title": "A House from China",
-      "summary": "A room-by-room view of China’s share of Polish imports, from doors and furniture to electronics. The house itself was drawn by AI, after a bare-knuckle fight with two image generators over one stubborn white pillar.",
+      "summary": "A nicer way to show China’s share of Polish imports, from doors and furniture to electronics. The house itself was drawn by AI, which let me experiment with different models and software.",
       "tags": ["Image generation"],
       "url": "https://anastasiiamorozova.github.io/portfolio/poland-china-import/",
       "behind": {
-        "title": "How I drew the house with two AI tools",
+        "title": "What have I learned from using AI to generate images?",
         "date": "2026-11-01",
         "body": "data/posts/house-from-china.html"
       },
@@ -209,11 +210,11 @@
       "category": "data-viz",
       "order": 4,
       "title": "Three decades of Polish politics, visualized",
-      "summary": "A Sankey diagram tracing thirty years of Polish political party history, built from Wikipedia election data scraped into Flourish and exported as SVG, then refined in Illustrator and InDesign for print. The same story also needed a radar diagram of political preferences. My first print commission, and the day I learned InDesign.",
+      "summary": "A Sankey diagram tracing thirty years of Polish political party history for a Polish print magazine. The same story also includes a radar diagram of political preferences. My first print commission, and the day I learned InDesign.",
       "tags": ["Illustrator", "InDesign"],
       "url": null,
       "behind": {
-        "title": "My first job for printed press and how I learned InDesign in one day",
+        "title": "My first job for the printed press and how I learned InDesign in one day",
         "date": "2025-12-01",
         "body": "data/posts/polish-politics.html"
       },
@@ -227,7 +228,7 @@
       "category": "data-viz",
       "order": 5,
       "title": "Faster than Pizza Delivery: Poland's Online Drug Market Is Out of Control",
-      "summary": "I scraped 500,000 messages from 1,500 Telegram channels using Telethon and a snowballing method, then built a Doc2Vec classifier trained on 300 manually labeled drug ads to identify advertisements at scale. String matching against a custom drug slang library helped quantify substance frequency, while InPost and BLIK mentions mapped how the market actually works. Presented at Dataharvest 2025 and now being replicated for Germany.",
+      "summary": "I scraped 500,000 messages from 1,500 Telegram channels using Telethon and a snowballing method, then built a Doc2Vec classifier trained on 300 manually labeled drug ads to identify advertisements at scale. Presented the methodology at Dataharvest 2025 and won a couple of Polish awards for this work.",
       "tags": ["Telegram", "ML"],
       "url": "https://vsquare.org/faster-than-pizza-delivery-polands-online-drug-market-telegram-parcel-lockers-inpost-blik-police/",
       "behind": {
@@ -245,7 +246,7 @@
       "category": "data-viz",
       "order": 6,
       "title": "The map of toxic Poland",
-      "summary": "We automated 3,000 FOIA requests to map illegal waste dumps across Poland, then used an LLM to extract location data from PDF responses. Ground-truthed on site, the dataset revealed nearly 200 hazardous dump sites nationwide — three of them caught fire in May 2024 alone.",
+      "summary": "We automated 3,000 FOIA requests to map illegal waste dumps across Poland, then used an LLM to extract location data from PDF responses. The dataset revealed nearly 200 hazardous dump sites nationwide.",
       "tags": ["Text-extraction from PDF"],
       "url": "https://smieci.frontstory.pl/",
       "behind": null,
@@ -258,15 +259,16 @@
       "slug": "sumy-shelters",
       "category": "data-viz",
       "order": 7,
-      "title": "How safe you are in Sumy during an air raid alert?",
-      "summary": "I used QGIS and official shelter location data from local authorities to map how well protected residents of Sumy region's largest cities actually are during air raid alerts. Visualized in Illustrator and published on Instagram. Made for my home region in Ukraine, dedicated to Kordon.Media.",
+      "title": "How safe are you in Sumy during an air raid alert?",
+      "summary": "I used QGIS and official shelter location data from local authorities to map how well protected residents of Sumy region's largest cities actually are during air raid alerts. Made for my home region in Ukraine, dedicated to Kordon.Media.",
       "tags": ["QGIS", "Illustrator"],
-      "url": "https://www.instagram.com/p/C9zrP7vu4WU/",
+      "url": null,
       "behind": null,
       "coverImage": "assets/covers/sumy-shelters.jpg",
-      "coverAlt": null,
+      "coverAlt": "Map of air raid shelters in the largest cities of Sumy region",
       "body": null,
-      "published": false
+      "published": true,
+      "zoomImage": "assets/zoom/sumy-shelters.jpg"
     },
     {
       "slug": "orlen",

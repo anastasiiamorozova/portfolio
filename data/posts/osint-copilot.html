@@ -1,0 +1,34 @@
+<p>Finding out where abducted Ukrainian children ended up is slow, repetitive OSINT work. A lot of the data is on Russian social media, some is in leaks that we have exclusive access to, and the data needed for context is in articles from local Russian authorities. The search also means running photos through face search and cross-referencing records.</p>
+<p>I built a toolkit that lets AI agents do the legwork of that search while keeping every step checkable. </p>
+<figure>
+<img src="assets/posts/osint-copilot/pipeline.jpg" alt="Hand-drawn diagram of the investigation pipeline: Input (an image or a CSV with names and dates of birth), then Capture (save the data and the query log), then Report (findings, leads and source links). Below: the automation should answer what do we know, how do we know it, what remains uncertain and what is eligible next" loading="lazy">
+<figcaption>The investigation pipeline</figcaption>
+</figure>
+<p>A case starts from one of two kinds of material:</p>
+<ul>
+<li><strong>Lists:</strong> children’s names and dates of birth. The original rows stay untouched. A model recognises unfamiliar column headers, Ukrainian names get a separate Russian spelling for searches, and each row is enriched one field at a time.</li>
+<li><strong>Pictures:</strong> group photos where nobody is named. A face-detection model cuts out every face, and the crops go to face search for profile leads.</li>
+</ul>
+<p>Both routes end the same way: raw captures, structured leads, queues of next steps and a report built from saved evidence.</p>
+<figure>
+<img src="assets/posts/osint-copilot/decision-tree.jpg" alt="Hand-drawn decision tree. Starting from an image, crop out faces and search for leads; starting from records, normalise the rows and search for leads. If there is no candidate or profile lead, flag the record. If there is, enrich the leads with data from other sources such as VK and Yandex, analyse the evidence and write a report" loading="lazy">
+<figcaption>Two starting points, one route to the report</figcaption>
+</figure>
+<p>Each tool is an agent skill: a script plus a short Markdown file that says when the agent may run it, what it takes in, what it saves and which safety rules apply. The workspace has the same kind of contracts on a larger scale: one file for the evidence rules, one for the workflow and one per case for its scope and risks.</p>
+<figure>
+<img src="assets/posts/osint-copilot/workspace.jpg" alt="Sketch of the workspace: a file panel with case folders, skills, AGENTS.md and the investigation playbook, a code panel in the middle, and a conversation panel with prompts on the right" loading="lazy">
+<figcaption>The workspace: files, code and the conversation with the agent</figcaption>
+</figure>
+<p>An orchestrator works as a traffic controller. It reads what has already been saved, works out which stage each person is at and writes queues of what is eligible next.</p>
+<p>The biggest risk in this work is false certainty. A similar face, a shared surname or a phone number that turns up in two records can make two different people look like one. So uncertainty is part of the output:</p>
+<ul>
+<li>Every finding is unverified, possible, likely or confirmed, and moves up only when the evidence gets better, not just when there is more of it.</li>
+<li>Identity confidence (is this the same person?) is scored separately from information confidence (is this claim reliable?).</li>
+<li>Conflicting names or dates of birth stay visible, each with its source, and empty searches are logged too.</li>
+</ul>
+<p>Every claim can be traced back to its input, timestamp, tool output and saved file, so a report can be regenerated from the evidence instead of from memory. Pages are archived before they’re cited, because Russian websites disappear quickly.</p>
+<p>To give my teammates access without the command line, I wrapped the workflow in a local web app. 
+<figure>
+<img src="assets/posts/osint-copilot/app.jpg" alt="The app with a test record: a made-up person’s name and date of birth, a checklist at 1 of 6, the conversation with the copilot, and the record’s audit trail listing added files, the checklist update and the status change" loading="lazy">
+<figcaption>A test record in the app. The person is made up, and report file names are blurred.</figcaption>
+</figure>

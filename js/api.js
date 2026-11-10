@@ -59,12 +59,17 @@ export async function getProjects(categorySlug) {
 
 /**
  * One project (full page content). Returns null when not found.
- * `behind.body` is the path to an HTML fragment (the behind-the-story post);
- * it's loaded here and returned as `behind.html`. The API returns `behind.html` directly.
+ * `body` is the path to an HTML fragment with the full story, returned as `html`;
+ * `behind.body` is the path to the behind-the-story post, returned as `behind.html`.
+ * The API returns `html` and `behind.html` directly.
  */
 export async function getProject(slug) {
   if (API_BASE) return getJSON(`${API_BASE}/projects/${encodeURIComponent(slug)}`);
   const project = (await loadStatic()).projects.find((p) => p.slug === slug && p.published) || null;
-  if (!project?.behind?.body) return project;
-  return { ...project, behind: { ...project.behind, html: await getText(project.behind.body) } };
+  if (!project) return null;
+  const [html, behindHtml] = await Promise.all([
+    project.body ? getText(project.body) : null,
+    project.behind?.body ? getText(project.behind.body) : null,
+  ]);
+  return { ...project, html, behind: project.behind && { ...project.behind, html: behindHtml } };
 }

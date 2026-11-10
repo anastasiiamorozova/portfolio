@@ -81,15 +81,16 @@ function tagsHTML(tags) {
 }
 
 // A card links to the published story when it has a `url`, otherwise to its project page
-// (the behind-the-story post). A card with a `zoomImage` opens that picture in a pop-up instead.
-// Stories with a post get a "Behind the story" button too.
+// (the full story in `body`, or the behind-the-story post). A card with a `zoomImage` opens
+// that picture in a pop-up instead. Stories with a post get a "Behind the story" button too.
 function cardHTML(p) {
   const img = p.coverImage
     ? `<img src="${esc(p.coverImage)}" alt="${esc(p.coverAlt || '')}" loading="lazy">`
     : 'Image';
   const page = `#/projects/${encodeURIComponent(p.slug)}`;
   const href = p.url || page;
-  const read = /^https?:\/\//.test(p.url ?? '') ? `<a class="card__more"${linkAttrs(p.url)}>Read the story</a>` : '';
+  const story = /^https?:\/\//.test(p.url ?? '') ? p.url : p.body ? page : null;
+  const read = story ? `<a class="card__more"${linkAttrs(story)}>Read the story</a>` : '';
   const behind = p.behind ? `<a class="card__more" href="${page}">Behind the story</a>` : '';
   const more = read || behind ? `<div class="card__links">${read}${behind}</div>` : '';
   const inner = `
@@ -181,20 +182,22 @@ async function renderProject(slug) {
 
   const category = categories.find((c) => c.slug === project.category);
   const num = String(project.order ?? '').padStart(2, '0');
-  const behind = project.behind;
+  // A project page shows the full story (`html`) when there is one, otherwise the behind-the-story post.
+  const behind = project.html ? null : project.behind;
+  const post = project.html ?? behind?.html;
   const title = behind?.title ?? project.title;
   // Back to the main page, with this story's field open.
   const back = `<a class="back" href="#/${encodeURIComponent(project.category)}">${backIcon}Back to the main page</a>`;
-  const meta = behind ? 'Behind the story' : `${category?.label ?? ''} — ${num}`;
+  const meta = behind ? 'Behind the story' : project.html ? category?.label ?? '' : `${category?.label ?? ''} — ${num}`;
   document.title = `${title} — ${site.name}`;
-  // behind.html is the owner's own post (a file in data/posts), so it's inserted as HTML.
+  // The post is the owner's own text (a file in data/posts), so it's inserted as HTML.
   app.innerHTML = `
-    <article class="project${behind ? ' project--post' : ''} anim" aria-label="Project">
+    <article class="project${post ? ' project--post' : ''} anim" aria-label="Project">
       ${back}
       <span class="project__meta">${esc(meta)}</span>
       <h1 class="project__title">${esc(title)}</h1>
-      <div class="project__body post">${behind?.html ?? ''}</div>
-      ${behind ? back : ''}
+      <div class="project__body post">${post ?? ''}</div>
+      ${post ? back : ''}
     </article>`;
 }
 

@@ -407,6 +407,12 @@ button { font: inherit; color: inherit; }
 
 .post p { margin: 0 0 1.1em; }
 
+.post ul { margin: 0 0 1.1em; padding-left: 1.3em; }
+
+.post li { margin-bottom: 0.6em; }
+
+.post li::marker { color: var(--accent); }
+
 .post strong { font-weight: 600; }
 
 .post a {

@@ -313,9 +313,37 @@
       "published": false
     },
     {
-      "slug": "banknote-mulch",
+      "slug": "ai-research-assistant",
       "category": "ai-tools",
       "order": 1,
+      "title": "AI research assistant for a cross-newsroom investigation",
+      "summary": "I built an AI agent that helped 50 non-technical journalists at Axel Springer Poland navigate a 17-sheet workbook on people in state-owned companies. Every search it runs is traceable, and it works where the reporters already are: in ChatGPT.",
+      "tags": ["Agents SDK"],
+      "url": null,
+      "behind": null,
+      "coverImage": "assets/covers/ai-research-assistant.jpg",
+      "coverAlt": "OpenAI Agents SDK logo",
+      "body": "data/posts/ai-research-assistant.html",
+      "published": true
+    },
+    {
+      "slug": "osint-copilot",
+      "category": "ai-tools",
+      "order": 2,
+      "title": "OSINT copilot for tracing deported Ukrainian children",
+      "summary": "I built a toolkit in which AI agents do the repetitive OSINT work of tracing Ukrainian children taken to Russia, while every lead stays traceable and graded. Its rule: automate the trail, and leave the decision to the researcher.",
+      "tags": ["Agent skills"],
+      "url": null,
+      "behind": null,
+      "coverImage": "assets/covers/osint-copilot.jpg",
+      "coverAlt": "A confidence scale: unverified, possible, likely, confirmed",
+      "body": "data/posts/osint-copilot.html",
+      "published": true
+    },
+    {
+      "slug": "banknote-mulch",
+      "category": "ai-tools",
+      "order": 3,
       "title": "Banknote mulch",
       "summary": "During eight years of PiS rule, Polish forest districts funneled tens of millions in public funds to churches, nationalist organizations, and entities connected to the foresters themselves. We tracked the money using public spending data and a custom text classifier to categorize thousands of transfers.",
       "tags": ["Public spending data", "Text classifier"],

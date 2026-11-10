@@ -1,0 +1,33 @@
+<p>I worked on this project for Axel Springer Poland as part of the Data&amp;AI team.</p>
+<p>The goal was to help 50 non-technical journalists navigate a large Excel workbook for an investigation into people in state-owned companies, their appointments, political activity, donations and business relationships.</p>
+<p>Traditionally, for this kind of project newsrooms would run a series of workshops and put a data manager in charge of answering a ton of questions, helping reporters find promising leads and keeping track of the evidence.</p>
+<p>We decided to see whether an AI agent could help connect the right dots.</p>
+<p>This was a cross-newsroom collaboration, but all the journalists had access to ChatGPT Enterprise. It made sense to build on that interface rather than create a separate application.</p>
+<p>The journalists needed answers to two types of questions:</p>
+<ul>
+<li><strong>Retrieval questions:</strong> What does the workbook contain? For example, which companies has a person held positions in, and which political parties have they donated to?</li>
+<li><strong>Web research questions:</strong> What do public sources add? For example, has a politician publicly discussed their affiliation with a particular party?</li>
+</ul>
+<p>In both cases, hallucinations were a major concern. The primary dataset was a workbook containing 17 sheets of collected records, linked through person IDs and company registration numbers. But simply uploading it to ChatGPT wouldn’t give us the detailed audit trail we needed to evaluate its searches and conclusions.</p>
+<p>My priority was to make the research process traceable and introduce checks around how the agent used evidence.</p>
+<p>I built Python tools to search the workbook and retrieve related records, preserving sheet names and row numbers. For external research, I connected Brave Search and added a separate tool for downloading and reading web pages and PDFs.</p>
+<p>I used the OpenAI Agents SDK to make those steps visible. Its tracing records model calls, tool arguments, returned data and errors in the OpenAI Platform’s Traces dashboard.</p>
+<figure>
+<img src="assets/posts/ai-research-assistant/trace.jpg" alt="A trace in the OpenAI Platform: the agent’s turns, model calls and tool calls such as inspect_workbook, search_workbook and get_person_records, with their timings, and the output of inspect_workbook listing the workbook’s sheets and columns" loading="lazy">
+<figcaption>One trace: every turn, model call and tool call, with the tool’s output</figcaption>
+</figure>
+<p>That helped me:</p>
+<ul>
+<li>Turn specific failures into fixes: clearer guidance about the workbook’s structure, recoverable search errors, and a check that requires the agent to attempt to read relevant search results before returning an answer based on them. A failed download remains unverified.</li>
+<li>Trace what journalists were searching for and how that translated into search queries.</li>
+</ul>
+<figure>
+<img src="assets/posts/ai-research-assistant/logs.jpg" alt="Responses logs in the OpenAI Platform: inputs passed to the agent and the tool calls it made in response, such as search_workbook, get_person_records and read_public_source" loading="lazy">
+<figcaption>The logs show what went into each step and which tool the agent called next</figcaption>
+</figure>
+<p>To make the workflow accessible, I packaged the Python code, research instructions and workbook as a skill, then installed it as a ChatGPT plugin.</p>
+<p>With the execution environment and API credentials configured, reporters can select the plugin in ChatGPT Work and ask questions in natural language. The skill’s instructions define how to cite sources, assess identity matches, handle uncertainty and distinguish recorded facts from interpretation.</p>
+<figure>
+<img src="assets/posts/ai-research-assistant/chatgpt-plugin.jpg" alt="The ChatGPT message box with the plugin selected and the question: did Kaczyński donate to PiS party in 2024?" loading="lazy">
+<figcaption>A reporter’s question to the plugin in ChatGPT</figcaption>
+</figure>

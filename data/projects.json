@@ -315,7 +315,7 @@
     {
       "slug": "ai-research-assistant",
       "category": "ai-tools",
-      "order": 1,
+      "order": 2,
       "title": "AI research assistant for a cross-newsroom investigation",
       "summary": "I built an AI agent that helped 50 non-technical journalists at Axel Springer Poland navigate a 17-sheet workbook on people in state-owned companies. Every search it runs is traceable, and it works in ChatGPT interface.",
       "tags": ["Agents SDK"],
@@ -329,7 +329,7 @@
     {
       "slug": "osint-copilot",
       "category": "ai-tools",
-      "order": 2,
+      "order": 3,
       "title": "OSINT copilot for tracing deported Ukrainian children",
       "summary": "I built a toolkit in which AI agents do the repetitive OSINT work of tracing Ukrainian children taken to Russia, while every lead stays traceable and graded.",
       "tags": ["Agent skills"],
@@ -343,7 +343,7 @@
     {
       "slug": "testimony-triage",
       "category": "ai-tools",
-      "order": 3,
+      "order": 1,
       "title": "AI triage of witness testimonies",
       "summary": "I built a tool that reads transcripts of witness interviews and flags passages that may point to war crimes or crimes against humanity, each with the exact quote. A researcher then keeps or dismisses every suggestion.",
       "tags": ["AI classification", "NLP", "Google Cloud Run"],

@@ -341,9 +341,23 @@
       "published": true
     },
     {
-      "slug": "banknote-mulch",
+      "slug": "testimony-triage",
       "category": "ai-tools",
       "order": 3,
+      "title": "AI triage of witness testimonies",
+      "summary": "I built a tool that reads transcripts of witness interviews and flags passages that may point to war crimes or crimes against humanity, each with the exact quote. A researcher then keeps or dismisses every suggestion.",
+      "tags": ["AI classification", "NLP", "Google Cloud Run"],
+      "url": null,
+      "behind": null,
+      "coverImage": "assets/covers/testimony-triage.jpg",
+      "coverAlt": "Suggestion cards in the tool, such as militarisation of school, with Keep and Dismiss buttons",
+      "body": "data/posts/testimony-triage.html",
+      "published": true
+    },
+    {
+      "slug": "banknote-mulch",
+      "category": "ai-tools",
+      "order": 4,
       "title": "Banknote mulch",
       "summary": "During eight years of PiS rule, Polish forest districts funneled tens of millions in public funds to churches, nationalist organizations, and entities connected to the foresters themselves. We tracked the money using public spending data and a custom text classifier to categorize thousands of transfers.",
       "tags": ["Public spending data", "Text classifier"],

@@ -1,0 +1,15 @@
+<p>Witness interviews are long: one transcript can run to hundreds of turns. I built a tool that reads them and flags the passages that may point to war crimes or crimes against humanity, such as the militarisation of schools or teaching only in Russian. Each suggestion comes with the exact quote, and a researcher keeps it, dismisses it or adds a note. The reviewed findings can be exported as a CSV.</p>
+<figure>
+<img src="assets/posts/testimony-triage/platform.jpg" alt="The tool: a library of uploaded transcripts on the left, suggestions such as militarisation of school and Russian anthem or flag ritual with Keep, Dismiss and Add note buttons in the middle, and the original transcript with highlighted passages and speaker labels on the right" loading="lazy">
+<figcaption>Suggestions in the middle, the original transcript on the right. File names and places are blurred.</figcaption>
+</figure>
+<p><strong>Low-level design</strong></p>
+<ul>
+<li><strong>Anonymisation:</strong> first, real names are swapped for tags like PERSON_1.</li>
+<li><strong>Speaker labelling:</strong> a batch of timestamped sections, plus the last two turns already labelled (for context), is sent to the model. The returned turns are aligned back to the original text with word alignment.</li>
+<li><strong>Classification:</strong> the labelled turns are cut into chunks of about 200 words, each ending before an interviewer turn, and each chunk is classified. Every call gets a taxonomy injected, in which each possible crime is described and proofread by a lawyer. The model returns findings structured by a JSON schema, which makes the prompt shorter and the answer structured. Each finding includes the issue, the exact quote, and what the witness actually says about it: supported, uncertain, hearsay or denied.</li>
+</ul>
+<figure>
+<img src="assets/posts/testimony-triage/csv.jpg" alt="A CSV export of suggestions with columns for ID, issue, status (supported or potential lead), perpetrator, setting, confidence, quote and the most relevant crime, such as crime against humanity: persecution" loading="lazy">
+<figcaption>The CSV export: one row per finding, with its status, confidence, quote and the crime it may point to</figcaption>
+</figure>

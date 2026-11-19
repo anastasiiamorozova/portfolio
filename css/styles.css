@@ -435,24 +435,6 @@ button { font: inherit; color: inherit; }
   color: #e4e6ee;
 }
 
-.post .code__bar {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 10px 14px;
-  background: #2a2d38;
-}
-
-.post .code__bar i { width: 11px; height: 11px; border-radius: 50%; background: #ff5f57; }
-.post .code__bar i:nth-child(2) { background: #febc2e; }
-.post .code__bar i:nth-child(3) { background: #28c840; }
-
-.post .code__bar span {
-  margin-left: 8px;
-  font: 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  color: #9aa0b4;
-}
-
 .post .code pre {
   margin: 0;
   padding: 16px 18px;

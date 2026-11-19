@@ -1,32 +1,117 @@
-<p>As a part of the investigative team, I built an internal AI-powered research tool to analyze a volume of documents and detect possible crimes against humanity in testimonies of illegally displaced children.</p>
+<p>As part of the investigative team, I built an internal AI-powered research tool to analyze large volumes of documents and detect potential evidence of crimes against humanity in testimonies of illegally displaced children.</p>
 <figure>
 <img src="assets/posts/testimony-triage/platform.jpg" alt="The tool: a library of uploaded transcripts on the left, suggestions such as militarisation of school and Russian anthem or flag ritual with Keep, Dismiss and Add note buttons in the middle, and the original transcript with highlighted passages and speaker labels on the right" loading="lazy">
 </figure>
-<p><strong>Challenges with the initial data</strong></p>
-<p>The transcripts came in with no speaker labels.</p>
-<p>People switch between Ukrainian and Russian, use slang, and the timestamps come every two or three sentences.</p>
-<p>No audio, so I couldn’t diarize to find out who was speaking.</p>
-<p><strong>The idea</strong></p>
-<p>For the investigation we needed to find the episodes where something relevant to crimes against children was said and determine which violation each one might be.</p>
-<p><strong>The challenges with analysis</strong></p>
-<p>The judgment depends mostly on the witness's answer, and a short answer like "Yes" only means something next to the question that came before it. So before I can classify anything, I have to work out who is speaking and which sentences are related to each other.</p>
-<p>The transcripts contain names and birthdates of minors, so I can't send whole documents to a model. At the same time we have to be able to check every suggestion against the original text.</p>
+<h2>Challenges with the initial data</h2>
+<ol>
+<li>The transcripts came with no speaker labels.</li>
+<li>People switch between Ukrainian and Russian, use slang, and timestamps are provided only every two or three sentences.</li>
+<li>There was no audio, so I couldn't diarize the recordings to find out who was speaking.</li>
+</ol>
+<h2>The idea</h2>
+<p>For the investigation, we needed to find the episodes where something relevant to crimes against children was said and determine which violation each one might represent.</p>
 <p>A raw transcript looks like this:</p>
-<blockquote>[00:12] Did they make you go to school there? Yes. What did you study? Russian history. Did you have Conversations About Important Things? Yes.</blockquote>
-<p><strong>Low-level design</strong></p>
-<p><strong>Anonymisation:</strong> first, real names are swapped for tags like PERSON_1</p>
-<p><strong>Speakers labeling:</strong> a batch of timestamped sections plus the last two turns already labelled (to provide context) are sent to the model. The returned turns are aligned back to the original with word alignment.</p>
-<p><strong>Classification:</strong> the labelled turns are cut into chunks of about 200 words, ending before an interviewer turn, and each window is classified. Each call gets a taxonomy injected, where each crime is described and proof-read by a lawyer. The model returns JSON-schema structured findings which makes the prompt shorter and the answer structured. It returns the issue, the exact quote, and what the witness actually says (supported, uncertain, hearsay or denied).</p>
+<div class="code"><div class="code__bar" aria-hidden="true"><i></i><i></i><i></i><span>transcript</span></div><pre><code><span class="t-mark">[00:12]</span> Did they make you go to school there? Yes. What did you study? Russian history. Did you have Conversations About Important Things? Yes.</code></pre></div>
+<h2>The challenges with analysis</h2>
+<ol>
+<li>Most of the transcript consists of the interviewer asking questions and the child providing very short answers like Yes or No. Before I can classify anything, I have to work out who is speaking and which sentences are related to each other.</li>
+<li>At first, I tried a local model because privacy was a primary concern. However, it wasn't able to break the transcript into correct logical chunks, detect the languages effectively, or understand the context of words used as slang. That's why I decided to use an AI model.</li>
+<li>Using a cloud-based model introduced another concern: the transcripts contain names and birthdates of minors, so I can't send entire documents to a model. At the same time, we need to be able to check every suggestion against the original text.</li>
+</ol>
+<h2>Low-level design</h2>
+<h3>1. Anonymisation</h3>
+<p>First, real names are swapped for tags like PERSON_1. This happens locally, based on the child's name, which is included in the filename of the testimony. It also catches patterns like name+patronimic etc.</p>
+<h3>2. Speaker labeling</h3>
+<p>A batch of timestamped sections, plus the last two turns that have already been labelled (to provide context), is sent to the model. It identifies the speakers and then the labels get aligned with the exact words in the original transcript.</p>
+<p>Each request contains a constant part of the prompt, which gives the model context and an example of the expected role of each speaker. The changing part is a chunk of the transcript.</p>
+<p><strong>Example</strong></p>
+<p>Fixed part:</p>
+<div class="code"><div class="code__bar" aria-hidden="true"><i></i><i></i><i></i><span>prompt</span></div><pre><code>You label speakers in an undiarized transcript of an interview with a witness. Copy every block verbatim into turns, in order. Do not correct, translate, or reorder anything.
+
+<span class="t-mark">Interviewer</span> - always speaks Ukrainian, asks questions, confirms (&quot;yes&quot;, &quot;correct?&quot;), reads procedures, and summarises.
+
+<span class="t-mark">Witness</span> - always speaks in the first person about their own life; often gives short answers.
+
+<span class="t-mark">Guardian</span> - a parent answering for or prompting the child.</code></pre></div>
+<p>Chunk:</p>
+<div class="code"><div class="code__bar" aria-hidden="true"><i></i><i></i><i></i><span>chunk</span></div><pre><code><span class="t-mark">--- block b7 [18:11] ---</span>
+
+eleventh grade? Yes. ... And did you undergo a medical examination? You were registered for military service, correct? Yes.</code></pre></div>
+<p>Response:</p>
+<div class="code"><div class="code__bar" aria-hidden="true"><i></i><i></i><i></i><span>json</span></div><pre><code><span class="t-punc">{</span>
+  <span class="t-key">&quot;blocks&quot;</span><span class="t-punc">:</span> <span class="t-punc">[</span>
+    <span class="t-punc">{</span>
+      <span class="t-key">&quot;id&quot;</span><span class="t-punc">:</span> <span class="t-str">&quot;b7&quot;</span><span class="t-punc">,</span>
+      <span class="t-key">&quot;turns&quot;</span><span class="t-punc">:</span> <span class="t-punc">[</span>
+        <span class="t-punc">{</span>
+          <span class="t-key">&quot;speaker&quot;</span><span class="t-punc">:</span> <span class="t-str">&quot;interviewer&quot;</span><span class="t-punc">,</span>
+          <span class="t-key">&quot;text&quot;</span><span class="t-punc">:</span> <span class="t-str">&quot;...military service, correct?&quot;</span><span class="t-punc">,</span>
+          <span class="t-key">&quot;confidence&quot;</span><span class="t-punc">:</span> <span class="t-num">0.95</span>
+        <span class="t-punc">}</span><span class="t-punc">,</span>
+        <span class="t-punc">{</span>
+          <span class="t-key">&quot;speaker&quot;</span><span class="t-punc">:</span> <span class="t-str">&quot;witness&quot;</span><span class="t-punc">,</span>
+          <span class="t-key">&quot;text&quot;</span><span class="t-punc">:</span> <span class="t-str">&quot;Yes.&quot;</span><span class="t-punc">,</span>
+          <span class="t-key">&quot;confidence&quot;</span><span class="t-punc">:</span> <span class="t-num">0.9</span>
+        <span class="t-punc">}</span>
+      <span class="t-punc">]</span>
+    <span class="t-punc">}</span>
+  <span class="t-punc">]</span>
+<span class="t-punc">}</span></code></pre></div>
+<h3>3. Legal taxonomy</h3>
+<p>A probabilistic response from the model is not enough to identify crimes against humanity or war crimes because these classifications are defined by law. Oftentimes, what is called a war crime on the internet doesn't reflect what constitutes a war crime under the legal definition.</p>
+<p>Therefore, we couldn't simply ask a model whether a passage described a war crime. Instead, we asked a lawyer to create a list of acts that fit the definitions of war crimes and crimes against humanity.</p>
+<p>One example from this taxonomy would be:</p>
+<div class="code"><div class="code__bar" aria-hidden="true"><i></i><i></i><i></i><span>yaml</span></div><pre><code><span class="t-key">STAFF_OR_SECURITY_PHYSICAL_ABUSE</span><span class="t-punc">:</span>
+
+  <span class="t-key">description</span><span class="t-punc">:</span> <span class="t-str">&quot;Beating or physical violence by camp staff, security, police, military, or officials, including for pro-Ukrainian expression.&quot;</span>
+
+  <span class="t-key">legal_sources</span><span class="t-punc">:</span>
+    <span class="t-punc">-</span> <span class="t-str">&quot;Annex: Crimes against humanity pp. 18-38&quot;</span>
+    <span class="t-punc">-</span> <span class="t-str">&quot;Annex B: Right to freedom from torture&quot;</span>
+
+  <span class="t-key">cah_relevance</span><span class="t-punc">:</span> <span class="t-str">&quot;Potential factual indicator for persecution, torture, or other inhumane acts depending on severity and context.&quot;</span>
+
+  <span class="t-key">positive_examples</span><span class="t-punc">:</span>
+    <span class="t-punc">-</span> <span class="t-str">&quot;They hit me with their feet; I had bruises.&quot;</span>
+    <span class="t-punc">-</span> <span class="t-str">&quot;The guards beat me for saying &#x27;Glory to Ukraine.&#x27;&quot;</span>
+
+  <span class="t-key">negative_examples</span><span class="t-punc">:</span>
+    <span class="t-punc">-</span> <span class="t-str">&quot;Well, they threatened me, but they didn&#x27;t hit me.&quot;</span>
+    <span class="t-punc">-</span> <span class="t-str">&quot;Didn&#x27;t they hit you there? No.&quot;</span></code></pre></div>
+<p>If a chunk turned out to be irrelevant, for example, when a child denied something suggested by the interviewer, the passage didn't go to the next classification step.</p>
+<h3>4. Classification</h3>
+<p>The labelled turns from step 2 are split into chunks of about 200 words. Each chunk ends before the interviewer asks the next question to preserve the question-and-answer logic. The taxonomy is included in each request.</p>
+<p>The fixed part of the prompt:</p>
+<div class="code"><div class="code__bar" aria-hidden="true"><i></i><i></i><i></i><span>prompt</span></div><pre><code>You assist in documenting possible international crimes. Only witness (or guardian) statements are evidence. A topic raised only in a question is not a finding. Short confirmations like &quot;Yes&quot; in response to a specific question count as findings; quote the short answer.
+
+<span class="t-mark">ISSUE LABELS:</span> 31 topics with definitions and examples as above.</code></pre></div>
+<p>Example output:</p>
+<div class="code"><div class="code__bar" aria-hidden="true"><i></i><i></i><i></i><span>json</span></div><pre><code><span class="t-punc">{</span>
+  <span class="t-key">&quot;findings&quot;</span><span class="t-punc">:</span> <span class="t-punc">[</span>
+    <span class="t-punc">{</span>
+      <span class="t-key">&quot;issue&quot;</span><span class="t-punc">:</span> <span class="t-str">&quot;MILITARY_REGISTRATION_OR_DRAFT_PRESSURE&quot;</span><span class="t-punc">,</span>
+      <span class="t-key">&quot;turn&quot;</span><span class="t-punc">:</span> <span class="t-str">&quot;t88&quot;</span><span class="t-punc">,</span>
+      <span class="t-key">&quot;quote&quot;</span><span class="t-punc">:</span> <span class="t-str">&quot;Yes.&quot;</span><span class="t-punc">,</span>
+      <span class="t-key">&quot;confidence&quot;</span><span class="t-punc">:</span> <span class="t-num">0.9</span><span class="t-punc">,</span>
+      <span class="t-key">&quot;note&quot;</span><span class="t-punc">:</span> <span class="t-str">&quot;Confirms boys were put on the military register.&quot;</span>
+    <span class="t-punc">}</span>
+  <span class="t-punc">]</span>
+<span class="t-punc">}</span></code></pre></div>
+<h3>5. Mapping to legal categories</h3>
+<p>After the model picks the closest description of each relevant passage containing some kind of mistreatment, a simple hard-coded dictionary is used to map each passage to a crime against humanity or war crime category.</p>
 <figure>
 <img src="assets/posts/testimony-triage/csv.jpg" alt="A CSV export of suggestions with columns for ID, issue, status (supported or potential lead), perpetrator, setting, confidence, quote and the most relevant crime, such as crime against humanity: persecution" loading="lazy">
 </figure>
-<p><strong>How I tested it</strong></p>
-<p>The first test measured the relevance of the passage against a human verified example.</p>
-<p>The second one checked the correctness of the category assigned to the passage.</p>
-<p><strong>High-level architecture</strong></p>
-<p>The flow is: upload, ingest (txt, docx or pdf), redact names, label speakers, cut windows, classify, add rule-based leads, remove duplicates, anchor to the original, map to crimes, save.</p>
-<p>I built it as an app to enable the team to upload files and keep each person's review decisions saved. Clicking a suggestion highlights the passage in the original. Each suggestion can be kept, dismissed or given a note, and the list can be exported to CSV.</p>
-<p>The app is one container with a private storage bucket mounted as a folder. Access is one shared passcode plus a display name. The OpenAI key lives in Secret Manager, so no user ever handles it, and the container image contains no transcripts. It runs a single instance, because the store is file-based. After a restart the job resumes without paying for the same chunks twice.</p>
-<p><strong>What didn't work</strong></p>
-<p>The first version was the YAML taxonomy with keyword dictionaries, regex Q/A markers and sentence-level labels. It separated the interviewer from everyone else reasonably well, but the rest was weak, and a labelled witness and guardian only helped if the roles were right.</p>
-<p>I also tried similarity-based chunking and labeling but it worked worse.</p>
+<h2>How I tested the accuracy</h2>
+<ol>
+<li>The first test measured whether the model could correctly identify the relevance of a passage against a human-verified example (0.98).</li>
+<li>The second test checked whether the categories assigned to the passages were correct (0.91).</li>
+</ol>
+<h2>High-level architecture</h2>
+<p>I built it as an app that allows the team to upload files and save each person's review decisions. Clicking on a suggestion highlights the corresponding passage in the original. Each suggestion can be kept, dismissed, or annotated, and the list can be exported to CSV.</p>
+<p>The app runs in a single container, with a private storage bucket mounted as a folder. Access is managed through one shared passcode and a display name. The OpenAI key is stored in Secret Manager, so no user ever handles it, and the container image contains no transcripts. It runs as a single instance because the storage is file-based.</p>
+<h2>What didn't work</h2>
+<p>My first attempt was to split the speakers based on regex patterns and classify only the parts that weren't questions. However, because most of the answers were Yes/No, they needed context.</p>
+<p>Then, instead of breaking the text into speakers, I tried splitting it into topics. The topics would be defined by how semantically similar neighbouring sentences were. I also tried creating a list of words that would indicate crimes, but the hard-coded approach was very inflexible.</p>
+<p>For example, the sentences "They were teaching us how to use guns" and "We heard guns" would fall into the same category of "military education" based on the word "gun".</p>
+<p>Glory to AI.</p>
